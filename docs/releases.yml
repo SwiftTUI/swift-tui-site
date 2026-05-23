@@ -1,0 +1,15 @@
+current:
+  swiftTUI: 0.1.0
+  web: 0.1.0
+  examplesRef: main
+repos:
+  swift-tui:
+    url: https://github.com/SwiftTUI/swift-tui
+    doccMount: docs
+  swift-tui-web:
+    url: https://github.com/SwiftTUI/swift-tui-web
+    npmPackages:
+      - "@swifttui/web"
+      - "@swifttui/build"
+  swift-tui-examples:
+    url: https://github.com/SwiftTUI/swift-tui-examples

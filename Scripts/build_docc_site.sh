@@ -2,22 +2,41 @@
 set -euo pipefail
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
+manifest_path="${site_root}/docs/docc-repos.yml"
 work_root="${site_root}/.build-docs-work"
-output_root="${site_root}/Website/dist/docs"
-swift_tui_checkout="${SWIFTTUI_CHECKOUT:-${site_root}/../swift-tui}"
+website_dist="${site_root}/Website/dist"
+
+repo_name="$(awk '/^[[:space:]]*- name:/ { print $3; exit }' "$manifest_path")"
+repository="$(awk '/^[[:space:]]*repository:/ { print $2; exit }' "$manifest_path")"
+ref="$(awk '/^[[:space:]]*ref:/ { print $2; exit }' "$manifest_path")"
+docc_command="$(awk -F': ' '/^[[:space:]]*doccCommand:/ { print $2; exit }' "$manifest_path")"
+output_path="$(awk '/^[[:space:]]*outputPath:/ { print $2; exit }' "$manifest_path")"
+mount_path="$(awk '/^[[:space:]]*mountPath:/ { print $2; exit }' "$manifest_path")"
+
+if [ -z "$repo_name" ] || [ -z "$repository" ] || [ -z "$ref" ] || [ -z "$docc_command" ] || [ -z "$output_path" ] || [ -z "$mount_path" ]; then
+  printf '[build_docc_site] invalid manifest: %s\n' "$manifest_path" >&2
+  exit 1
+fi
+
+source_checkout="${SWIFTTUI_CHECKOUT:-${site_root}/../${repo_name}}"
+clone_dir="${work_root}/${repo_name}"
+output_root="${website_dist}/${mount_path}"
 
 rm -rf "$work_root" "$output_root"
 mkdir -p "$work_root" "$output_root"
 
-if [ -d "$swift_tui_checkout/.git" ]; then
-  git clone "$swift_tui_checkout" "$work_root/swift-tui"
+if [ -d "$source_checkout/.git" ]; then
+  git clone "$source_checkout" "$clone_dir"
 else
-  git clone https://github.com/SwiftTUI/swift-tui "$work_root/swift-tui"
+  git clone "https://github.com/${repository}" "$clone_dir"
 fi
+
 (
-  cd "$work_root/swift-tui"
-  Scripts/build_docc_archive.sh --hosting-base-path docs --output-path .build-docs
+  cd "$clone_dir"
+  git fetch --tags origin "$ref" >/dev/null 2>&1 || true
+  git checkout --quiet "$ref"
+  sh -c "$docc_command"
 )
 
-cp -R "$work_root/swift-tui/.build-docs"/. "$output_root"/
-printf '[build_docc_site] copied swift-tui DocC archive to %s\n' "$output_root"
+cp -R "${clone_dir}/${output_path}"/. "$output_root"/
+printf '[build_docc_site] copied %s DocC archive at %s to %s\n' "$repo_name" "$ref" "$output_root"
