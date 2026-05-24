@@ -17,7 +17,7 @@ const site = process.env.ASTRO_SITE ?? "http://localhost:4321";
 const base = process.env.ASTRO_BASE ?? "/";
 const webExampleRoute = "/webexample";
 const websiteRoot = fileURLToPath(new URL(".", import.meta.url));
-const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/Examples/WebExample";
+const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/WebExample";
 const webExampleRoot = resolve(
   websiteRoot,
   webExampleDir,

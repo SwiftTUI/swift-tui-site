@@ -4,7 +4,7 @@ import { brotliDecompress } from "node:zlib";
 import { promisify } from "node:util";
 
 const decompressBrotli = promisify(brotliDecompress);
-const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/Examples/WebExample";
+const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/WebExample";
 const wasmPath = resolve(
   process.cwd(),
   webExampleDir,

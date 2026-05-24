@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const iframeSrc = `${base}/webexample/?embed=marketing`;
 const isDev = import.meta.env.DEV;
-const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/Examples/WebExample";
+const webExampleDir = process.env.WEBEXAMPLE_DIR ?? "../../swift-tui-examples/WebExample";
 const localWebExampleIndexPath = resolve(process.cwd(), webExampleDir, "pages-dist/index.html");
 const localWebExampleWasmPath = resolve(
   process.cwd(),
@@ -50,7 +50,7 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
         <div class="dev-stub mono" aria-hidden="true">
           <div class="ds-frame">
             <div class="ds-row"><span class="ds-prompt">›</span><span>swift build --swift-sdk swift-6.3.1-RELEASE_wasm</span></div>
-            <div class="ds-row dim"><span>     </span><span>building swift-tui-examples/Examples/WebExample/TerminalApp ...</span></div>
+            <div class="ds-row dim"><span>     </span><span>building swift-tui-examples/WebExample/TerminalApp ...</span></div>
             <div class="ds-row dim"><span>     </span><span>brotli q=9 → app.wasm (4.2&thinsp;MiB → 1.3&thinsp;MiB)</span></div>
             <div class="ds-row"><span class="ds-prompt">›</span><span>bun run build:wasm:dev</span></div>
             <div class="ds-row dim"><span>     </span><span>artifact ready at <em>/webexample/</em>, awaiting Pages composition</span></div>

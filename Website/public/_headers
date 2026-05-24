@@ -3,7 +3,7 @@
 # Layout (set in .github/workflows/cloudflare-pages.yml):
 #   /              <- Astro stub (this Website/ project)
 #   /docs/         <- DocC archive
-#   /webexample/   <- swift-tui-examples/Examples/WebExample WASI demo
+#   /webexample/   <- swift-tui-examples/WebExample WASI demo
 
 # Cross-origin isolation for the whole origin so the WebExample iframe
 # can use SharedArrayBuffer-backed stdin without a service-worker shim.
