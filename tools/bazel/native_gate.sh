@@ -14,6 +14,7 @@ if [[ -z "$repo_root" ]]; then
 fi
 
 cd "$repo_root"
+bun install --cwd Website --frozen-lockfile
 bun run --cwd Website check
 bun run --cwd Website build
 exec Scripts/build_docc_site.sh
