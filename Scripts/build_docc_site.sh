@@ -25,7 +25,7 @@ output_root="${website_dist}/${mount_path}"
 rm -rf "$work_root" "$output_root"
 mkdir -p "$work_root" "$output_root"
 
-if [ -d "$source_checkout/.git" ]; then
+if git -C "$source_checkout" rev-parse --git-dir >/dev/null 2>&1; then
   git clone "$source_checkout" "$clone_dir"
 else
   git clone "https://github.com/${repository}" "$clone_dir"
