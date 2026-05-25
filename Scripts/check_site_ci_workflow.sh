@@ -42,10 +42,12 @@ require_text "WEBEXAMPLE_DIR" "$deploy_workflow"
 require_text "brotli --test" "$deploy_workflow"
 require_text "WebAssembly.compile" "$deploy_workflow"
 require_text "CLOUDFLARE_PAGES_FILE_LIMIT" "$deploy_workflow"
+require_text 'secrets.SWIFTTUI_CI_TOKEN || github.token' "$deploy_workflow"
 
 require_text "Scripts/check_site.sh" "$test_workflow"
 require_text "repository: SwiftTUI/swift-tui" "$test_workflow"
 require_text "repository: SwiftTUI/swift-tui-examples" "$test_workflow"
 require_text "repository: SwiftTUI/swift-tui-web" "$test_workflow"
+require_text 'secrets.SWIFTTUI_CI_TOKEN || github.token' "$test_workflow"
 
 printf '[check_site_ci_workflow] ok\n'
