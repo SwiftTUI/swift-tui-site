@@ -7,7 +7,7 @@ name: Deploy Website to Cloudflare Pages
 # Layout of the uploaded artifact:
 #   /              <- Astro site (swift-tui-site/Website/dist/)
 #   /docs/         <- DocC archive
-#   /webexample/   <- swift-tui-examples/Examples/WebExample/pages-dist/
+#   /webexample/   <- swift-tui-examples/WebExample/pages-dist/
 
 on:
   workflow_dispatch:
@@ -40,6 +40,7 @@ jobs:
         with:
           repository: SwiftTUI/swift-tui
           path: swift-tui
+          fetch-depth: 0
 
       - name: Checkout examples
         uses: actions/checkout@v6
@@ -94,7 +95,7 @@ jobs:
           path: |
             ~/.cache/org.swift.swiftpm
             ~/.swiftpm
-          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-examples/Examples/WebExample/TerminalApp/Package.resolved') }}
+          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-examples/WebExample/TerminalApp/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-swiftpm-cfpages-
             ${{ runner.os }}-swiftpm-website-
@@ -106,7 +107,7 @@ jobs:
             ~/.bun/install/cache
             swift-tui-site/Website/node_modules
             swift-tui-examples/node_modules
-            swift-tui-examples/Examples/WebExample/node_modules
+            swift-tui-examples/WebExample/node_modules
             swift-tui-web/node_modules
             swift-tui-web/packages/web/node_modules
             swift-tui-web/packages/build/node_modules
@@ -144,12 +145,12 @@ jobs:
         shell: bash
         working-directory: swift-tui-site/Website
         env:
-          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/Examples/WebExample
+          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/WebExample
         run: bun run build:wasm
 
       - name: Validate uploaded WebExample wasm parses in the browser API
         shell: bash
-        working-directory: swift-tui-examples/Examples/WebExample
+        working-directory: swift-tui-examples/WebExample
         run: |
           set -euo pipefail
           wasm_path="./pages-dist/TerminalApp/dist/assets/app.wasm"
@@ -162,7 +163,7 @@ jobs:
         env:
           ASTRO_SITE: ${{ steps.site.outputs.url }}
           ASTRO_BASE: /
-          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/Examples/WebExample
+          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/WebExample
         run: bun run build
 
       - name: Build DocC archive
@@ -183,7 +184,7 @@ jobs:
           cp -R swift-tui-site/Website/dist/. "$ARTIFACT_ROOT/"
           cp -R swift-tui-site/Website/dist/docs/. "$DOCS_ROOT/"
           rm -rf "$DOCS_ROOT/documentation"
-          cp -R swift-tui-examples/Examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
+          cp -R swift-tui-examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
           wasm_path="$WEBEXAMPLE_ROOT/TerminalApp/dist/assets/app.wasm"
           if [ ! -f "$wasm_path" ]; then
             echo "::error::Missing WebExample wasm at $wasm_path"
