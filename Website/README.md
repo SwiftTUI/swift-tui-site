@@ -33,8 +33,12 @@ bun run build:full     # release WebExample + DocC + Astro dist/
 bun run build:dev      # debug WebExample + DocC + Astro dist/
 ```
 
-By default, wasm scripts expect `swift-tui-site`, `swift-tui-examples`, and
-`swift-tui-web` to be sibling checkouts. Set `WEBEXAMPLE_DIR` to point at a
-different WebExample checkout. The full website builds generate DocC from the
-repositories listed in `../docs/docc-repos.yml` and copy the archive into
-`Website/dist/docs/`.
+Pre-public status: wasm scripts currently expect source inputs for WebExample
+and the SwiftTUI web packages while the public releases are being prepared. Set
+`WEBEXAMPLE_DIR` to point at a specific WebExample checkout. The full website
+builds generate DocC from the repositories listed in `../docs/docc-repos.yml`
+and copy the archive into `Website/dist/docs/`.
+
+The public-release cutover should make the default path fetch tagged public
+inputs from `../docs/releases.yml` so a fresh site clone can build without
+sibling checkouts.

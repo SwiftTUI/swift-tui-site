@@ -12,9 +12,10 @@ documentation.
 | `docs/` | DocC composition config: `docc-repos.yml`, `releases.yml` |
 | `Scripts/` | Gates + build: `build_docc_site.sh`, `check_site.sh` |
 
-The Astro build embeds the live browser demo by building and compressing the
-[`WebExample`](../swift-tui-examples/WebExample) wasm (`build:wasm` pulls from
-the sibling examples repo).
+The Astro build embeds the live browser demo by building and compressing
+WebExample wasm. Pre-public builds currently use source checkout inputs; the
+public cutover should default to tagged examples/web artifacts, with
+`WEBEXAMPLE_DIR` kept as an explicit local override.
 
 ## Toolchains
 
