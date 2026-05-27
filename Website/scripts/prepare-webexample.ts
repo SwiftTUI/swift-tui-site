@@ -13,11 +13,14 @@ const examplesRef = process.env.SWIFTTUI_EXAMPLES_REF ?? await readExamplesRef()
 
 if (webExampleOverride) {
   const webExampleDir = resolve(process.cwd(), webExampleOverride);
-  await installExamplesDependencies(resolve(webExampleDir, ".."));
+  const examplesRoot = resolve(webExampleDir, "..");
+  await installExamplesDependencies(examplesRoot, {
+    frozenLockfile: !usesCoordinationOverlay(examplesRoot),
+  });
   console.log(`[prepare-webexample] using WEBEXAMPLE_DIR=${webExampleDir}`);
 } else {
   await ensurePublicExamplesCheckout(defaultExamplesRoot, examplesRef);
-  await installExamplesDependencies(defaultExamplesRoot);
+  await installExamplesDependencies(defaultExamplesRoot, { frozenLockfile: true });
   console.log(`[prepare-webexample] prepared swift-tui-examples ${examplesRef}`);
 }
 
@@ -65,8 +68,24 @@ async function isGitCheckout(path: string): Promise<boolean> {
   return result.exitCode === 0;
 }
 
-async function installExamplesDependencies(examplesRoot: string): Promise<void> {
-  run(["bun", "install", "--frozen-lockfile"], { cwd: examplesRoot });
+function usesCoordinationOverlay(examplesRoot: string): boolean {
+  const overlayExamplesCheckout = process.env.SWIFTTUI_EXAMPLES_CHECKOUT;
+  if (!overlayExamplesCheckout) {
+    return false;
+  }
+
+  return examplesRoot === resolve(process.cwd(), overlayExamplesCheckout);
+}
+
+async function installExamplesDependencies(
+  examplesRoot: string,
+  options: { frozenLockfile: boolean }
+): Promise<void> {
+  const command = ["bun", "install"];
+  if (options.frozenLockfile) {
+    command.push("--frozen-lockfile");
+  }
+  run(command, { cwd: examplesRoot });
 }
 
 function run(

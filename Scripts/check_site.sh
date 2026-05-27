@@ -25,6 +25,7 @@ require_command wasm-opt
 "$site_root/Scripts/check_site_ci_workflow.sh"
 
 bun install --cwd "$website_dir" --frozen-lockfile
+bun run --cwd "$website_dir" test
 
 bun run --cwd "$website_dir" build:wasm
 
@@ -40,6 +41,12 @@ bun run --cwd "$website_dir" check
 ASTRO_SITE="${ASTRO_SITE:-https://swifttui.sh}" \
   ASTRO_BASE="${ASTRO_BASE:-/}" \
   bun run --cwd "$website_dir" build
+bun run --cwd "$website_dir" compose:webexample
+
+composed_wasm_path="$website_dir/dist/webexample/TerminalApp/dist/assets/app.wasm"
+if [[ ! -f "$composed_wasm_path" ]]; then
+  fail "missing composed WebExample wasm at $composed_wasm_path"
+fi
 
 "$site_root/Scripts/build_docc_site.sh"
 

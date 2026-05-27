@@ -21,20 +21,42 @@ fi
 source_checkout="${SWIFTTUI_CHECKOUT:-}"
 clone_dir="${work_root}/${repo_name}"
 output_root="${website_dist}/${mount_path}"
+using_source_checkout=0
+
+if [ -n "$source_checkout" ]; then
+  if [ ! -d "$source_checkout" ]; then
+    printf '[build_docc_site] SWIFTTUI_CHECKOUT does not exist: %s\n' "$source_checkout" >&2
+    exit 1
+  fi
+  source_checkout="$(cd "$source_checkout" && pwd)"
+  using_source_checkout=1
+fi
 
 rm -rf "$work_root" "$output_root"
 mkdir -p "$work_root" "$output_root"
 
-if [ -n "$source_checkout" ] && git -C "$source_checkout" rev-parse --git-dir >/dev/null 2>&1; then
-  git clone "$source_checkout" "$clone_dir"
+if [ "$using_source_checkout" -eq 1 ]; then
+  mkdir -p "$clone_dir"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a \
+      --exclude='.git' \
+      --exclude='.build' \
+      --exclude='node_modules' \
+      "$source_checkout"/ "$clone_dir"/
+  else
+    cp -R "$source_checkout"/. "$clone_dir"/
+    rm -rf "$clone_dir/.git" "$clone_dir/.build" "$clone_dir/node_modules"
+  fi
 else
   git clone "https://github.com/${repository}" "$clone_dir"
 fi
 
 (
   cd "$clone_dir"
-  git fetch --tags origin "$ref" >/dev/null 2>&1 || true
-  git checkout --quiet "$ref"
+  if [ "$using_source_checkout" -eq 0 ]; then
+    git fetch --tags origin "$ref" >/dev/null 2>&1 || true
+    git checkout --quiet "$ref"
+  fi
   sh -c "$docc_command"
 )
 
