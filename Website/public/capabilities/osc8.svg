@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" role="img" aria-label="OSC 8 hyperlink placeholder">
+  <rect width="800" height="400" fill="#0a0a0a"/>
+  <text x="60" y="86" font-family="Geist Mono, monospace" font-size="14" fill="#a1a1aa">OSC 8 · sanitized hyperlinks</text>
+  <text x="60" y="170" font-family="Geist Mono, monospace" font-size="16" fill="#ededed">Read the </text>
+  <text x="156" y="170" font-family="Geist Mono, monospace" font-size="16" fill="#34d399" text-decoration="underline">docs at swifttui.sh/docs</text>
+  <text x="60" y="220" font-family="Geist Mono, monospace" font-size="12" fill="#71717a">↳ resolves to https://swifttui.sh/docs (escape-sequence sanitized)</text>
+  <text x="60" y="332" font-family="Geist Mono, monospace" font-size="11" fill="#52525b">placeholder · replace with real capture</text>
+</svg>
