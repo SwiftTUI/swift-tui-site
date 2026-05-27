@@ -18,14 +18,14 @@ if [ -z "$repo_name" ] || [ -z "$repository" ] || [ -z "$ref" ] || [ -z "$docc_c
   exit 1
 fi
 
-source_checkout="${SWIFTTUI_CHECKOUT:-${site_root}/../${repo_name}}"
+source_checkout="${SWIFTTUI_CHECKOUT:-}"
 clone_dir="${work_root}/${repo_name}"
 output_root="${website_dist}/${mount_path}"
 
 rm -rf "$work_root" "$output_root"
 mkdir -p "$work_root" "$output_root"
 
-if git -C "$source_checkout" rev-parse --git-dir >/dev/null 2>&1; then
+if [ -n "$source_checkout" ] && git -C "$source_checkout" rev-parse --git-dir >/dev/null 2>&1; then
   git clone "$source_checkout" "$clone_dir"
 else
   git clone "https://github.com/${repository}" "$clone_dir"

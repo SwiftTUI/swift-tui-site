@@ -27,31 +27,9 @@ jobs:
         with:
           path: swift-tui-site
 
-      - name: Checkout swift-tui
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui
-          fetch-depth: 0
-
-      - name: Checkout examples
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui-examples
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui-examples
-
-      - name: Checkout web packages
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui-web
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui-web
-
       - name: Install swiftly and Swift toolchain
         shell: bash
-        working-directory: swift-tui
+        working-directory: swift-tui-site
         run: |
           set -euo pipefail
           curl -fsSLO https://download.swift.org/swiftly/darwin/swiftly.pkg
@@ -67,7 +45,6 @@ jobs:
 
       - name: Install wasm Swift SDK
         shell: bash
-        working-directory: swift-tui
         run: |
           set -euo pipefail
           if ! swiftly run swift sdk list | grep -q "swift-6.3.1-RELEASE_wasm"; then
@@ -88,8 +65,4 @@ jobs:
       - name: Run site gate
         shell: bash
         working-directory: swift-tui-site
-        env:
-          SWIFTTUI_CHECKOUT: ${{ github.workspace }}/swift-tui
-          SWIFTTUI_EXAMPLES_CHECKOUT: ${{ github.workspace }}/swift-tui-examples
-          SWIFTTUI_WEB_CHECKOUT: ${{ github.workspace }}/swift-tui-web
         run: Scripts/check_site.sh

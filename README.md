@@ -32,9 +32,10 @@ bun run --cwd Website build:full
 
 ## WebExample And Docs Inputs
 
-Pre-public status: the default build still expects source checkouts for
-WebExample and web packages while the public releases are being prepared. You
-can point the build at a specific WebExample checkout with:
+The `0.0.1` public pre-release build fetches the tagged
+`swift-tui-examples` repo into `.build/public-inputs/` and uses the WebExample
+release-tarball dependencies recorded there. You can still point the build at a
+specific local WebExample checkout when testing unpublished changes:
 
 ```bash
 WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
@@ -43,7 +44,3 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
 
 DocC inputs are listed in [`docs/docc-repos.yml`](docs/docc-repos.yml). Release
 metadata lives in [`docs/releases.yml`](docs/releases.yml).
-
-Remaining public-release work: replace untagged examples/web inputs with public
-release tags or artifacts so a fresh site clone can build without sibling
-checkouts by default.

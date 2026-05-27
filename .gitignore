@@ -1,3 +1,4 @@
+.build/
 .build-docs-work/
 _cf-pages-artifact/
 Website/.astro/

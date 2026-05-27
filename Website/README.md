@@ -1,7 +1,7 @@
 # Website
 
 Astro site that frames the
-[`swift-tui-examples/WebExample`](https://github.com/SwiftTUI/swift-tui-examples/tree/main/WebExample)
+[`swift-tui-examples/WebExample`](https://github.com/SwiftTUI/swift-tui-examples/tree/0.0.1/WebExample)
 WASI demo in an iframe.
 Deployed at <https://swifttui.sh>.
 
@@ -33,12 +33,8 @@ bun run build:full     # release WebExample + DocC + Astro dist/
 bun run build:dev      # debug WebExample + DocC + Astro dist/
 ```
 
-Pre-public status: wasm scripts currently expect source inputs for WebExample
-and the SwiftTUI web packages while the public releases are being prepared. Set
-`WEBEXAMPLE_DIR` to point at a specific WebExample checkout. The full website
-builds generate DocC from the repositories listed in `../docs/docc-repos.yml`
-and copy the archive into `Website/dist/docs/`.
-
-The public-release cutover should make the default path fetch tagged public
-inputs from `../docs/releases.yml` so a fresh site clone can build without
-sibling checkouts.
+By default, wasm scripts fetch the tagged public WebExample input recorded in
+`../docs/releases.yml` into `../.build/public-inputs/`. Set `WEBEXAMPLE_DIR` to
+point at a specific WebExample checkout only when testing unpublished local
+inputs. The full website builds generate DocC from the repositories listed in
+`../docs/docc-repos.yml` and copy the archive into `Website/dist/docs/`.

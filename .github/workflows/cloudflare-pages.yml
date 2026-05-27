@@ -35,28 +35,6 @@ jobs:
         with:
           path: swift-tui-site
 
-      - name: Checkout swift-tui
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui
-          fetch-depth: 0
-
-      - name: Checkout examples
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui-examples
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui-examples
-
-      - name: Checkout web packages
-        uses: actions/checkout@v6
-        with:
-          repository: SwiftTUI/swift-tui-web
-          token: ${{ secrets.SWIFTTUI_CI_TOKEN || github.token }}
-          path: swift-tui-web
-
       - name: Resolve site URL
         id: site
         shell: bash
@@ -72,7 +50,7 @@ jobs:
 
       - name: Install swiftly and Swift toolchain
         shell: bash
-        working-directory: swift-tui
+        working-directory: swift-tui-site
         run: |
           set -euo pipefail
           curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg
@@ -98,7 +76,7 @@ jobs:
           path: |
             ~/.cache/org.swift.swiftpm
             ~/.swiftpm
-          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-examples/WebExample/TerminalApp/Package.resolved') }}
+          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-site/docs/releases.yml') }}
           restore-keys: |
             ${{ runner.os }}-swiftpm-cfpages-
             ${{ runner.os }}-swiftpm-website-
@@ -109,19 +87,15 @@ jobs:
           path: |
             ~/.bun/install/cache
             swift-tui-site/Website/node_modules
-            swift-tui-examples/node_modules
-            swift-tui-examples/WebExample/node_modules
-            swift-tui-web/node_modules
-            swift-tui-web/packages/web/node_modules
-            swift-tui-web/packages/build/node_modules
-          key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-examples/bun.lock', 'swift-tui-web/bun.lock') }}
+            swift-tui-site/.build/public-inputs/swift-tui-examples/node_modules
+            swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample/node_modules
+          key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}
           restore-keys: |
             ${{ runner.os }}-bun-cfpages-
             ${{ runner.os }}-bun-website-
 
       - name: Install wasm Swift SDK used by WebExample
         shell: bash
-        working-directory: swift-tui
         run: |
           set -euo pipefail
           if ! swiftly run swift sdk list | grep -q "swift-6.3.1-RELEASE_wasm"; then
@@ -139,21 +113,14 @@ jobs:
         working-directory: swift-tui-site/Website
         run: bun install --frozen-lockfile
 
-      - name: Install WebExample deps
-        shell: bash
-        working-directory: swift-tui-examples
-        run: bun install --frozen-lockfile
-
       - name: Build WebExample
         shell: bash
         working-directory: swift-tui-site/Website
-        env:
-          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/WebExample
         run: bun run build:wasm
 
       - name: Validate uploaded WebExample wasm parses in the browser API
         shell: bash
-        working-directory: swift-tui-examples/WebExample
+        working-directory: swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample
         run: |
           set -euo pipefail
           wasm_path="./pages-dist/TerminalApp/dist/assets/app.wasm"
@@ -166,7 +133,6 @@ jobs:
         env:
           ASTRO_SITE: ${{ steps.site.outputs.url }}
           ASTRO_BASE: /
-          WEBEXAMPLE_DIR: ${{ github.workspace }}/swift-tui-examples/WebExample
         run: bun run build
 
       - name: Build DocC archive
@@ -187,7 +153,7 @@ jobs:
           cp -R swift-tui-site/Website/dist/. "$ARTIFACT_ROOT/"
           cp -R swift-tui-site/Website/dist/docs/. "$DOCS_ROOT/"
           rm -rf "$DOCS_ROOT/documentation"
-          cp -R swift-tui-examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
+          cp -R swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
           wasm_path="$WEBEXAMPLE_ROOT/TerminalApp/dist/assets/app.wasm"
           if [ ! -f "$wasm_path" ]; then
             echo "::error::Missing WebExample wasm at $wasm_path"
