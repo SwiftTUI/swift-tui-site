@@ -56,7 +56,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 .product(name: <span class="s">"SwiftTUI"</span>, package: <span class="s">"swift-tui"</span>)</code></pre>
       </div>
 
-      <ul class="meta reveal mono" style="--i:5">
+      <div class="install reveal" style="--i:5" role="region" aria-label="run modes">
+        <div class="install-head mono">
+          <span class="prompt">$ run anywhere</span>
+          <span class="sep">·</span>
+          <span class="ver">one source &middot; four hosts</span>
+        </div>
+        <pre class="install-body mono"><code><span class="cm"># terminal executable</span>
+swift run CounterApp
+
+<span class="cm"># localhost browser (WebHost)</span>
+swift run CounterApp --web
+
+<span class="cm"># static WASI bundle for browser deploy</span>
+swift build --swift-sdk wasm32-wasi
+
+<span class="cm"># embed the same Scene inside a native SwiftUI app</span>
+<span class="cm">// import SwiftUIHost; SwiftUIHostAppView(app: CounterApp())</span></code></pre>
+      </div>
+
+      <ul class="meta reveal mono" style="--i:6">
         <li><span class="k">requires</span><span class="v">Swift 6.3 · macOS 15+ / iOS 18+ package platforms · Linux/WASI paths</span></li>
         <li><span class="k">stability</span><span class="v"><em>0.0.1 pre-release</em> · source-breaking changes may land before 1.0</span></li>
         <li><span class="k">runs in</span><span class="v">terminal · WASI browser package · localhost WebHost · SwiftUI host</span></li>
