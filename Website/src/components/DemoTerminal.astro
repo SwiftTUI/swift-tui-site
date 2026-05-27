@@ -81,7 +81,7 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
             loading="eager"
             decoding="sync"
           />
-          <script is:inline>
+          <script>
             document.querySelectorAll('.demo-stage iframe').forEach(function(f) {
               f.addEventListener('load', function() { f.setAttribute('data-loaded', 'true'); });
             });
@@ -215,16 +215,6 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     height: var(--demo-h);
     background: var(--bg);
   }
-  iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
-    background: var(--bg);
-  }
-
   /* placeholder overlay: sits behind the iframe; fades out once iframe reports loaded */
   .demo-stage {
     position: absolute;
@@ -250,11 +240,11 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     pointer-events: none;
     /* start visible; transition defined here, triggered by data-loaded on the preceding iframe */
     opacity: 1;
+    transition: opacity 200ms ease 120ms;
   }
   /* adjacent-sibling selector: placeholder immediately follows the iframe in DOM order */
   .demo-stage iframe[data-loaded="true"] + .demo-placeholder {
     opacity: 0;
-    transition: opacity 200ms ease 120ms;
   }
 
   /* dev fallback (only renders during `astro dev`) */
