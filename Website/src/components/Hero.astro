@@ -16,12 +16,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       </h1>
 
       <p class="lead reveal" style="--i:2">
-        A Swift package that lowers SwiftUI-shaped views through a strict
-        seven-phase pipeline — no global solver, no virtual DOM, no
-        <span class="mono">curses</span>. The same <span class="mono">App</span>
-        and <span class="mono">Scene</span> declarations can run in a terminal
-        executable, through WASI browser deployment, through a native WebHost
-        launch, or inside a host-managed SwiftUI surface.
+        Author your <span class="mono">App</span> once. Ship it as a terminal
+        executable, a static WASI bundle, a localhost WebHost, or embedded
+        inside a native SwiftUI surface &mdash; the same
+        <span class="mono">View</span> tree, the same
+        <span class="mono">@State</span>, the same
+        <span class="mono">@FocusState</span>. Under the hood, SwiftTUI lowers
+        SwiftUI-shaped views through a strict seven-phase pipeline &mdash; no
+        global solver, no virtual DOM, no <span class="mono">curses</span>.
       </p>
       <div class="actions reveal" style="--i:3">
         <a class="cta cta--primary" href="#demo">
