@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Layouts side by side placeholder">
+  <rect width="1200" height="750" fill="#0a0a0a"/>
+  <rect x="40" y="40" width="555" height="670" fill="#0d0d0d" stroke="#1f1f1f"/>
+  <text x="60" y="80" font-family="Geist, sans-serif" font-size="14" fill="#a1a1aa">SwiftUI · native AppKit</text>
+  <rect x="605" y="40" width="555" height="670" fill="#0d0d0d" stroke="#1f1f1f"/>
+  <text x="625" y="80" font-family="Geist Mono, monospace" font-size="14" fill="#a1a1aa">SwiftTUI · terminal cells</text>
+  <text x="600" y="395" font-family="Geist Mono, monospace" font-size="34" fill="#34d399" text-anchor="middle">Layouts · side by side</text>
+  <text x="600" y="430" font-family="Geist Mono, monospace" font-size="13" fill="#52525b" text-anchor="middle">placeholder · replace with PNG capture</text>
+</svg>
