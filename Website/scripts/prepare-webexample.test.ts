@@ -4,10 +4,13 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const websiteRoot = resolve(import.meta.dir, "..");
+const siteRoot = resolve(websiteRoot, "..");
+const defaultExamplesRoot = resolve(siteRoot, ".build/public-inputs/swift-tui-examples");
 const tempRoots: string[] = [];
 
 afterEach(async () => {
   await Promise.all(tempRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+  await rm(defaultExamplesRoot, { recursive: true, force: true });
 });
 
 test("overlay WebExample inputs install without a frozen lockfile", async () => {
@@ -36,6 +39,65 @@ test("plain WebExample overrides keep frozen lockfile installs", async () => {
   const log = await readFile(logPath, "utf8");
   expect(log).toContain(`cwd=${examplesRoot}`);
   expect(log).toContain("args=install --frozen-lockfile");
+});
+
+test("cache-restored default input directory is recloned instead of treated as the parent site checkout", async () => {
+  const root = await realpath(await mkdtemp(join(tmpdir(), "prepare-webexample-default-")));
+  tempRoots.push(root);
+
+  const fakeBin = join(root, "bin");
+  const fakeGit = join(fakeBin, "git");
+  const fakeBun = join(fakeBin, "bun");
+  const logPath = join(root, "commands.log");
+
+  await rm(defaultExamplesRoot, { recursive: true, force: true });
+  await mkdir(join(defaultExamplesRoot, "node_modules"), { recursive: true });
+  await mkdir(fakeBin, { recursive: true });
+
+  await writeFile(
+    fakeGit,
+    `#!/usr/bin/env bash
+set -euo pipefail
+printf 'git %s\\n' "$*" >> "$FAKE_COMMAND_LOG"
+if [[ "$*" == "-C ${defaultExamplesRoot} rev-parse --git-dir" ]]; then
+  printf '${siteRoot}/.git\\n'
+  exit 0
+fi
+if [[ "$*" == "-C ${defaultExamplesRoot} rev-parse --show-toplevel" ]]; then
+  printf '${siteRoot}\\n'
+  exit 0
+fi
+if [[ "$1" == "clone" ]]; then
+  mkdir -p "$7/WebExample"
+  exit 0
+fi
+exit 0
+`,
+  );
+
+  await writeFile(
+    fakeBun,
+    `#!/usr/bin/env bash
+set -euo pipefail
+printf 'bun cwd=%s args=%s\\n' "$PWD" "$*" >> "$FAKE_COMMAND_LOG"
+`,
+  );
+  await chmod(fakeGit, 0o755);
+  await chmod(fakeBun, 0o755);
+
+  const result = runPrepareWebExample({
+    env: {
+      PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
+      FAKE_COMMAND_LOG: logPath,
+      SWIFTTUI_EXAMPLES_REF: "0.0.3",
+    },
+  });
+
+  expect(result.exitCode).toBe(0);
+  const log = await readFile(logPath, "utf8");
+  expect(log).toContain("git clone --depth 1 --branch 0.0.3 https://github.com/SwiftTUI/swift-tui-examples.git");
+  expect(log).not.toContain(`git -C ${defaultExamplesRoot} fetch`);
+  expect(log).toContain(`bun cwd=${defaultExamplesRoot} args=install --frozen-lockfile`);
 });
 
 async function makeFixture(): Promise<{

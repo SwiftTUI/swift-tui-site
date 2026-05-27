@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readFile, realpath, rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,7 +39,7 @@ async function ensurePublicExamplesCheckout(
 ): Promise<void> {
   await mkdir(dirname(checkoutRoot), { recursive: true });
 
-  if (await isGitCheckout(checkoutRoot)) {
+  if (await isExpectedExamplesCheckout(checkoutRoot)) {
     run(["git", "-C", checkoutRoot, "fetch", "--tags", "--force", "origin", ref]);
     run(["git", "-C", checkoutRoot, "checkout", "--force", ref]);
     run(["git", "-C", checkoutRoot, "clean", "-fdx"]);
@@ -59,13 +59,40 @@ async function ensurePublicExamplesCheckout(
   ]);
 }
 
-async function isGitCheckout(path: string): Promise<boolean> {
-  const result = Bun.spawnSync({
-    cmd: ["git", "-C", path, "rev-parse", "--git-dir"],
-    stdout: "ignore",
+async function isExpectedExamplesCheckout(path: string): Promise<boolean> {
+  const topLevelResult = Bun.spawnSync({
+    cmd: ["git", "-C", path, "rev-parse", "--show-toplevel"],
+    stdout: "pipe",
     stderr: "ignore",
   });
-  return result.exitCode === 0;
+  if (topLevelResult.exitCode !== 0) {
+    return false;
+  }
+
+  const topLevel = new TextDecoder().decode(topLevelResult.stdout).trim();
+  const [resolvedTopLevel, resolvedPath] = await Promise.all([
+    realpath(topLevel).catch(() => topLevel),
+    realpath(path).catch(() => path),
+  ]);
+  if (resolvedTopLevel !== resolvedPath) {
+    return false;
+  }
+
+  const originResult = Bun.spawnSync({
+    cmd: ["git", "-C", path, "remote", "get-url", "origin"],
+    stdout: "pipe",
+    stderr: "ignore",
+  });
+  if (originResult.exitCode !== 0) {
+    return false;
+  }
+
+  const origin = new TextDecoder().decode(originResult.stdout).trim();
+  return normalizeGitRemote(origin) === normalizeGitRemote(examplesRepository);
+}
+
+function normalizeGitRemote(remote: string): string {
+  return remote.replace(/\/+$/, "").replace(/\.git$/, "");
 }
 
 function usesCoordinationOverlay(examplesRoot: string): boolean {
