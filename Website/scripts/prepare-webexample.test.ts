@@ -75,7 +75,7 @@ set -euo pipefail
   return { examplesRoot, logPath, env };
 }
 
-function runPrepareWebExample(options: { env: Record<string, string> }): Bun.SpawnSyncReturns<"pipe"> {
+function runPrepareWebExample(options: { env: Record<string, string> }): Bun.SyncSubprocess<"pipe", "pipe"> {
   return Bun.spawnSync({
     cmd: [process.execPath, "run", "scripts/prepare-webexample.ts"],
     cwd: websiteRoot,
