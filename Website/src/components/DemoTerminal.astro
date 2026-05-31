@@ -82,9 +82,54 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
             decoding="sync"
           />
           <script>
-            document.querySelectorAll('.demo-stage iframe').forEach(function(f) {
-              f.addEventListener('load', function() { f.setAttribute('data-loaded', 'true'); });
-            });
+            // Narrow viewports can't give the embedded terminal enough columns
+            // for its full control row at the fixed marketing font size, so the
+            // SwiftTUI app clips its own layout at the terminal's right edge.
+            // Render the iframe at a fixed logical width once the surface drops
+            // below it, then scale the whole frame down to fit — the complete
+            // landscape-style layout stays visible, just smaller. On wide
+            // viewports the iframe simply fills the surface (no transform).
+            (function () {
+              function fitStage(stage: Element) {
+                const frame = stage.querySelector("iframe");
+                const surface = stage.parentElement;
+                if (!frame || !surface) return;
+                const logical =
+                  parseFloat(
+                    getComputedStyle(stage).getPropertyValue("--demo-logical-w"),
+                  ) || 720;
+                const apply = () => {
+                  const w = surface.clientWidth;
+                  const h = surface.clientHeight;
+                  if (!w || !h) return;
+                  if (w >= logical) {
+                    frame.style.width = "100%";
+                    frame.style.height = "100%";
+                    frame.style.transform = "";
+                  } else {
+                    const scale = w / logical;
+                    frame.style.width = `${logical}px`;
+                    frame.style.height = `${h / scale}px`;
+                    frame.style.transform = `scale(${scale})`;
+                  }
+                };
+                apply();
+                if (typeof ResizeObserver !== "undefined") {
+                  new ResizeObserver(apply).observe(surface);
+                } else {
+                  window.addEventListener("resize", apply);
+                }
+              }
+              document.querySelectorAll(".demo-stage").forEach((stage) => {
+                const f = stage.querySelector("iframe");
+                if (f) {
+                  f.addEventListener("load", () => {
+                    f.setAttribute("data-loaded", "true");
+                  });
+                }
+                fitStage(stage);
+              });
+            })();
           </script>
         </div>
       )}
@@ -143,6 +188,11 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     overflow: hidden;
     container-type: inline-size;
     container-name: demo;
+    /* Logical width the embedded terminal renders at before the surface is
+       scaled to fit. ~720px ≈ a standard 80-column terminal at the marketing
+       font size, enough for the full control row + Zoom picker. Below this
+       surface width the demo-stage script scales the iframe down. */
+    --demo-logical-w: 720px;
   }
   .bar {
     display: grid;
@@ -229,6 +279,8 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     display: block;
     background: var(--bg);
     z-index: 1;
+    /* scale origin for the narrow-viewport fit transform (set in script) */
+    transform-origin: top left;
   }
   .demo-placeholder {
     position: absolute;
