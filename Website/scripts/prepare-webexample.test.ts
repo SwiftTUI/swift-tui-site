@@ -1,15 +1,30 @@
 import { afterEach, expect, test } from "bun:test";
-import { chmod, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import {
+  chmod,
+  mkdir,
+  mkdtemp,
+  readFile,
+  realpath,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 const websiteRoot = resolve(import.meta.dir, "..");
 const siteRoot = resolve(websiteRoot, "..");
-const defaultExamplesRoot = resolve(siteRoot, ".build/public-inputs/swift-tui-examples");
+const defaultExamplesRoot = resolve(
+  siteRoot,
+  ".build/public-inputs/swift-tui-examples",
+);
 const tempRoots: string[] = [];
 
 afterEach(async () => {
-  await Promise.all(tempRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+  await Promise.all(
+    tempRoots
+      .splice(0)
+      .map((root) => rm(root, { recursive: true, force: true })),
+  );
   await rm(defaultExamplesRoot, { recursive: true, force: true });
 });
 
@@ -42,7 +57,9 @@ test("plain WebExample overrides keep frozen lockfile installs", async () => {
 });
 
 test("cache-restored default input directory is recloned instead of treated as the parent site checkout", async () => {
-  const root = await realpath(await mkdtemp(join(tmpdir(), "prepare-webexample-default-")));
+  const root = await realpath(
+    await mkdtemp(join(tmpdir(), "prepare-webexample-default-")),
+  );
   tempRoots.push(root);
 
   const fakeBin = join(root, "bin");
@@ -89,15 +106,19 @@ printf 'bun cwd=%s args=%s\\n' "$PWD" "$*" >> "$FAKE_COMMAND_LOG"
     env: {
       PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
       FAKE_COMMAND_LOG: logPath,
-      SWIFTTUI_EXAMPLES_REF: "0.0.3",
+      SWIFTTUI_EXAMPLES_REF: "0.0.6",
     },
   });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
-  expect(log).toContain("git clone --depth 1 --branch 0.0.3 https://github.com/SwiftTUI/swift-tui-examples.git");
+  expect(log).toContain(
+    "git clone --depth 1 --branch 0.0.6 https://github.com/SwiftTUI/swift-tui-examples.git",
+  );
   expect(log).not.toContain(`git -C ${defaultExamplesRoot} fetch`);
-  expect(log).toContain(`bun cwd=${defaultExamplesRoot} args=install --frozen-lockfile`);
+  expect(log).toContain(
+    `bun cwd=${defaultExamplesRoot} args=install --frozen-lockfile`,
+  );
 });
 
 async function makeFixture(): Promise<{
@@ -105,7 +126,9 @@ async function makeFixture(): Promise<{
   logPath: string;
   env: Record<string, string>;
 }> {
-  const root = await realpath(await mkdtemp(join(tmpdir(), "prepare-webexample-")));
+  const root = await realpath(
+    await mkdtemp(join(tmpdir(), "prepare-webexample-")),
+  );
   tempRoots.push(root);
 
   const examplesRoot = join(root, "swift-tui-examples");
@@ -137,7 +160,9 @@ set -euo pipefail
   return { examplesRoot, logPath, env };
 }
 
-function runPrepareWebExample(options: { env: Record<string, string> }): Bun.SyncSubprocess<"pipe", "pipe"> {
+function runPrepareWebExample(options: {
+  env: Record<string, string>;
+}): Bun.SyncSubprocess<"pipe", "pipe"> {
   return Bun.spawnSync({
     cmd: [process.execPath, "run", "scripts/prepare-webexample.ts"],
     cwd: websiteRoot,
