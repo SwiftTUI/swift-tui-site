@@ -7,6 +7,7 @@ import SiteIcons from "../components/SiteIcons.astro";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
 const canonical = `${site}${base || ""}/pipeline/`;
+const docsUrl = `${base}/docs/documentation/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Rendering Pipeline";
 const description =
@@ -243,6 +244,23 @@ const phases = [
 <span class="kw">let</span> work = frame.commitPlan</code></pre>
         </div>
       </section>
+
+      <section class="developer-docs">
+        <div class="shell docs-grid">
+          <div>
+            <span class="eyebrow"><span class="num">/docs</span>Implementation details</span>
+            <h2>Use DocC for the runtime pipeline reference.</h2>
+          </div>
+          <div class="docs-copy">
+            <p>
+              This page explains the product model. The DocC reference carries
+              the developer guide for the runtime callpath, stage scheduling,
+              diagnostics, and host handoff.
+            </p>
+            <a class="docs-link mono" href={docsUrl}>Open the DocC reference</a>
+          </div>
+        </div>
+      </section>
     </main>
     <SiteFooter />
   </body>
@@ -313,13 +331,15 @@ const phases = [
   .example-band,
   .phase-list,
   .boundary,
-  .inspect {
+  .inspect,
+  .developer-docs {
     padding: 72px 0;
     border-top: 1px solid var(--line);
   }
   .example-grid,
   .inspect-grid,
-  .boundary-grid {
+  .boundary-grid,
+  .docs-grid {
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     gap: 42px;
@@ -328,17 +348,28 @@ const phases = [
   .example-grid h2,
   .inspect-grid h2,
   .boundary-grid h2,
+  .docs-grid h2,
   .section-head h2 {
     margin-top: 14px;
   }
   .example-grid p,
   .inspect-grid p,
-  .boundary-copy p {
+  .boundary-copy p,
+  .docs-copy p {
     margin-top: 16px;
     max-width: 68ch;
     line-height: 1.65;
   }
   .boundary-copy p:first-child { margin-top: 0; }
+  .docs-copy p:first-child { margin-top: 0; }
+  .docs-link {
+    display: inline-block;
+    margin-top: 22px;
+    color: var(--accent);
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .docs-link:hover { color: var(--ink); }
   .code {
     margin: 0;
     padding: 18px;
@@ -429,7 +460,8 @@ const phases = [
     .hero-grid,
     .example-grid,
     .inspect-grid,
-    .boundary-grid {
+    .boundary-grid,
+    .docs-grid {
       grid-template-columns: 1fr;
     }
     .phase-cards { grid-template-columns: 1fr; }
