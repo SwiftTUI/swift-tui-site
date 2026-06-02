@@ -32,7 +32,7 @@ bun run --cwd Website build:full
 
 ## WebExample And Docs Inputs
 
-The `0.0.9` public pre-release build fetches the tagged
+The `0.0.10` public pre-release build fetches the tagged
 `swift-tui-examples` repo into `.build/public-inputs/` and uses the WebExample
 release-tarball dependencies recorded there. You can still point the build at a
 specific local WebExample checkout when testing unpublished changes:
