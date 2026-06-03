@@ -1,7 +1,7 @@
 current:
-  swiftTUI: 0.0.11
-  web: 0.0.11
-  examplesRef: 0.0.11
+  swiftTUI: 0.0.12
+  web: 0.0.12
+  examplesRef: 0.0.12
 repos:
   swift-tui:
     url: https://github.com/SwiftTUI/swift-tui
