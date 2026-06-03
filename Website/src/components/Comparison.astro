@@ -3,31 +3,29 @@ const rows = [
   {
     name: "SwiftTUI",
     accent: true,
-    cells: ["✓", "✓ via SwiftUIHost", "✓ WASI, no emulator", "✓ SwiftTUICharts", "✓ SwiftTUIAnimatedImage"],
+    cells: ["✓", "✓ via SwiftUIHost", "✓ WASI, no emulator"],
   },
-  { name: "Bubble Tea (Go)", cells: ["—", "—", "—", "community", "—"] },
-  { name: "Textual (Python)", cells: ["—", "—", "via textual-serve", "partial", "—"] },
-  { name: "Ratatui (Rust)", cells: ["—", "—", "—", "community", "—"] },
-  { name: "Ink (JS/React)", cells: ["partial (JSX)", "—", "—", "community", "—"] },
+  { name: "Bubble Tea (Go)", cells: ["—", "—", "—"] },
+  { name: "Textual (Python)", cells: ["—", "—", "via textual-serve"] },
+  { name: "Ratatui (Rust)", cells: ["—", "—", "—"] },
+  { name: "Ink (JS/React)", cells: ["partial (JSX)", "—", "—"] },
 ];
 const headers = [
   "SwiftUI-style DSL",
   "Native app embed",
   "Browser deploy w/o emulator",
-  "First-party charts",
-  "First-party GIF / PNG",
 ];
 ---
 <section class="compare" id="compare">
   <div class="shell">
     <header class="head">
       <span class="eyebrow"><span class="num">/02</span>Where SwiftTUI sits</span>
-      <h2>One author surface. Four hosts. First-party charts and animated images.</h2>
+      <h2>One author surface. Four hosts.</h2>
       <p class="lede">
         Compared to other modern TUI frameworks against the things SwiftTUI
         was built to do. Marks reflect the libraries' first-party stories;
-        community packages exist in several cells but are not equivalent to
-        framework-integrated support.
+        partial marks note limited or indirect support, not
+        framework-integrated equivalence.
       </p>
     </header>
 
@@ -72,7 +70,7 @@ const headers = [
   }
   .row {
     display: grid;
-    grid-template-columns: 1.2fr repeat(5, 1fr);
+    grid-template-columns: 1.2fr repeat(3, 1fr);
     border-bottom: 1px solid var(--line);
   }
   .row:last-child { border-bottom: 0; }
@@ -102,11 +100,11 @@ const headers = [
 
   @media (max-width: 1080px) {
     .grid { font-size: 11px; }
-    .row { grid-template-columns: 1.2fr repeat(5, 1fr); }
+    .row { grid-template-columns: 1.2fr repeat(3, 1fr); }
     .cell { padding: 10px 8px; }
   }
   @media (max-width: 720px) {
     .grid { overflow-x: auto; }
-    .row { min-width: 720px; }
+    .row { min-width: 480px; }
   }
 </style>
