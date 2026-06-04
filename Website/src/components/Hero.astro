@@ -74,7 +74,9 @@ swift run CounterApp --web
 swift build --swift-sdk wasm32-wasi
 
 <span class="cm"># embed the same Scene inside a native SwiftUI app</span>
-<span class="cm">// import SwiftUIHost; SwiftUIHostAppView(app: CounterApp())</span></code></pre>
+<span class="cm">// import SwiftUIHost</span>
+<span class="cm">// let state = try SwiftUIHostAppState(app: CounterApp())</span>
+<span class="cm">// SwiftUIHostAppView(state: state)</span></code></pre>
       </div>
 
       <ul class="meta reveal mono" style="--i:6">
