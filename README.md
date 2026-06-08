@@ -44,3 +44,9 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
 
 DocC inputs are listed in [`docs/docc-repos.yml`](docs/docc-repos.yml). Release
 metadata lives in [`docs/releases.yml`](docs/releases.yml).
+
+## License
+
+MIT — see [LICENSE](LICENSE). The composed DocC archive under `/docs/` is built
+from the separately-tracked [`swift-tui`](https://github.com/SwiftTUI/swift-tui)
+repository (also MIT).
