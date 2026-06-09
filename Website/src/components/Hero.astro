@@ -1,21 +1,34 @@
 ---
 import DemoTerminal from "./DemoTerminal.astro";
+import logo from "../../logo/logo.svg";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const logoSrc = typeof logo === "string" ? logo : logo.src;
 ---
 <section class="hero">
   <div class="shell">
     <div class="copy">
-      <span class="tag reveal" style="--i:0">
+      <img
+        class="hero-brand reveal"
+        src={logoSrc}
+        width="80"
+        height="80"
+        style="--i:0"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+      />
+
+      <span class="tag reveal" style="--i:1">
         <span class="dot"></span>
         <span>0.0.18 pre-release · live demo below</span>
       </span>
 
-      <h1 class="reveal" style="--i:1">
+      <h1 class="reveal" style="--i:2">
         SwiftUI semantics,<br/>
         drawn in <span class="accent">terminal cells</span>.
       </h1>
 
-      <p class="lead reveal" style="--i:2">
+      <p class="lead reveal" style="--i:3">
         Author your <span class="mono">App</span> once. Ship it as a terminal
         executable, a static WASI bundle, a localhost WebHost, or embedded
         inside a native SwiftUI surface &mdash; the same
@@ -25,7 +38,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         SwiftUI-shaped views through a strict seven-phase pipeline &mdash; no
         global solver, no virtual DOM, no <span class="mono">curses</span>.
       </p>
-      <div class="actions reveal" style="--i:3">
+      <div class="actions reveal" style="--i:4">
         <a class="cta cta--primary" href="#demo">
           <span>Run the demo</span>
           <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -40,7 +53,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         </a>
       </div>
 
-      <div class="install reveal" style="--i:4" role="region" aria-label="installation">
+      <div class="install reveal" style="--i:5" role="region" aria-label="installation">
         <div class="install-head mono">
           <span class="prompt">Package.swift</span>
           <span class="sep">·</span>
@@ -58,7 +71,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 .product(name: <span class="s">"SwiftTUI"</span>, package: <span class="s">"swift-tui"</span>)</code></pre>
       </div>
 
-      <div class="install reveal" style="--i:5" role="region" aria-label="run modes">
+      <div class="install reveal" style="--i:6" role="region" aria-label="run modes">
         <div class="install-head mono">
           <span class="prompt">$ run anywhere</span>
           <span class="sep">·</span>
@@ -79,7 +92,7 @@ swift build --swift-sdk wasm32-wasi
 <span class="cm">// SwiftUIHostAppView(state: state)</span></code></pre>
       </div>
 
-      <ul class="meta reveal mono" style="--i:6">
+      <ul class="meta reveal mono" style="--i:7">
         <li><span class="k">requires</span><span class="v">Swift 6.3 · macOS 15+ / iOS 18+ package platforms · Linux/WASI paths</span></li>
         <li><span class="k">stability</span><span class="v"><em>0.0.18 pre-release</em> · source-breaking changes may land before 1.0</span></li>
         <li><span class="k">runs in</span><span class="v">terminal · WASI browser package · localhost WebHost · SwiftUI host</span></li>
@@ -92,6 +105,36 @@ swift build --swift-sdk wasm32-wasi
   </div>
 </section>
 
+<script is:inline>
+  // Brand hand-off: reveal the compact header lockup once the oversized
+  // hero mark has scrolled up behind the sticky header. IntersectionObserver
+  // fires only at the crossing (no per-frame scroll work → smooth on mobile);
+  // CSS in site.css does the cross-fade off the `.is-scrolled` class.
+  (() => {
+    const root = document.documentElement;
+    const mark = document.querySelector(".hero-brand");
+    if (!mark) return;
+    const header = document.querySelector(".site-header");
+    const offset = header ? header.offsetHeight : 61;
+    const setScrolled = (on) => root.classList.toggle("is-scrolled", on);
+
+    // Initial state up front so reloads / anchor deep-links land correctly.
+    setScrolled(mark.getBoundingClientRect().bottom <= offset);
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(
+        (entries) => setScrolled(!entries[0].isIntersecting),
+        { rootMargin: `-${offset}px 0px 0px 0px`, threshold: 0 },
+      ).observe(mark);
+    } else {
+      const onScroll = () =>
+        setScrolled(mark.getBoundingClientRect().bottom <= offset);
+      addEventListener("scroll", onScroll, { passive: true });
+      addEventListener("resize", onScroll, { passive: true });
+    }
+  })();
+</script>
+
 <style>
   .hero {
     padding: 72px 0 28px;
@@ -103,6 +146,16 @@ swift build --swift-sdk wasm32-wasi
     align-items: start;
   }
   .copy { padding-top: 8px; }
+  /* oversized brand mark — the prominent top-of-page presence that the
+     compact header lockup cross-fades in to replace once scrolled past.
+     Sizing mirrors Mark.astro's ~20% corner radius, fluid for mobile. */
+  .hero-brand {
+    width: clamp(58px, 9vw, 80px);
+    height: clamp(58px, 9vw, 80px);
+    border-radius: clamp(12px, 1.8vw, 16px);
+    object-fit: cover;
+    margin-bottom: 24px;
+  }
   /* two-layer accent: emerald → cyan across the highlighted word */
   h1 .accent {
     background: var(--accent-grad);
@@ -190,6 +243,7 @@ swift build --swift-sdk wasm32-wasi
   }
   @media (max-width: 720px) {
     .hero { padding: 44px 0 18px; }
+    .hero-brand { margin-bottom: 18px; }
     p.lead { font-size: 16px; }
     .meta li { grid-template-columns: 90px 1fr; gap: 8px; }
   }

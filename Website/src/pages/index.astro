@@ -50,7 +50,7 @@ const softwareSourceCodeJsonLd = {
 };
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" class="is-handoff">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -60,6 +60,18 @@ const softwareSourceCodeJsonLd = {
     <meta name="author" content="GoodHats" />
     <meta name="theme-color" content="#0d1117" />
     <ThemeScript />
+    <noscript>
+      <!-- Without JS the scroll observer can't run, so keep the header
+           brand permanently visible instead of hidden-forever. -->
+      <style>
+        :root.is-handoff .site-header .brand {
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+          pointer-events: auto !important;
+        }
+      </style>
+    </noscript>
     <link rel="canonical" href={canonical} />
 
     <meta property="og:title" content="SwiftTUI" />

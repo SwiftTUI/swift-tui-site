@@ -290,6 +290,31 @@ img, svg { display: block; }
   .reveal { animation: none; opacity: 1; transform: none; }
 }
 
+/* ── brand hand-off: large hero mark → compact header lockup ───────
+   On the homepage (`.is-handoff`, set server-side in index.astro) the
+   oversized hero mark carries the brand at the top of the page, so the
+   small header lockup stays hidden until you scroll past the mark. A tiny
+   inline observer in Hero.astro toggles `.is-scrolled` on <html>; the
+   cross-fade is pure CSS. The lockup keeps its reserved slot the whole
+   time (visibility, not display) so the nav never reflows; `visibility` is
+   delayed on hide so it leaves the tab order / a11y tree only after the
+   fade. A <noscript> fallback reveals the lockup when the observer can't
+   run. The global prefers-reduced-motion rule collapses the transitions. */
+:root.is-handoff .site-header .brand {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 260ms ease, visibility 0s linear 260ms;
+}
+:root.is-handoff.is-scrolled .site-header .brand {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity 260ms ease, transform 260ms ease, visibility 0s;
+}
+
 /* horizontal divide-y replacement (vertical 1px strokes) */
 .divider {
   height: 1px;
