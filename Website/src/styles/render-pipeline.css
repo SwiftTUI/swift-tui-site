@@ -224,11 +224,17 @@
 
 .rp .twocol {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) lets each track shrink below its content's min-content
+     width; without the 0 floor the nowrap .mono-flow line props the column
+     open and the two cards overflow the viewport on wide screens. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
 }
 
 .rp .prose-card {
+  /* allow the grid item to shrink so its overflow-x:auto .mono-flow scrolls
+     internally rather than forcing the card (and the row) wider. */
+  min-width: 0;
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
