@@ -103,7 +103,13 @@ swift build --swift-sdk wasm32-wasi
     align-items: start;
   }
   .copy { padding-top: 8px; }
-  h1 .accent { color: var(--accent); }
+  /* two-layer accent: emerald → cyan across the highlighted word */
+  h1 .accent {
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   p.lead {
     margin-top: 22px;
     font-size: 17px;

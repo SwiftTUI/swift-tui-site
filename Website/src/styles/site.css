@@ -28,12 +28,25 @@
   --ink-3:      var(--quiet);
   --ink-4:      #566370;
 
-  /* accent (single brand accent) */
-  --accent:     #4c8dff;
-  --accent-soft:rgba(76, 141, 255, 0.13);
-  --accent-dim: rgba(76, 141, 255, 0.42);
-  --accent-hover:#6ba5ff;
-  --on-accent:  #ffffff;
+  /* brand accent — a two-layer system pulled from the logo (logo.svg):
+     the primary leans *bluer* than the mark (a cyan-teal sampled toward the
+     #00d5bf / #00556a highlights+shadows), the secondary *matches* the mark's
+     blue-green emerald body (#00aa80 / #00bf95). Components keep reading
+     --accent; the duo surfaces together via --accent-grad (hero word, dot,
+     ambient glow), so the brand reads as teal→cyan rather than only emerald. */
+  --accent:      #1fb6cf;            /* layer 1 — bluer-than-logo cyan-teal */
+  --accent-rgb:  31, 182, 207;       /* channels for rgba() glow expressions */
+  --accent-soft: rgba(31, 182, 207, 0.13);
+  --accent-dim:  rgba(31, 182, 207, 0.42);
+  --accent-hover:#3fcde4;
+  --on-accent:   #04232b;            /* dark teal ink on solid accent fills (~6.6:1) */
+
+  --accent-2:      #00bf95;          /* layer 2 — logo blue-green emerald */
+  --accent-2-rgb:  0, 191, 149;
+  --accent-2-soft: rgba(0, 191, 149, 0.13);
+  --accent-2-hover:#19d3a6;
+
+  --accent-grad: linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 100%);
 
   /* meaning-carrying accents: warm = main actor, teal = off-actor */
   --main-actor: #d8a657;
@@ -44,11 +57,15 @@
   --drop:       #cf6679;
   --warn:       var(--main-actor);
 
-  /* syntax */
-  --tok-kw:     #ff7b72;
-  --tok-type:   #79c0ff;
-  --tok-str:    #a5d6ff;
-  --tok-num:    #d2a8ff;
+  /* syntax — retuned onto the brand axis instead of the GitHub blue/red set.
+     Types carry the brand cyan (layer 1) and strings a clearly lighter mint
+     (layer 2) so the two stay distinct where they hug — Text("…"), Button("…").
+     Keywords reuse the established brand warm (--main-actor gold) for warm/cool
+     contrast against both; numbers + @property-wrappers keep a quiet violet. */
+  --tok-kw:     #e0a85c;   /* keywords — brand gold */
+  --tok-type:   #45c8db;   /* types — brand cyan (layer 1) */
+  --tok-str:    #5fdcab;   /* strings — brand mint (layer 2), lighter than type */
+  --tok-num:    #c8a6f5;   /* numbers + @attributes — quiet violet */
   --tok-com:    #6e7a87;
 
   /* chrome + code surfaces */
@@ -96,11 +113,20 @@
   --quiet:      #818b98;
   --ink-4:      #a0a8b0;
 
-  --accent:     #0969da;
-  --accent-soft:rgba(9, 105, 218, 0.10);
-  --accent-dim: rgba(9, 105, 218, 0.32);
-  --accent-hover:#0a5fc0;
-  --on-accent:  #ffffff;
+  /* same two-layer accent, deepened so white text clears AA on solid fills
+     (--accent ~4.6:1 with #fff) and both layers read as text on white. */
+  --accent:      #0a7d92;            /* deep cyan-teal */
+  --accent-rgb:  10, 125, 146;
+  --accent-soft: rgba(10, 125, 146, 0.10);
+  --accent-dim:  rgba(10, 125, 146, 0.32);
+  --accent-hover:#0a6576;
+  --on-accent:   #ffffff;
+
+  --accent-2:      #0c7e62;          /* deep logo emerald */
+  --accent-2-rgb:  12, 126, 98;
+  --accent-2-soft: rgba(12, 126, 98, 0.10);
+  --accent-2-hover:#0a6b53;
+  /* --accent-grad inherits the var() definition above, so it re-tints here. */
 
   --main-actor: #9a6700;
   --main-actor-soft: rgba(154, 103, 0, 0.12);
@@ -109,10 +135,11 @@
   --ok:         #1a7f37;
   --drop:       #cf222e;
 
-  --tok-kw:     #cf222e;
-  --tok-type:   #0550ae;
-  --tok-str:    #0a3069;
-  --tok-num:    #8250df;
+  /* same roles, deepened so each clears AA on the white code surface. */
+  --tok-kw:     #9a6700;   /* keywords — brand gold (matches --main-actor) */
+  --tok-type:   #0a7d92;   /* types — brand cyan */
+  --tok-str:    #0f7a52;   /* strings — brand emerald */
+  --tok-num:    #8250df;   /* numbers + @attributes — quiet violet */
   --tok-com:    #6e7781;
 
   --topbar-bg:  rgba(255, 255, 255, 0.85);
@@ -185,14 +212,14 @@ img, svg { display: block; }
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(900px 540px at 86% -10%, rgba(76, 141, 255, 0.10), transparent 60%),
-    radial-gradient(720px 480px at -8% 12%, rgba(255, 255, 255, 0.04), transparent 60%);
+    radial-gradient(900px 540px at 86% -10%, rgba(31, 182, 207, 0.10), transparent 60%),
+    radial-gradient(760px 520px at -8% 12%, rgba(0, 191, 149, 0.07), transparent 60%);
 }
-/* light mode: a fainter, cooler wash and no overlay grain */
+/* light mode: a fainter wash of the same two-layer accent, no overlay grain */
 :root[data-theme="light"] .ambient {
   background:
-    radial-gradient(900px 540px at 86% -10%, rgba(9, 105, 218, 0.06), transparent 60%),
-    radial-gradient(720px 480px at -8% 12%, rgba(2, 6, 23, 0.03), transparent 60%);
+    radial-gradient(900px 540px at 86% -10%, rgba(10, 125, 146, 0.06), transparent 60%),
+    radial-gradient(760px 520px at -8% 12%, rgba(12, 126, 98, 0.05), transparent 60%);
 }
 :root[data-theme="light"] .grain { display: none; }
 
@@ -241,13 +268,13 @@ img, svg { display: block; }
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-grad);
   box-shadow: 0 0 0 3px var(--accent-soft);
   animation: dot-pulse 2.4s ease-in-out infinite;
 }
 @keyframes dot-pulse {
   0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); }
-  50%      { box-shadow: 0 0 0 6px rgba(76, 141, 255, 0.04); }
+  50%      { box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.04); }
 }
 
 /* anchored fade-up reveal driven by --i index variable */
