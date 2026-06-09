@@ -110,11 +110,11 @@
   .dotline { display: inline-flex; gap: 6px; }
   .dotline .d {
     width: 8px; height: 8px; border-radius: 50%;
-    background: #1f1f1f;
+    background: var(--term-dot);
   }
-  .dotline .d.red { background: #ff5f56; }
-  .dotline .d.yellow { background: #ffbd2e; }
-  .dotline .d.green { background: #27c93f; }
+  .dotline .d.red { background: var(--term-red); }
+  .dotline .d.yellow { background: var(--term-yellow); }
+  .dotline .d.green { background: var(--term-green); }
 
   .code {
     margin: 0;
@@ -125,13 +125,13 @@
     overflow-x: auto;
     flex: 1;
   }
-  .code .kw { color: #d28cff; }
-  .code .ty { color: #6ddfff; }
-  .code .s  { color: var(--accent); }
-  .code .n  { color: #f59e0b; }
-  .code .at { color: #f59e0b; }
+  .code .kw { color: var(--tok-kw); }
+  .code .ty { color: var(--tok-type); }
+  .code .s  { color: var(--tok-str); }
+  .code .n  { color: var(--tok-num); }
+  .code .at { color: var(--tok-num); }
 
-  .output { background: #060606; }
+  .output { background: var(--inset); }
   .render {
     margin: 0;
     padding: 22px 18px;
@@ -140,7 +140,7 @@
     color: var(--ink-2);
     overflow-x: auto;
     background:
-      linear-gradient(180deg, rgba(52,211,153,0.04) 0%, transparent 18%, transparent 100%);
+      linear-gradient(180deg, rgba(76,141,255,0.05) 0%, transparent 18%, transparent 100%);
     flex: 1;
     min-height: 280px;
     white-space: pre;
@@ -148,7 +148,7 @@
   .render .b { color: var(--ink); font-weight: 600; }
   .render .bar { color: var(--accent); }
   .render .bar-dim { color: var(--ink-4); }
-  .render .num { color: #f59e0b; }
+  .render .num { color: var(--tok-num); }
   .render .hl { color: var(--ink); }
   .render .cursor {
     display: inline-block;
@@ -166,7 +166,7 @@
     border-top: 1px solid var(--line);
     font-size: 11px;
     color: var(--ink-3);
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.4));
+    background: transparent;
   }
   .pane-foot .caret { color: var(--accent); margin-right: 6px; }
   .pane-foot em { font-style: normal; color: var(--ink-2); }

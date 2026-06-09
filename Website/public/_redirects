@@ -12,3 +12,9 @@
 # through to the project's homepage fallback.
 /docs/documentation /docs/ 200
 /docs/documentation/* /docs/ 200
+
+# The /pipeline/ walkthrough cites swift-tui source files with repo-relative
+# links (e.g. ../../swift-tui/Sources/...), which resolve to /swift-tui/... at
+# the origin root. Route those to the source on GitHub so the citations work on
+# the deployed site without rewriting the walkthrough's script.
+/swift-tui/* https://github.com/SwiftTUI/swift-tui/blob/main/:splat 302

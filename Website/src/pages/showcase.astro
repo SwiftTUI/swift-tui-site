@@ -3,6 +3,7 @@ import "../styles/site.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
@@ -71,6 +72,8 @@ const tiles: Tile[] = [
     <meta property="og:image:alt" content="SwiftTUI logo over a dark marketing card" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#0d1117" />
+    <ThemeScript />
     <SiteIcons />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -185,7 +188,7 @@ const tiles: Tile[] = [
   .shot {
     aspect-ratio: 1200 / 750;
     overflow: hidden;
-    background: #060606;
+    background: var(--inset);
     border-bottom: 1px solid var(--line);
   }
   .shot img {

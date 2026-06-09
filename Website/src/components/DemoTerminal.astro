@@ -180,7 +180,7 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     position: relative;
     border: 1px solid var(--line-strong);
     border-radius: 14px;
-    background: linear-gradient(180deg, #0c0c0c 0%, #0a0a0a 100%);
+    background: linear-gradient(180deg, var(--panel) 0%, var(--term-bg) 100%);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.04) inset,
       0 24px 64px -28px rgba(0, 0, 0, 0.65),
@@ -208,12 +208,12 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #1f1f1f;
+    background: var(--term-dot);
     border: 1px solid rgba(255, 255, 255, 0.04);
   }
-  .dots span:nth-child(1) { background: #ff5f56; border-color: rgba(0,0,0,0.2); }
-  .dots span:nth-child(2) { background: #ffbd2e; border-color: rgba(0,0,0,0.2); }
-  .dots span:nth-child(3) { background: #27c93f; border-color: rgba(0,0,0,0.2); }
+  .dots span:nth-child(1) { background: var(--term-red); border-color: rgba(0,0,0,0.2); }
+  .dots span:nth-child(2) { background: var(--term-yellow); border-color: rgba(0,0,0,0.2); }
+  .dots span:nth-child(3) { background: var(--term-green); border-color: rgba(0,0,0,0.2); }
 
   .title {
     display: inline-flex;
@@ -256,7 +256,7 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
   }
   .cap.on {
     color: var(--accent);
-    border-color: rgba(52, 211, 153, 0.45);
+    border-color: var(--accent-dim);
     background: var(--accent-soft);
   }
 
@@ -309,8 +309,8 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     font-size: 12.5px;
     line-height: 1.85;
     background:
-      radial-gradient(700px 380px at 100% 100%, rgba(52,211,153,0.05), transparent 65%),
-      #060606;
+      radial-gradient(700px 380px at 100% 100%, rgba(76,141,255,0.05), transparent 65%),
+      var(--term-bg);
   }
   .ds-frame { max-width: 720px; }
   .ds-row { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: baseline; }
@@ -379,7 +379,7 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
     border-top: 1px solid var(--line);
     font-size: 11px;
     color: var(--ink-3);
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
+    background: transparent;
   }
   .status em { font-style: normal; color: var(--ink-2); }
   .status .caret { color: var(--accent); margin-right: 6px; }
@@ -422,13 +422,13 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
   }
   .phaseRing.on {
     color: var(--accent);
-    border-color: rgba(52, 211, 153, 0.45);
+    border-color: var(--accent-dim);
     background: var(--accent-soft);
     animation: phase-cycle 2.4s ease-in-out infinite;
   }
   @keyframes phase-cycle {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.30); }
-    50%      { box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.00); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 141, 255, 0.30); }
+    50%      { box-shadow: 0 0 0 4px rgba(76, 141, 255, 0.00); }
   }
 
   .caption {

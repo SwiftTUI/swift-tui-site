@@ -1,90 +1,18 @@
 ---
 import "../styles/site.css";
+import "../styles/render-pipeline.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
 const canonical = `${site}${base || ""}/pipeline/`;
-const docsUrl = `${base}/docs/documentation/`;
 const ogImage = `${site}${base || ""}/og.png`;
-const title = "SwiftTUI Rendering Pipeline";
+const title = "SwiftTUI Render Pipeline — a developer walkthrough";
 const description =
-  "A user-facing guide to SwiftTUI's resolve, measure, place, semantics, draw, raster, and commit frame pipeline.";
-
-const phases = [
-  {
-    n: "01",
-    name: "resolve",
-    question: "What views exist in this frame?",
-    artifact: "ResolvedNode tree",
-    body:
-      "SwiftTUI evaluates the authored View body and records structure, modifiers, environment values, identity, and presentation declarations. Nothing has a size yet. The result is a tree that says what the interface is made of.",
-    example:
-      "A VStack with a title, Divider, ProgressView, and two LabeledContent rows becomes a resolved tree with those children and their modifiers attached.",
-  },
-  {
-    n: "02",
-    name: "measure",
-    question: "How much cell space does each subtree want?",
-    artifact: "MeasuredNode tree",
-    body:
-      "Parents propose a cell size, and children choose the size they need inside that proposal. Text wrapping, fixed sizes, spacing, custom Layout values, and controls make their sizing decisions here.",
-    example:
-      "Given a 40-column proposal, the title can stay on one row while a long label may wrap or report a taller measured size.",
-  },
-  {
-    n: "03",
-    name: "place",
-    question: "Where does each measured view land?",
-    artifact: "PlacedNode tree",
-    body:
-      "The layout engine assigns each measured subtree an integer-cell rectangle: x, y, width, and height. This is the first phase with final geometry.",
-    example:
-      "The title might land at row 0, the divider at row 1, and the progress view at row 2, all within the same 40-column window.",
-  },
-  {
-    n: "04",
-    name: "semantics",
-    question: "How can the user interact with this frame?",
-    artifact: "SemanticSnapshot",
-    body:
-      "SwiftTUI walks the placed tree and extracts focus targets, button actions, key commands, pointer hit regions, scroll routes, selection routes, drop targets, and accessibility nodes.",
-    example:
-      "A focused TextField contributes an editing route and caret position; a disabled Button stays visible but does not contribute an activation route.",
-  },
-  {
-    n: "05",
-    name: "draw",
-    question: "What should be painted?",
-    artifact: "DrawNode commands",
-    body:
-      "Placed views become drawing commands: text runs, dividers, borders, shapes, chart marks, table chrome, image placeholders, and style tokens. Drawing commands still are not terminal bytes.",
-    example:
-      "The divider becomes a horizontal rule command, and the progress view becomes text plus filled and empty bar segments with semantic styles.",
-  },
-  {
-    n: "06",
-    name: "raster",
-    question: "Which styled cells are visible?",
-    artifact: "RasterSurface",
-    body:
-      "Draw commands are packed into a grid of terminal cells. Each cell records a character and style information. The raster surface is host-neutral data, so terminal escape sequences are still outside this phase.",
-    example:
-      "A 40 by 8 preview frame becomes 320 cells, including blank cells, divider glyphs, bar glyphs, and styled text cells.",
-  },
-  {
-    n: "07",
-    name: "commit",
-    question: "What runtime work follows this frame?",
-    artifact: "CommitPlan",
-    body:
-      "SwiftTUI packages lifecycle transitions and handler installation for the runtime. This is where appeared and disappeared identities, task starts and cancellations, and current input handlers become explicit work.",
-    example:
-      "If a sheet opens, the commit plan installs overlay handlers and starts any newly appeared task after the frame is ready to present.",
-  },
-];
+  "A source-grounded walkthrough of the SwiftTUI render pipeline: from authored View code through the runtime stages, the seven phase products, change propagation, isolation, commit policy, and host handoff.";
 ---
 <!doctype html>
 <html lang="en">
@@ -93,13 +21,15 @@ const phases = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0d1117" />
+    <ThemeScript />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="article" />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="SwiftTUI logo over a dark marketing card" />
+    <meta property="og:image:alt" content="SwiftTUI render pipeline walkthrough" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={ogImage} />
     <SiteIcons />
@@ -109,366 +39,369 @@ const phases = [
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
     />
+    <script is:inline defer src={`${base}/render-pipeline/app.js`}></script>
   </head>
   <body>
     <div class="ambient" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
+
     <SiteHeader />
-    <main>
-      <section class="pipeline-hero">
-        <div class="shell hero-grid">
-          <div class="hero-copy">
-            <span class="tag">
-              <span class="dot"></span>
-              <span>rendering pipeline</span>
-            </span>
-            <h1>How a SwiftTUI frame becomes terminal cells.</h1>
-            <p class="lead">
-              Every frame follows the same path: resolve, measure, place,
-              semantics, draw, raster, and commit. The split keeps app code
-              predictable: layout decides geometry, semantics decide interaction,
-              drawing decides visible content, and presentation decides terminal
-              bytes only after the frame is data.
-            </p>
-          </div>
-          <aside class="hero-panel mono" aria-label="Pipeline overview">
-            <div class="panel-bar">Frame path</div>
-            <ol>
-              {phases.map((phase) => (
-                <li>
-                  <span>{phase.n}</span>
-                  <strong>{phase.name}</strong>
-                  <em>{phase.question}</em>
-                </li>
-              ))}
-            </ol>
-          </aside>
-        </div>
-      </section>
 
-      <section class="example-band">
-        <div class="shell example-grid">
-          <div>
-            <span class="eyebrow"><span class="num">/example</span>One authored view</span>
-            <h2>The same declaration feeds every phase.</h2>
-            <p>
-              You author a View. SwiftTUI handles the pipeline. You only reach
-              for pipeline artifacts when you want previews, test assertions, or
-              detailed debugging output.
-            </p>
-          </div>
-          <pre class="code mono"><code><span class="kw">struct</span> <span class="ty">BuildSummary</span>: <span class="ty">View</span> &#123;
-  <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
-    <span class="ty">VStack</span>(alignment: .leading, spacing: <span class="n">0</span>) &#123;
-      <span class="ty">Text</span>(<span class="s">"Deploy Queue"</span>).bold()
-      <span class="ty">Divider</span>()
-      <span class="ty">ProgressView</span>(<span class="s">"Release"</span>, value: <span class="n">18</span>, total: <span class="n">24</span>)
-      <span class="ty">LabeledContent</span>(<span class="s">"Owner"</span>, value: <span class="s">"infra"</span>)
-    &#125;
-    .padding(<span class="n">1</span>)
-  &#125;
-&#125;</code></pre>
-        </div>
-      </section>
+    <main class="rp">
+      <div class="doc-shell" id="top">
+        <aside class="toc" aria-label="On this page">
+          <p class="toc-kicker">On this page</p>
+          <nav id="toc-nav"></nav>
+          <p class="toc-note">
+            Code references are repo-relative paths into the
+            <code>swift-tui</code> package and open the cited source on GitHub.
+          </p>
+        </aside>
 
-      <section class="phase-list">
-        <div class="shell">
-          <header class="section-head">
-            <span class="eyebrow"><span class="num">/phases</span>Step by step</span>
-            <h2>What each phase answers.</h2>
-          </header>
-          <ol class="phase-cards">
-            {phases.map((phase) => (
-              <li class="phase-card">
-                <div class="phase-main">
-                  <span class="phase-num mono">{phase.n}</span>
-                  <div>
-                    <h3>{phase.name}</h3>
-                    <p class="question">{phase.question}</p>
-                  </div>
-                </div>
-                <p>{phase.body}</p>
-                <div class="phase-example">
-                  <span class="mono">example</span>
-                  <p>{phase.example}</p>
-                </div>
-                <div class="artifact mono">{phase.artifact}</div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section class="boundary">
-        <div class="shell boundary-grid">
-          <div>
-            <span class="eyebrow"><span class="num">/boundary</span>Terminal presentation</span>
-            <h2>Terminal escape sequences happen after raster.</h2>
-          </div>
-          <div class="boundary-copy">
-            <p>
-              The raster surface is a styled cell grid, not a stream of terminal
-              control codes. Terminal capability decisions such as truecolor,
-              ANSI fallback, Kitty graphics, Sixel graphics, and OSC 8 hyperlink
-              emission happen at the presentation boundary.
+        <div class="rp-main">
+          <!-- ===================== INTRO ===================== -->
+          <section class="lede" id="intro">
+            <p class="eyebrow">Onboarding walkthrough</p>
+            <h1>What happens between your <code>View</code> and the terminal.</h1>
+            <p class="lede-copy">
+              A SwiftTUI frame is not "draw the view." It is a short chain of typed,
+              immutable products produced under a deliberate scheduling and isolation
+              model. This page follows one small view through that chain, explains why
+              the engine is shaped the way it is, and points at the exact source that
+              implements each step. It is written for engineers reading the framework
+              for the first time, and as a refresher for people changing the renderer.
             </p>
-            <p>
-              That boundary is also where SwiftTUI sanitizes authored text and
-              hyperlink destinations before writing bytes to a terminal stream.
-              Layout, routing, and raster data stay independent from terminal
-              escape-sequence safety rules.
-            </p>
-          </div>
-        </div>
-      </section>
+            <dl class="lede-facts">
+              <div>
+                <dt>Two pipelines, one frame</dt>
+                <dd>A 7-product <em>data</em> model and a 5-stage <em>scheduling</em> model that are intentionally not the same shape.</dd>
+              </div>
+              <div>
+                <dt>Source-grounded</dt>
+                <dd>Every claim links to a file and line in <code>swift-tui</code>; nothing here is invented.</dd>
+              </div>
+              <div>
+                <dt>Current at <code>HEAD</code></dt>
+                <dd>Mirrors the framework's own DocC <em>Runtime Render Pipeline</em> article.</dd>
+              </div>
+            </dl>
+          </section>
 
-      <section class="inspect">
-        <div class="shell inspect-grid">
-          <div>
-            <span class="eyebrow"><span class="num">/inspect</span>When you need artifacts</span>
-            <h2>Use DefaultRenderer for previews and assertions.</h2>
-            <p>
-              App code usually does not call pipeline phases directly. For a
-              preview, test, or diagnostic path, render a view on the main actor
-              and inspect the returned frame artifacts.
-            </p>
-          </div>
-          <pre class="code mono"><code><span class="kw">let</span> renderer = <span class="ty">DefaultRenderer</span>()
-<span class="kw">let</span> frame = renderer.render(
-  <span class="ty">BuildSummary</span>(),
-  proposal: .init(width: <span class="n">40</span>, height: <span class="n">8</span>)
-)
+          <!-- ===================== MENTAL MODEL ===================== -->
+          <section class="doc-section" id="overview">
+            <div class="section-head">
+              <span class="section-no">01</span>
+              <div>
+                <h2>The mental model: two views of one frame</h2>
+                <p class="section-lead">
+                  The most common point of confusion is that SwiftTUI documentation
+                  talks about <em>seven phases</em> in some places and <em>five
+                  stages</em> in others. These are two descriptions of the same frame,
+                  kept separate on purpose.
+                </p>
+              </div>
+            </div>
 
-<span class="kw">let</span> surface = frame.rasterSurface
-<span class="kw">let</span> routes = frame.semanticSnapshot
-<span class="kw">let</span> work = frame.commitPlan</code></pre>
-        </div>
-      </section>
+            <div class="twocol">
+              <article class="prose-card">
+                <h3>Phase products — the data model</h3>
+                <p>
+                  Phase products are the values the engine computes, in order. Each is an
+                  immutable type owned by <code>SwiftTUICore</code>. Later products are
+                  <em>derived</em> from earlier ones; nothing earlier is mutated.
+                </p>
+                <p class="mono-flow">resolve → measure → place → semantics → draw → raster → commit</p>
+                <p>
+                  You can reason about correctness purely in these terms: given a resolved
+                  tree, layout is a function; given placement, drawing is a function.
+                </p>
+              </article>
+              <article class="prose-card">
+                <h3>Runtime stages — the scheduling model</h3>
+                <p>
+                  Runtime stages are the boundaries an interactive session schedules work
+                  across. They are owned by <code>SwiftTUIRuntime</code> and exist to place
+                  cancellation points, animation sampling, and an off-actor boundary.
+                </p>
+                <p class="mono-flow">head → animationInjection → latePreferenceReconciliation → fusedFrameTail → commit</p>
+                <p>
+                  <code>fusedFrameTail</code> deliberately collapses five phase products
+                  into one scheduling node so that pure work can leave the main actor.
+                </p>
+              </article>
+            </div>
 
-      <section class="developer-docs">
-        <div class="shell docs-grid">
-          <div>
-            <span class="eyebrow"><span class="num">/docs</span>Implementation details</span>
-            <h2>Use DocC for the runtime pipeline reference.</h2>
-          </div>
-          <div class="docs-copy">
-            <p>
-              This page explains the product model. The DocC reference carries
-              the developer guide for the runtime callpath, stage scheduling,
-              diagnostics, and host handoff.
+            <figure class="mapping" aria-labelledby="mapping-cap">
+              <div class="mapping-board" id="mapping-board"></div>
+              <figcaption id="mapping-cap">
+                The mapping is not one-to-one. <strong>head</strong> covers
+                <code>resolve</code>; <strong>animationInjection</strong> and
+                <strong>latePreferenceReconciliation</strong> adjust the in-flight draft
+                without introducing a new product; <strong>fusedFrameTail</strong> spans
+                <code>measure</code>→<code>raster</code>; <strong>commit</strong> covers
+                <code>commit</code>. That difference is the whole point of having two
+                models — see <a href="#isolation">isolation</a>.
+              </figcaption>
+            </figure>
+
+            <aside class="callout">
+              <p class="callout-tag">Why this matters</p>
+              <p>
+                The fused tail is a <em>scheduling optimization over distinct products</em>,
+                not a different data model. If you remember one sentence from this page,
+                remember that one: it explains the cancellation, the off-actor boundary,
+                and why a single state change can still produce zero visible frames.
+              </p>
+            </aside>
+          </section>
+
+          <!-- ===================== INTERACTIVE WALKTHROUGH ===================== -->
+          <section class="doc-section" id="explorer">
+            <div class="section-head">
+              <span class="section-no">02</span>
+              <div>
+                <h2>Walk a frame through the runtime stages</h2>
+                <p class="section-lead">
+                  Step through the five runtime stages. The left panel highlights the
+                  authored lines being interpreted, the centre describes the stage, and the
+                  right panel shows the products that exist <em>so far</em> — honestly: no
+                  terminal cells exist until <code>raster</code> inside the fused tail.
+                </p>
+              </div>
+            </div>
+
+            <div class="explorer">
+              <div class="explorer-controls" role="group" aria-label="Walkthrough controls">
+                <button class="btn" id="prev-button" type="button">
+                  <span aria-hidden="true">←</span> Prev
+                </button>
+                <button class="btn btn-primary" id="play-toggle" type="button" aria-label="Auto-advance the walkthrough">
+                  <span class="play-label">Auto-play</span>
+                  <span class="pause-label">Pause</span>
+                </button>
+                <button class="btn" id="next-button" type="button">
+                  Next <span aria-hidden="true">→</span>
+                </button>
+                <span class="explorer-progress" id="explorer-progress" aria-live="polite"></span>
+              </div>
+
+              <div class="explorer-grid">
+                <section class="panel code-panel" aria-labelledby="code-title">
+                  <header class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Authored input</p>
+                      <h3 id="code-title">BuildSummary.swift</h3>
+                    </div>
+                    <span class="tag">View body</span>
+                  </header>
+                  <pre class="code"><code id="view-code"></code></pre>
+                </section>
+
+                <section class="panel stage-panel" aria-labelledby="stage-title">
+                  <header class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Runtime stage</p>
+                      <h3 id="stage-title">RuntimeRenderPipeline</h3>
+                    </div>
+                    <span class="tag" id="stage-counter">1 / 5</span>
+                  </header>
+                  <div class="stage-rail" id="stage-rail"></div>
+                  <div class="stage-detail" id="stage-detail"></div>
+                </section>
+
+                <section class="panel product-panel" aria-labelledby="product-title">
+                  <header class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Products so far</p>
+                      <h3 id="product-title">Frame state</h3>
+                    </div>
+                    <span class="tag" id="product-status">building head</span>
+                  </header>
+                  <div class="product-ledger" id="product-ledger"></div>
+                  <pre class="terminal" aria-label="Representative product state"><code id="terminal-output"></code></pre>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===================== PHASE PRODUCTS ===================== -->
+          <section class="doc-section" id="products">
+            <div class="section-head">
+              <span class="section-no">03</span>
+              <div>
+                <h2>The seven phase products</h2>
+                <p class="section-lead">
+                  Each product answers one question about the frame and is gathered, in
+                  full, onto <code>FrameArtifacts</code>. Hosts consume committed contracts
+                  rather than reaching into renderer-private state.
+                </p>
+              </div>
+            </div>
+            <div class="product-table" id="product-table"></div>
+            <p class="source-line">
+              Defined in
+              <a href="../../swift-tui/Sources/SwiftTUICore/Commit/FrameArtifacts.swift">SwiftTUICore/Commit/FrameArtifacts.swift</a>.
             </p>
-            <a class="docs-link mono" href={docsUrl}>Open the DocC reference</a>
-          </div>
+          </section>
+
+          <!-- ===================== CHANGE PROPAGATION ===================== -->
+          <section class="doc-section" id="propagation">
+            <div class="section-head">
+              <span class="section-no">04</span>
+              <div>
+                <h2>How a change becomes a frame</h2>
+                <p class="section-lead">
+                  State writes, input, signals, and deadlines never call the renderer
+                  directly. They record <em>intent</em>. A scheduler coalesces that intent,
+                  and the run loop pulls one frame's worth of work at a time — which is why
+                  ten mutations in a tick render once, not ten times.
+                </p>
+              </div>
+            </div>
+            <ol class="flow" id="propagation-flow"></ol>
+            <aside class="callout callout-fix">
+              <p class="callout-tag">Common misconception</p>
+              <p>
+                A <code>@State</code> write does not "trigger a re-render." It marks the
+                owning graph node dirty and asks the scheduler for a frame. The scheduler
+                decides <em>when</em>, and may merge your write with others into a single
+                <code>ScheduledFrame</code>. The renderer then re-evaluates only the dirty
+                frontier, not the whole tree.
+              </p>
+            </aside>
+          </section>
+
+          <!-- ===================== ISOLATION ===================== -->
+          <section class="doc-section" id="isolation">
+            <div class="section-head">
+              <span class="section-no">05</span>
+              <div>
+                <h2>What runs where</h2>
+                <p class="section-lead">
+                  Authored <code>View</code>, <code>Scene</code>, and <code>App</code> values
+                  are main-actor APIs. The fused tail is pure over already-resolved products,
+                  so it can run off the main actor when the strategy allows. That boundary is
+                  the reason the scheduling model exists at all.
+                </p>
+              </div>
+            </div>
+            <div class="isolation">
+              <div class="isolation-col" id="isolation-main"></div>
+              <div class="isolation-col" id="isolation-tail"></div>
+            </div>
+            <h3 class="sub-h">Invariants the renderer upholds</h3>
+            <ul class="invariants" id="invariants"></ul>
+          </section>
+
+          <!-- ===================== COMMIT / FRAME FATES ===================== -->
+          <section class="doc-section" id="commit">
+            <div class="section-head">
+              <span class="section-no">06</span>
+              <div>
+                <h2>Four fates of a frame</h2>
+                <p class="section-lead">
+                  Computing a frame's products is not the same as showing it. Commit applies
+                  completed-frame policy, and a candidate can take one of four paths. This is
+                  the honest answer to "I changed state but nothing on screen changed."
+                </p>
+              </div>
+            </div>
+            <div class="fates" id="fates"></div>
+            <p class="source-line">
+              Decided in
+              <a href="../../swift-tui/Sources/SwiftTUIRuntime/Rendering/DefaultRenderer+CompletedFrameCandidates.swift">DefaultRenderer+CompletedFrameCandidates.swift</a>.
+            </p>
+          </section>
+
+          <!-- ===================== HANDOFF ===================== -->
+          <section class="doc-section" id="handoff">
+            <div class="section-head">
+              <span class="section-no">07</span>
+              <div>
+                <h2>Crossing into the host</h2>
+                <p class="section-lead">
+                  Commit produces data, not output. <code>RunLoop</code> presents a committed
+                  frame according to the configured output mode and the roles the surface
+                  implements. Terminal bytes live entirely below this boundary.
+                </p>
+              </div>
+            </div>
+
+            <h3 class="sub-h">Host-facing damage is re-derived, not forwarded</h3>
+            <div class="damage" id="damage"></div>
+
+            <h3 class="sub-h">Presentation paths</h3>
+            <div class="handoff" id="handoff-flow"></div>
+            <p class="source-line">
+              Dispatched in
+              <a href="../../swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift">RunLoop+Presentation.swift</a>;
+              the host contract lives in
+              <a href="../../swift-tui/Sources/SwiftTUIRuntime/Terminal/PresentationSurface.swift">PresentationSurface.swift</a>.
+            </p>
+          </section>
+
+          <!-- ===================== SOURCE DEEP DIVE ===================== -->
+          <section class="doc-section" id="source">
+            <div class="section-head">
+              <span class="section-no">08</span>
+              <div>
+                <h2>Read the real code</h2>
+                <p class="section-lead">
+                  The walkthrough above is grounded in these excerpts. Use the tabs to inspect
+                  the points where data changes shape. Highlighted lines are the ones the prose
+                  refers to.
+                </p>
+              </div>
+            </div>
+            <div class="source-tabs" id="source-tabs" role="tablist" aria-label="Source excerpts"></div>
+            <div class="source-workbench">
+              <aside class="source-meta" id="source-meta"></aside>
+              <pre class="source-snippet"><code id="source-snippet"></code></pre>
+              <aside class="source-notes" id="source-notes"></aside>
+            </div>
+          </section>
+
+          <!-- ===================== DIAGNOSTICS ===================== -->
+          <section class="doc-section" id="diagnostics">
+            <div class="section-head">
+              <span class="section-no">09</span>
+              <div>
+                <h2>Observing the pipeline</h2>
+                <p class="section-lead">
+                  You do not have to read the source to see what the renderer did. With a
+                  diagnostics sink installed, the runtime emits a <code>RuntimeFrameSample</code>
+                  per committed frame, zero-artifact outcome, and elision.
+                </p>
+              </div>
+            </div>
+            <div class="diag" id="diag"></div>
+            <p class="source-line">
+              <code>SwiftTUIProfiling</code> turns these neutral samples into consumer-facing
+              records and summaries; the runtime does not depend on the profiling product.
+            </p>
+          </section>
+
+          <!-- ===================== CODE MAP / GLOSSARY ===================== -->
+          <section class="doc-section" id="map">
+            <div class="section-head">
+              <span class="section-no">10</span>
+              <div>
+                <h2>Where to look next</h2>
+                <p class="section-lead">
+                  Start from the question you actually have. These are the framework's own
+                  entry points, plus a glossary of the types named throughout this page.
+                </p>
+              </div>
+            </div>
+            <h3 class="sub-h">Start here when you ask…</h3>
+            <div class="codemap" id="codemap"></div>
+            <h3 class="sub-h">Glossary</h3>
+            <div class="glossary" id="glossary"></div>
+          </section>
         </div>
-      </section>
+      </div>
     </main>
+
     <SiteFooter />
   </body>
 </html>
-
-<style>
-  .pipeline-hero {
-    padding: 76px 0 48px;
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.96fr) minmax(320px, 0.72fr);
-    gap: 48px;
-    align-items: start;
-  }
-  .hero-copy .tag { margin-bottom: 24px; }
-  .lead {
-    margin-top: 22px;
-    max-width: 68ch;
-    font-size: 17px;
-    line-height: 1.6;
-  }
-  .hero-panel {
-    border: 1px solid var(--line-strong);
-    border-radius: 8px;
-    background: var(--panel);
-    overflow: hidden;
-  }
-  .panel-bar {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--line);
-    color: var(--ink-3);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    background: var(--panel-2);
-  }
-  .hero-panel ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .hero-panel li {
-    display: grid;
-    grid-template-columns: 42px 86px 1fr;
-    gap: 12px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--line);
-    align-items: baseline;
-  }
-  .hero-panel li:last-child { border-bottom: 0; }
-  .hero-panel span {
-    color: var(--accent);
-    font-size: 11px;
-  }
-  .hero-panel strong {
-    color: var(--ink);
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .hero-panel em {
-    color: var(--ink-3);
-    font-size: 11px;
-    font-style: normal;
-    line-height: 1.45;
-  }
-
-  .example-band,
-  .phase-list,
-  .boundary,
-  .inspect,
-  .developer-docs {
-    padding: 72px 0;
-    border-top: 1px solid var(--line);
-  }
-  .example-grid,
-  .inspect-grid,
-  .boundary-grid,
-  .docs-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 42px;
-    align-items: start;
-  }
-  .example-grid h2,
-  .inspect-grid h2,
-  .boundary-grid h2,
-  .docs-grid h2,
-  .section-head h2 {
-    margin-top: 14px;
-  }
-  .example-grid p,
-  .inspect-grid p,
-  .boundary-copy p,
-  .docs-copy p {
-    margin-top: 16px;
-    max-width: 68ch;
-    line-height: 1.65;
-  }
-  .boundary-copy p:first-child { margin-top: 0; }
-  .docs-copy p:first-child { margin-top: 0; }
-  .docs-link {
-    display: inline-block;
-    margin-top: 22px;
-    color: var(--accent);
-    font-size: 13px;
-    text-decoration: none;
-  }
-  .docs-link:hover { color: var(--ink); }
-  .code {
-    margin: 0;
-    padding: 18px;
-    border: 1px solid var(--line-strong);
-    border-radius: 8px;
-    background: #060606;
-    color: var(--ink);
-    font-size: 12.5px;
-    line-height: 1.7;
-    overflow-x: auto;
-  }
-  .code .kw { color: #d28cff; }
-  .code .ty { color: #6ddfff; }
-  .code .s { color: var(--accent); }
-  .code .n { color: #f59e0b; }
-
-  .section-head {
-    max-width: 760px;
-    margin-bottom: 34px;
-  }
-  .phase-cards {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-  }
-  .phase-card {
-    border: 1px solid var(--line-strong);
-    border-radius: 8px;
-    background: linear-gradient(180deg, var(--panel) 0%, var(--bg-soft) 100%);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 290px;
-  }
-  .phase-main {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-  .phase-num {
-    color: var(--accent);
-    font-size: 11px;
-  }
-  .phase-card h3 {
-    font-size: 22px;
-    letter-spacing: -0.012em;
-  }
-  .question {
-    margin-top: 5px;
-    color: var(--ink-3);
-    font-size: 13px;
-  }
-  .phase-card > p {
-    color: var(--ink-2);
-    font-size: 14px;
-    line-height: 1.62;
-  }
-  .phase-example {
-    margin-top: 18px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--line);
-  }
-  .phase-example span {
-    color: var(--ink-4);
-    font-size: 10.5px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .phase-example p {
-    margin-top: 6px;
-    color: var(--ink-3);
-    font-size: 13px;
-    line-height: 1.55;
-  }
-  .artifact {
-    margin-top: auto;
-    padding-top: 16px;
-    color: var(--accent);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-  }
-
-  @media (max-width: 980px) {
-    .hero-grid,
-    .example-grid,
-    .inspect-grid,
-    .boundary-grid,
-    .docs-grid {
-      grid-template-columns: 1fr;
-    }
-    .phase-cards { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 620px) {
-    .pipeline-hero { padding-top: 48px; }
-    .hero-panel li { grid-template-columns: 34px 76px 1fr; gap: 8px; }
-    .phase-card { min-height: 0; }
-  }
-</style>

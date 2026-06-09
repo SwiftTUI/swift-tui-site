@@ -1,0 +1,77 @@
+---
+// Pre-paint theme bootstrap + global toggle wiring.
+//
+// Inlined and blocking (is:inline) so it runs before first paint and the page
+// never flashes the wrong appearance. Precedence: an explicit saved choice
+// wins; otherwise follow the OS — and keep following it live until the user
+// makes an explicit choice. The toggle button (#theme-toggle) lives in
+// SiteHeader; this wires it once it exists. Include in each page's <head>.
+---
+<script is:inline>
+  (function () {
+    "use strict";
+    var STORAGE_KEY = "swifttui-theme";
+    var root = document.documentElement;
+    var mql = window.matchMedia
+      ? window.matchMedia("(prefers-color-scheme: light)")
+      : null;
+
+    function storedTheme() {
+      try {
+        var value = localStorage.getItem(STORAGE_KEY);
+        return value === "light" || value === "dark" ? value : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function systemTheme() {
+      return mql && mql.matches ? "light" : "dark";
+    }
+
+    function apply(theme) {
+      root.dataset.theme = theme;
+    }
+
+    // Start aligned with the system unless the user has chosen before.
+    apply(storedTheme() || systemTheme());
+
+    // Keep following the OS until an explicit choice is made.
+    if (mql) {
+      var onSystemChange = function () {
+        if (!storedTheme()) apply(systemTheme());
+      };
+      if (mql.addEventListener) mql.addEventListener("change", onSystemChange);
+      else if (mql.addListener) mql.addListener(onSystemChange);
+    }
+
+    function wireToggle() {
+      var button = document.getElementById("theme-toggle");
+      if (!button) return;
+      var sync = function () {
+        var isLight = root.dataset.theme === "light";
+        var label = isLight ? "Switch to dark mode" : "Switch to light mode";
+        button.setAttribute("aria-pressed", String(isLight));
+        button.setAttribute("aria-label", label);
+        button.setAttribute("title", label);
+      };
+      button.addEventListener("click", function () {
+        var next = root.dataset.theme === "light" ? "dark" : "light";
+        apply(next);
+        try {
+          localStorage.setItem(STORAGE_KEY, next);
+        } catch (error) {
+          /* storage unavailable (private mode); theme still applies */
+        }
+        sync();
+      });
+      sync();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", wireToggle);
+    } else {
+      wireToggle();
+    }
+  })();
+</script>
