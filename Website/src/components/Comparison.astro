@@ -1,19 +1,73 @@
 ---
+// Cells carry an explicit state (yes | partial | no) decoupled from their
+// label, so a "—" can still carry a qualifier (e.g. "— immediate-mode").
+// Verdicts fact-checked June 2026 against each framework's current release;
+// see the legend below for versions.
 const rows = [
   {
     name: "SwiftTUI",
     accent: true,
-    cells: ["✓", "✓ via SwiftUIHost", "✓ WASI, no emulator"],
+    cells: [
+      { s: "yes", t: "✓" },
+      { s: "yes", t: "✓ SwiftUI-shaped" },
+      { s: "yes", t: "✓ tap·drag·hover" },
+      { s: "yes", t: "✓ SwiftUIHost" },
+      { s: "yes", t: "✓ WebHost · DOM" },
+      { s: "yes", t: "✓ WASI · DOM" },
+    ],
   },
-  { name: "Bubble Tea (Go)", cells: ["—", "—", "—"] },
-  { name: "Textual (Python)", cells: ["—", "—", "via textual-serve"] },
-  { name: "Ratatui (Rust)", cells: ["—", "—", "—"] },
-  { name: "Ink (JS/React)", cells: ["partial (JSX)", "—", "—"] },
+  {
+    name: "Bubble Tea (Go)",
+    cells: [
+      { s: "yes", t: "✓" },
+      { s: "yes", t: "✓ Elm arch" },
+      { s: "partial", t: "~ mouse events" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+    ],
+  },
+  {
+    name: "Textual (Python)",
+    cells: [
+      { s: "yes", t: "✓" },
+      { s: "yes", t: "✓ widgets · CSS" },
+      { s: "partial", t: "~ mouse · hover" },
+      { s: "no", t: "—" },
+      { s: "yes", t: "✓ serve · xterm" },
+      { s: "no", t: "—" },
+    ],
+  },
+  {
+    name: "Ratatui (Rust)",
+    cells: [
+      { s: "yes", t: "✓" },
+      { s: "no", t: "— immediate-mode" },
+      { s: "partial", t: "~ backend only" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+      { s: "partial", t: "~ Ratzilla · DOM" },
+    ],
+  },
+  {
+    name: "Ink (JS/React)",
+    cells: [
+      { s: "yes", t: "✓" },
+      { s: "yes", t: "✓ React" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+      { s: "no", t: "—" },
+    ],
+  },
 ];
 const headers = [
-  "SwiftUI-style DSL",
+  "Terminal rendering",
+  "Declarative UI",
+  "Pointer & gestures",
   "Native app embed",
-  "Browser deploy w/o emulator",
+  "Served to browser",
+  "Static WASM build",
 ];
 ---
 <section class="compare" id="compare">
@@ -22,10 +76,13 @@ const headers = [
       <span class="eyebrow"><span class="num">/02</span>Where SwiftTUI sits</span>
       <h2>One author surface. Four hosts.</h2>
       <p class="lede">
-        Compared to other modern TUI frameworks against the things SwiftTUI
-        was built to do. Marks reflect the libraries' first-party stories;
-        partial marks note limited or indirect support, not
-        framework-integrated equivalence.
+        One declarative <span class="mono">View</span> tree, rendered to four
+        hosts &mdash; a terminal, a native SwiftUI surface, a localhost WebHost,
+        and a static WASM bundle. Both browser paths paint to the DOM with a
+        real accessibility tree, not a terminal emulator. Here's how that
+        surface area lines up against other modern TUI frameworks: the first two
+        columns are common ground, the last four are where the same source
+        travels.
       </p>
     </header>
 
@@ -38,15 +95,18 @@ const headers = [
         <div class={`row ${r.accent ? "accent" : ""}`} role="row">
           <span class="cell name" role="rowheader">{r.name}</span>
           {r.cells.map((c) => (
-            <span class="cell" role="cell" data-state={c === "✓" || c.startsWith("✓") ? "yes" : c === "—" ? "no" : "partial"}>{c}</span>
+            <span class="cell" role="cell" data-state={c.s}>{c.t}</span>
           ))}
         </div>
       ))}
     </div>
 
     <p class="foot mono">
-      Sources: each project's README and official docs. Corrections welcome via
-      the <a href="https://github.com/SwiftTUI/swift-tui-site/issues">site repo</a>.
+      Compared June 2026 against current releases &mdash; Bubble Tea 2.0 ·
+      Textual 8.2 · Ratatui 0.30 · Ink 7.0. <span class="lk">✓</span>&nbsp;first-party
+      · <span class="lk">~</span>&nbsp;partial, third-party, or raw mouse events
+      · <span class="lk">—</span>&nbsp;none. Ratzilla is an ecosystem crate;
+      Textual's browser host streams a server-side process through xterm.js.
     </p>
   </div>
 </section>
@@ -59,7 +119,7 @@ const headers = [
   }
   .head { max-width: 760px; margin-bottom: 36px; }
   .head h2 { margin-top: 16px; }
-  .head .lede { margin-top: 14px; max-width: 70ch; }
+  .head .lede { margin-top: 14px; max-width: 72ch; }
 
   .grid {
     border: 1px solid var(--line-strong);
@@ -70,7 +130,7 @@ const headers = [
   }
   .row {
     display: grid;
-    grid-template-columns: 1.2fr repeat(3, 1fr);
+    grid-template-columns: 1.1fr repeat(6, minmax(0, 1fr));
     border-bottom: 1px solid var(--line);
   }
   .row:last-child { border-bottom: 0; }
@@ -94,17 +154,15 @@ const headers = [
   .cell[data-state="no"]  { color: var(--ink-4); }
   .cell[data-state="partial"] { color: var(--warn); }
 
-  .foot { margin-top: 14px; font-size: 11px; color: var(--ink-4); }
-  .foot a { color: var(--ink-3); border-bottom: 1px solid var(--line); }
-  .foot a:hover { color: var(--accent); }
+  .foot { margin-top: 14px; font-size: 11px; color: var(--ink-4); line-height: 1.7; }
+  .foot .lk { color: var(--ink-2); }
 
   @media (max-width: 1080px) {
     .grid { font-size: 11px; }
-    .row { grid-template-columns: 1.2fr repeat(3, 1fr); }
     .cell { padding: 10px 8px; }
   }
-  @media (max-width: 720px) {
-    .grid { overflow-x: auto; }
-    .row { min-width: 480px; }
+  @media (max-width: 980px) {
+    .grid { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .row { min-width: 900px; }
   }
 </style>
