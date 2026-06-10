@@ -10,7 +10,9 @@
         <span class="mono">Scene</span> declarations flow into terminal-native
         binaries, browser deployments built with <span class="mono">SwiftTUIWASI</span>,
         localhost browser sessions through <span class="mono">SwiftTUIWebHost</span>,
-        and retained native scenes through <span class="mono">SwiftUIHost</span>.
+        retained native scenes through <span class="mono">SwiftUIHost</span>, and
+        host-managed Android surfaces through
+        <span class="mono">SwiftTUIAndroidHost</span>.
         The framework owns the cells; each host owns its chrome.
       </p>
     </header>
@@ -94,6 +96,31 @@ swift build --swift-sdk swift-6.3.1-RELEASE_wasm \
           <div class="half">
             <div class="tile-id">
               <span class="badge">embed</span>
+              <span class="badge preview">preview</span>
+              <span class="path mono">SwiftTUIAndroidHost</span>
+            </div>
+            <h3>Inside Android</h3>
+            <p>
+              Host the same scenes in a Jetpack Compose view. The Swift runtime
+              keeps layout, focus, and accessibility semantics; the Kotlin side
+              paints styled cells and images on an Android
+              <span class="mono">Canvas</span> and bridges keys and touch back
+              into SwiftTUI input.
+            </p>
+            <pre class="code mono"><code><span class="cm">// Jetpack Compose host view</span>
+<span class="kw">val</span> state = rememberSwiftTUIHostState()
+<span class="ty">SwiftTUIHostView</span>(
+  state = state,
+  modifier = <span class="ty">Modifier</span>.fillMaxSize()
+)</code></pre>
+            <ul class="meta mono">
+              <li><span class="dot on"></span><span>renders the hosted gallery on arm64-v8a · official Swift Android SDK</span></li>
+              <li><span class="dot"></span><span class="dim">early preview · IME, clipboard, and drag gestures still landing</span></li>
+            </ul>
+          </div>
+          <div class="half">
+            <div class="tile-id">
+              <span class="badge">embed</span>
               <span class="path mono">SwiftTUIWebHost</span>
             </div>
             <h3>Localhost browser host</h3>
@@ -166,6 +193,11 @@ swift build --swift-sdk swift-6.3.1-RELEASE_wasm \
     border: 1px solid var(--line-strong);
     color: var(--ink-2);
   }
+  .badge.preview {
+    border-color: rgba(var(--accent-rgb), 0.45);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
   .path { color: var(--ink-3); font-size: 11.5px; }
   .tile h3 {
     font-size: 22px;
@@ -220,7 +252,7 @@ swift build --swift-sdk swift-6.3.1-RELEASE_wasm \
 
   .split {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 0;
   }
   .half { padding: 4px 22px; }

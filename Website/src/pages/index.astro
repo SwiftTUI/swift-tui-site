@@ -19,7 +19,7 @@ const canonical = `${site}${base || ""}/`;
 
 const title = "SwiftTUI · SwiftUI semantics, drawn in terminal cells";
 const description =
-  "SwiftTUI is a Swift package that lowers SwiftUI-shaped views through a strict seven-phase pipeline. The same App and Scene declarations can run in a terminal executable, through WASI browser deployment, through a native WebHost launch, or inside a host-managed SwiftUI surface.";
+  "SwiftTUI is a Swift package that lowers SwiftUI-shaped views through a strict seven-phase pipeline. The same App and Scene declarations can run in a terminal executable, through WASI browser deployment, through a native WebHost launch, inside a host-managed SwiftUI surface, or — as an early preview — inside a host-managed Android surface.";
 const ogImage = `${canonical}og.png`;
 
 const softwareSourceCodeJsonLd = {
@@ -28,7 +28,7 @@ const softwareSourceCodeJsonLd = {
   name: "SwiftTUI",
   description,
   programmingLanguage: "Swift",
-  runtimePlatform: "Swift 6.3, macOS 15+, iOS 18+, Linux, WASI, Android source support",
+  runtimePlatform: "Swift 6.3, macOS 15+, iOS 18+, Linux, WASI, Android arm64 host (preview)",
   codeRepository: "https://github.com/SwiftTUI/swift-tui",
   url: canonical,
   license: "https://github.com/SwiftTUI/swift-tui/blob/0.0.18/LICENSE",
@@ -43,6 +43,7 @@ const softwareSourceCodeJsonLd = {
     "TUI",
     "Terminal UI",
     "WASI",
+    "Android",
     "Cross platform",
     "Swift Package",
     "Swift 6",
@@ -56,7 +57,7 @@ const softwareSourceCodeJsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="keywords" content="Swift, SwiftUI, TUI, Terminal UI, WASI, Swift 6, Swift package, terminal framework, declarative TUI, GoodHats" />
+    <meta name="keywords" content="Swift, SwiftUI, TUI, Terminal UI, WASI, Android, Swift 6, Swift package, terminal framework, declarative TUI, GoodHats" />
     <meta name="author" content="GoodHats" />
     <meta name="theme-color" content="#0d1117" />
     <ThemeScript />
