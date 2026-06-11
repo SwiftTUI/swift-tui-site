@@ -242,7 +242,10 @@ swift build --swift-sdk wasm32-wasi
   }
 
   @media (max-width: 1080px) {
-    .shell { grid-template-columns: 1fr; gap: 44px; }
+    /* minmax(0, 1fr) — not a bare 1fr — so a wide grid child (the demo
+       terminal, the code blocks) can't blow the track's auto minimum past
+       the viewport and push the whole column off-screen on mobile. */
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 44px; }
     .stage { position: static; }
   }
   @media (max-width: 720px) {
