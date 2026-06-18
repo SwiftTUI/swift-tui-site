@@ -6,6 +6,8 @@ repos:
   swift-tui:
     url: https://github.com/SwiftTUI/swift-tui
     doccMount: docs
+  swift-tui-swiftui:
+    url: https://github.com/SwiftTUI/swift-tui-swiftui
   swift-tui-web:
     url: https://github.com/SwiftTUI/swift-tui-web
     npmPackages:
