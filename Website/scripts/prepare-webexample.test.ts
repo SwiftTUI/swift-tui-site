@@ -106,14 +106,14 @@ printf 'bun cwd=%s args=%s\\n' "$PWD" "$*" >> "$FAKE_COMMAND_LOG"
     env: {
       PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
       FAKE_COMMAND_LOG: logPath,
-      SWIFTTUI_EXAMPLES_REF: "0.0.25",
+      SWIFTTUI_EXAMPLES_REF: "0.0.26",
     },
   });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
   expect(log).toContain(
-    "git clone --depth 1 --branch 0.0.25 https://github.com/SwiftTUI/swift-tui-examples.git",
+    "git clone --depth 1 --branch 0.0.26 https://github.com/SwiftTUI/swift-tui-examples.git",
   );
   expect(log).not.toContain(`git -C ${defaultExamplesRoot} fetch`);
   expect(log).toContain(
