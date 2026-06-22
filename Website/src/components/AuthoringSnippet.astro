@@ -7,13 +7,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 // that the `white-space: pre` surface depends on. The static frame is real; the
 // click-to-increment interaction below is a lightweight JS simulation (see the
 // pane footer disclosure), not the live WASM runtime.
-const renderMarkup = `<div style="font-family: monospace; white-space: pre;background-color: #2d2a2e;color: #fcfcfa;-webkit-user-select: none;user-select: none;">
+const renderMarkup = `<div style="font-family: monospace; line-height: 0.9; white-space: pre;background-color: #2d2a2e;color: #fcfcfa;-webkit-user-select: none;user-select: none;">
  <div style="display: inline;color: rgb(252, 252, 250);">&#9623;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9622;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
- <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>   <div id="authoring-demo-count" style="display: inline;color: rgb(252, 252, 250);font-weight: bold;">Count: 0</div>    <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div><div id="authoring-demo-count" style="display: inline;color: rgb(252, 252, 250);font-weight: bold;">   Count: 0    </div><div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
- <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>  <div class="increment-btn" style="display: inline;background-color: rgb(78, 60, 57);cursor: pointer;"> </div><div class="increment-btn" style="display: inline;color: rgb(255, 255, 255);background-color: rgb(78, 60, 57);cursor: pointer;">Increment</div><div class="increment-btn" style="display: inline;background-color: rgb(78, 60, 57);cursor: pointer;"> </div>  <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>  <div class="increment-btn" style="display: inline;background-color: rgb(78, 60, 57);cursor: pointer;"> </div><div class="increment-btn" style="display: inline;color: rgb(255, 255, 255);background-color: rgb(78, 60, 57);cursor: pointer;">Increment</div><div class="increment-btn" style="display: inline;background-color: #17281F;cursor: pointer;"> </div>  <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
  <div style="display: inline;color: rgb(252, 252, 250);">&#9629;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9624;</div></div>`;
@@ -72,13 +72,12 @@ const renderMarkup = `<div style="font-family: monospace; white-space: pre;backg
           <span class="dotline">
             <span class="d red"></span><span class="d yellow"></span><span class="d green"></span>
           </span>
-          <span class="path">TerminalSurfaceRenderer · previewUnicode</span>
-          <span class="meta">simulated input</span>
+          <span class="path">TerminalSurfaceRenderer</span>
+          <span class="meta">simulated</span>
         </div>
         <div class="render-surface" id="authoring-demo" set:html={renderMarkup}></div>
         <div class="pane-foot mono">
-          <span><span class="caret">›</span> Real frame from <em>.border(set: .innerHalfBlock)</em></span>
-          <span class="sim-note">Counter interaction simulated in JS &mdash; <a href={`${base}/webexample/`}>run the live WASM build &rarr;</a></span>
+          <span class="sim-note">Interaction simulated in JS &mdash; <a href={`${base}/webexample/`}>run the live WASM build &rarr;</a></span>
         </div>
       </article>
     </div>
@@ -93,9 +92,28 @@ const renderMarkup = `<div style="font-family: monospace; white-space: pre;backg
     var countEl = document.getElementById("authoring-demo-count");
     var buttons = root.querySelectorAll(".increment-btn");
 
+    // Keep the box a fixed width as the number grows more digits: re-center the
+    // label within the interior cell width (captured from the server-rendered
+    // padded label) so the right border stays put instead of being pushed out
+    // at 10, 100, ... This matches SwiftTUI, where the box is sized by the wider
+    // "Increment" button and the count Text is centered within it.
+    var interior = countEl.textContent.length;
+
+    function spaces(n) {
+      return n > 0 ? Array(n + 1).join(" ") : "";
+    }
+
+    function render() {
+      var label = "Count: " + count;
+      var pad = interior - label.length;
+      if (pad < 0) pad = 0;
+      var left = Math.floor(pad / 2);
+      countEl.textContent = spaces(left) + label + spaces(pad - left);
+    }
+
     function increment() {
       count += 1;
-      countEl.textContent = "Count: " + count;
+      render();
     }
 
     for (var i = 0; i < buttons.length; i++) {
