@@ -1,4 +1,22 @@
 ---
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Actual SwiftTUI render of CounterView (with `.border(set: .innerHalfBlock).padding()`),
+// captured as previewUnicode HTML. Injected via `set:html` so Astro's default
+// HTML compression does not collapse the significant box-drawing whitespace
+// that the `white-space: pre` surface depends on. The static frame is real; the
+// click-to-increment interaction below is a lightweight JS simulation (see the
+// pane footer disclosure), not the live WASM runtime.
+const renderMarkup = `<div style="font-family: monospace; white-space: pre;background-color: #2d2a2e;color: #fcfcfa;-webkit-user-select: none;user-select: none;">
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9623;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9604;&#9622;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>   <div id="authoring-demo-count" style="display: inline;color: rgb(252, 252, 250);font-weight: bold;">Count: 0</div>    <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>  <div class="increment-btn" style="display: inline;background-color: rgb(78, 60, 57);cursor: pointer;"> </div><div class="increment-btn" style="display: inline;color: rgb(255, 255, 255);background-color: rgb(78, 60, 57);cursor: pointer;">Increment</div><div class="increment-btn" style="display: inline;background-color: rgb(78, 60, 57);cursor: pointer;"> </div>  <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9616;</div>               <div style="display: inline;color: rgb(252, 252, 250);">&#9612;</div>
+ <div style="display: inline;color: rgb(252, 252, 250);">&#9629;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9600;&#9624;</div></div>`;
 ---
 <section class="snippet" id="authoring">
   <div class="shell">
@@ -19,7 +37,7 @@
       <article class="pane source">
         <div class="pane-bar mono">
           <span class="path">CounterApp.swift</span>
-          <span class="meta">24 cells × 6 rows · proposal</span>
+          <span class="meta">innerHalfBlock · padded</span>
         </div>
         <pre class="code mono"><code><span class="kw">import</span> <span class="ty">SwiftTUI</span>
 
@@ -43,6 +61,8 @@
     &#125;
     .onAppear &#123; focused = <span class="kw">true</span> &#125;
     .padding(<span class="n">2</span>)
+    .border(set: .innerHalfBlock)
+    .padding()
   &#125;
 &#125;</code></pre>
       </article>
@@ -53,23 +73,36 @@
             <span class="d red"></span><span class="d yellow"></span><span class="d green"></span>
           </span>
           <span class="path">TerminalSurfaceRenderer · previewUnicode</span>
-          <span class="meta">illustrative</span>
+          <span class="meta">simulated input</span>
         </div>
-        <pre class="render mono"><code> <span class="b">Count: 3</span>
-
- <span class="hl">[ Increment ]</span><span class="cursor"> </span>
-
-
-</code></pre>
+        <div class="render-surface" id="authoring-demo" set:html={renderMarkup}></div>
         <div class="pane-foot mono">
-          <span><span class="caret">›</span> renderer.render(_:proposal:)</span>
-          <span>frame &rarr; <em>FrameArtifacts</em></span>
-          <span>surface &rarr; <em>RasterSurface</em></span>
+          <span><span class="caret">›</span> Real frame from <em>.border(set: .innerHalfBlock)</em></span>
+          <span class="sim-note">Counter interaction simulated in JS &mdash; <a href={`${base}/webexample/`}>run the live WASM build &rarr;</a></span>
         </div>
       </article>
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("authoring-demo");
+    if (!root) return;
+    var count = 0;
+    var countEl = document.getElementById("authoring-demo-count");
+    var buttons = root.querySelectorAll(".increment-btn");
+
+    function increment() {
+      count += 1;
+      countEl.textContent = "Count: " + count;
+    }
+
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener("click", increment);
+    }
+  })();
+</script>
 
 <style>
   .snippet {
@@ -132,32 +165,26 @@
   .code .at { color: var(--tok-num); }
 
   .output { background: var(--inset); }
-  .render {
-    margin: 0;
-    padding: 22px 18px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--ink-2);
-    overflow-x: auto;
-    background:
-      linear-gradient(180deg, rgba(var(--accent-rgb),0.05) 0%, transparent 18%, transparent 100%);
+  .render-surface {
     flex: 1;
     min-height: 280px;
-    white-space: pre;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    overflow: auto;
+    background:
+      linear-gradient(180deg, rgba(var(--accent-rgb),0.05) 0%, transparent 18%, transparent 100%);
   }
-  .render .b { color: var(--ink); font-weight: 600; }
-  .render .bar { color: var(--accent); }
-  .render .bar-dim { color: var(--ink-4); }
-  .render .num { color: var(--tok-num); }
-  .render .hl { color: var(--ink); }
-  .render .cursor {
-    display: inline-block;
-    width: 0.6em;
-    background: var(--accent);
-    color: transparent;
-    animation: blink 1.05s steps(2, end) infinite;
+  /* Injected via set:html, so these children lack the scoped data attribute. */
+  :global(.render-surface > div) {
+    font-size: 13px;
+    line-height: 1.45;
+    border-radius: 8px;
+    padding: 12px 16px;
   }
-  @keyframes blink { 50% { background: transparent; } }
+  :global(.increment-btn) { transition: filter 0.12s ease; }
+  :global(.increment-btn:hover) { filter: brightness(1.3); }
 
   .pane-foot {
     display: flex;
@@ -170,6 +197,9 @@
   }
   .pane-foot .caret { color: var(--accent); margin-right: 6px; }
   .pane-foot em { font-style: normal; color: var(--ink-2); }
+  .pane-foot .sim-note { margin-left: auto; color: var(--ink-4); }
+  .pane-foot .sim-note a { color: var(--accent); text-decoration: none; }
+  .pane-foot .sim-note a:hover { text-decoration: underline; }
 
   @media (max-width: 1080px) {
     .grid { grid-template-columns: 1fr; }
