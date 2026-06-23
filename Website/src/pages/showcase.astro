@@ -4,6 +4,8 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteIcons from "../components/SiteIcons.astro";
 import ThemeScript from "../components/ThemeScript.astro";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
@@ -11,7 +13,72 @@ const canonical = `${site}${base || ""}/showcase/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Showcase";
 const description =
-  "Four production-quality apps built with SwiftTUI: a GIF editor, a terminal workspace, a side-by-side SwiftUI/SwiftTUI layout demo, and a git visualization CLI.";
+  "One SwiftTUI component gallery, rendered by every host — macOS and iOS through SwiftUIHost, Android through SwiftTUIAndroidHost, the browser through WASI, the terminal natively — plus maintained example apps you can clone and run.";
+
+// Live WebExample embed. The whole origin is cross-origin isolated (public/_headers
+// applies COOP/COEP to /*), so the iframe's SharedArrayBuffer-backed stdin works on
+// this page exactly as it does on the homepage demo. In `astro dev` without a composed
+// wasm artifact the route 404s, so fall back to the poster — mirrors DemoTerminal.
+const isDev = import.meta.env.DEV;
+const webExampleDir =
+  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-examples/WebExample";
+const hasLocalWebExampleArtifact =
+  existsSync(resolve(process.cwd(), webExampleDir, "pages-dist/index.html")) &&
+  existsSync(
+    resolve(process.cwd(), webExampleDir, "pages-dist/TerminalApp/dist/assets/app.wasm"),
+  );
+const showWebStub = isDev && !hasLocalWebExampleArtifact;
+const webIframeSrc = `${base}/webexample/?embed=marketing`;
+const webDemoHref = `${base}/webexample/`;
+const webSourceHref =
+  "https://github.com/SwiftTUI/swift-tui-examples/tree/main/WebExample";
+
+type Host = {
+  slug: string;
+  platform: string;
+  host: string;
+  body: string;
+  href: string;
+  img: string;
+  preview?: boolean;
+};
+
+// The same gallery surface (GalleryDemoViews / gallery-demo), rendered by each host.
+const hosts: Host[] = [
+  {
+    slug: "macos",
+    platform: "macOS",
+    host: "SwiftUIHost",
+    body: "Retained inside a native SwiftUI window. Theme tokens swap at runtime; the authored views never branch on the host.",
+    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/SwiftUIExample",
+    img: `${base}/showcase/host-macos.png`,
+  },
+  {
+    slug: "ios",
+    platform: "iOS",
+    host: "SwiftUIHost",
+    body: "The same scenes in a native iOS app shell, with keyboard, pointer, and accessibility bridged into SwiftTUI input.",
+    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/SwiftUIExample",
+    img: `${base}/showcase/host-ios.png`,
+  },
+  {
+    slug: "android",
+    platform: "Android",
+    host: "SwiftTUIAndroidHost",
+    body: "Swift cross-compiled to arm64, painting styled cells and images on a Jetpack Compose Canvas through a JNI shim.",
+    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/AndroidGallery",
+    img: `${base}/showcase/host-android.svg`,
+    preview: true,
+  },
+  {
+    slug: "terminal",
+    platform: "Terminal",
+    host: "SwiftTUICLI",
+    body: "The native substrate. ANSI / Kitty / Sixel negotiated against the live terminal, mouse and signals by default.",
+    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gallery",
+    img: `${base}/showcase/host-terminal.png`,
+  },
+];
 
 type Tile = {
   slug: string;
@@ -94,39 +161,159 @@ const tiles: Tile[] = [
             <span class="eyebrow mono"><span class="num">/00</span>Showcase</span>
             <h1>Built with SwiftTUI.</h1>
             <p class="lede">
-              The framework already runs production-quality apps. These are
-              maintained example apps in <span class="mono">swift-tui-examples</span> —
-              clone the repo and they all build and run with one command.
+              The framework already runs production-quality apps — and runs the
+              same one on every host. Below: one component gallery rendered five
+              ways, then maintained example apps in
+              <span class="mono">swift-tui-examples</span> you can clone and run
+              with a single command.
             </p>
           </header>
 
-          <ol class="grid">
-            {tiles.map((t) => (
-              <li class="tile">
-                <a class="link" href={t.repo} rel="noreferrer noopener">
-                  <div class="shot">
-                    <img
-                      src={`${base}/showcase/${t.slug}.svg`}
-                      alt={`${t.title} screenshot`}
-                      loading="lazy"
-                      width="1200"
-                      height="750"
-                    />
-                  </div>
-                  <div class="meta">
-                    <h2>{t.title}</h2>
-                    <p class="sub">{t.subtitle}</p>
-                    <p class="body">{t.body}</p>
-                    <span class="cta mono">view source →</span>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ol>
+          <!-- ── /01 · the same gallery, every host ──────────────────────── -->
+          <section class="hosts" aria-labelledby="hosts-title">
+            <header class="sub-head">
+              <span class="eyebrow mono"><span class="num">/01</span>Every host</span>
+              <h2 id="hosts-title">One gallery. Every host.</h2>
+              <p class="sub-lede">
+                These are not four apps — they are the
+                <span class="mono">same</span> SwiftTUI component gallery, the
+                same <span class="mono">View</span>s, handed to a different host.
+                The framework owns the cells; each host owns its chrome.
+              </p>
+            </header>
+
+            <ul class="devices">
+              {hosts.map((h) => (
+                <li class="device">
+                  <a class="device-link" href={h.href} rel="noreferrer noopener">
+                    <div class="device-shot">
+                      <img
+                        src={h.img}
+                        alt={`SwiftTUI gallery running on ${h.platform}`}
+                        loading="lazy"
+                        width="1000"
+                        height="1000"
+                      />
+                      {h.preview && <span class="ribbon mono">preview</span>}
+                    </div>
+                    <div class="device-meta">
+                      <div class="device-id">
+                        <span class="platform">{h.platform}</span>
+                        <span class="host-badge mono">{h.host}</span>
+                      </div>
+                      <p class="device-body">{h.body}</p>
+                      <span class="cta mono">view example →</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <!-- the browser host, running live on this page -->
+            <div class="web-feature">
+              <div class="web-id">
+                <span class="platform">Browser</span>
+                <span class="host-badge mono">SwiftTUIWASI · @swifttui/web</span>
+              </div>
+              <div class="web-frame">
+                <div class="web-bar">
+                  <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                  <span class="url mono">swifttui.sh/webexample</span>
+                  <span class="live mono"><span class="live-dot"></span>live</span>
+                </div>
+                <div class="web-surface">
+                  {showWebStub ? (
+                    <div class="web-stub">
+                      <img class="web-poster" src={`${base}/showcase/host-web.png`} alt="" aria-hidden="true" />
+                      <p class="web-stub-note mono">
+                        Live wasm demo composes in production. Run
+                        <span class="mark"> bun run build:wasm:dev </span> in
+                        <span class="mark"> Website/ </span> to mount it locally.
+                      </p>
+                    </div>
+                  ) : (
+                    <div class="web-stage">
+                      <iframe
+                        src={webIframeSrc}
+                        title="SwiftTUI WebExample — live WASI demo"
+                        loading="lazy"
+                        referrerpolicy="same-origin"
+                      ></iframe>
+                      <img
+                        class="web-poster"
+                        src={`${base}/showcase/host-web.png`}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div class="web-meta">
+                <p class="device-body">
+                  The same authored <span class="mono">View</span>s, built to
+                  <span class="mono"> wasm32-wasi</span> and mounted on a canvas
+                  through <span class="mono">@swifttui/web</span> — running right
+                  here, no terminal emulator, no xterm.js.
+                </p>
+                <div class="web-actions mono">
+                  <a class="solid" href={webDemoHref}>open full demo →</a>
+                  <a class="ghost" href={webSourceHref} rel="noreferrer noopener">view source →</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── /02 · maintained example apps ───────────────────────────── -->
+          <section class="examples" aria-labelledby="examples-title">
+            <header class="sub-head">
+              <span class="eyebrow mono"><span class="num">/02</span>Example apps</span>
+              <h2 id="examples-title">Built in the open.</h2>
+              <p class="sub-lede">
+                Maintained example apps in
+                <span class="mono">swift-tui-examples</span> — clone the repo and
+                they all build and run with one command.
+              </p>
+            </header>
+
+            <ol class="grid">
+              {tiles.map((t) => (
+                <li class="tile">
+                  <a class="link" href={t.repo} rel="noreferrer noopener">
+                    <div class="shot">
+                      <img
+                        src={`${base}/showcase/${t.slug}.svg`}
+                        alt={`${t.title} screenshot`}
+                        loading="lazy"
+                        width="1200"
+                        height="750"
+                      />
+                    </div>
+                    <div class="meta">
+                      <h3>{t.title}</h3>
+                      <p class="sub">{t.subtitle}</p>
+                      <p class="body">{t.body}</p>
+                      <span class="cta mono">view source →</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
       </section>
     </main>
     <SiteFooter />
+
+    <script>
+      // Fade each web poster out once its iframe paints, so the live demo
+      // hands off cleanly from the static screenshot (same idiom as DemoTerminal).
+      document.querySelectorAll(".web-stage iframe").forEach((frame) => {
+        frame.addEventListener("load", () => frame.setAttribute("data-loaded", "true"));
+      });
+    </script>
   </body>
 </html>
 
@@ -139,7 +326,7 @@ const tiles: Tile[] = [
   }
 
   .head { max-width: 760px; margin-bottom: 48px; }
-  .head .eyebrow {
+  .eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -148,7 +335,7 @@ const tiles: Tile[] = [
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
-  .head .eyebrow .num { color: var(--accent); }
+  .eyebrow .num { color: var(--accent); }
   .head h1 {
     font-size: 44px;
     line-height: 1.05;
@@ -165,6 +352,228 @@ const tiles: Tile[] = [
   }
   .head .lede .mono { color: var(--ink); }
 
+  /* ── section sub-headers ──────────────────────────────────────── */
+  .sub-head { max-width: 760px; margin: 0 0 28px; }
+  .sub-head h2 {
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.018em;
+    margin: 12px 0 0;
+    color: var(--ink);
+  }
+  .sub-lede {
+    margin-top: 12px;
+    max-width: 66ch;
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .sub-lede .mono { color: var(--ink); }
+
+  .hosts { margin-bottom: 72px; }
+  .examples { padding-top: 8px; border-top: 1px solid var(--line); margin-top: 8px; }
+  .examples .sub-head { margin-top: 40px; }
+
+  /* ── host device band ─────────────────────────────────────────── */
+  .devices {
+    list-style: none;
+    margin: 0 0 18px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .device {
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 200ms ease, transform 200ms ease;
+  }
+  .device-link { display: block; color: inherit; text-decoration: none; }
+  .device-shot {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--inset);
+    border-bottom: 1px solid var(--line);
+  }
+  .device-shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ribbon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: rgba(13, 17, 23, 0.7);
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(4px);
+  }
+  .device-meta { padding: 16px 16px 18px; }
+  .device-id { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .platform {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .host-badge {
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+  .device-body {
+    color: var(--ink-3);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 8px 0 0;
+  }
+  .cta {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .device:hover {
+    border-color: var(--accent-dim);
+    transform: translateY(-1px);
+  }
+
+  /* ── live web feature ─────────────────────────────────────────── */
+  .web-feature {
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg-soft) 100%);
+    padding: 20px 20px 22px;
+  }
+  .web-id { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .web-frame {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--term-bg);
+    box-shadow: 0 24px 64px -28px rgba(0, 0, 0, 0.6);
+  }
+  .web-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 38px;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent);
+  }
+  .web-bar .dots { display: inline-flex; gap: 7px; }
+  .web-bar .dots span {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--term-dot);
+  }
+  .web-bar .dots span:nth-child(1) { background: var(--term-red); }
+  .web-bar .dots span:nth-child(2) { background: var(--term-yellow); }
+  .web-bar .dots span:nth-child(3) { background: var(--term-green); }
+  .web-bar .url {
+    justify-self: center;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .web-bar .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .web-bar .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .web-surface {
+    position: relative;
+    height: 460px;
+    background: var(--bg);
+  }
+  .web-stage { position: absolute; inset: 0; }
+  .web-stage iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: var(--bg);
+    z-index: 1;
+  }
+  .web-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 220ms ease 140ms;
+  }
+  .web-stage iframe[data-loaded="true"] + .web-poster { opacity: 0; }
+  .web-stub { position: absolute; inset: 0; }
+  .web-stub .web-poster { z-index: 0; opacity: 0.5; }
+  .web-stub-note {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--ink-2);
+    background: linear-gradient(180deg, transparent, rgba(13, 17, 23, 0.92));
+  }
+  .web-stub-note .mark {
+    color: var(--ink);
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+  .web-meta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .web-meta .device-body { max-width: 62ch; margin: 0; font-size: 13.5px; }
+  .web-actions { display: inline-flex; gap: 10px; flex-shrink: 0; }
+  .web-actions a {
+    font-size: 12px;
+    padding: 8px 13px;
+    border-radius: 7px;
+    transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  }
+  .web-actions .solid {
+    color: var(--on-accent);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .web-actions .solid:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .web-actions .ghost {
+    color: var(--ink-2);
+    border: 1px solid var(--line-strong);
+  }
+  .web-actions .ghost:hover { color: var(--ink); border-color: var(--line-warm); background: var(--panel-2); }
+
+  /* ── example app grid (existing) ──────────────────────────────── */
   .grid {
     list-style: none;
     margin: 0;
@@ -198,7 +607,7 @@ const tiles: Tile[] = [
     display: block;
   }
   .meta { padding: 22px 22px 24px; }
-  .meta h2 {
+  .meta h3 {
     font-size: 20px;
     font-weight: 500;
     letter-spacing: -0.012em;
@@ -216,20 +625,27 @@ const tiles: Tile[] = [
     line-height: 1.55;
     margin: 12px 0 0;
   }
-  .meta .cta {
-    display: inline-block;
-    margin-top: 14px;
-    font-size: 12px;
-    color: var(--accent);
-  }
+  .meta .cta { margin-top: 14px; }
   .tile:hover {
     border-color: var(--accent-dim);
     transform: translateY(-1px);
   }
   .tile:hover .cta { color: var(--accent); }
 
+  @media (max-width: 980px) {
+    .devices { grid-template-columns: 1fr 1fr; }
+  }
   @media (max-width: 920px) {
     .grid { grid-template-columns: 1fr; }
     .head h1 { font-size: 34px; }
+    .sub-head h2 { font-size: 24px; }
+  }
+  @media (max-width: 720px) {
+    .web-surface { height: 360px; }
+    .web-meta { flex-direction: column; align-items: stretch; }
+    .web-actions { justify-content: flex-start; }
+  }
+  @media (max-width: 520px) {
+    .devices { grid-template-columns: 1fr; }
   }
 </style>
