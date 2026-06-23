@@ -2,7 +2,7 @@
 const points = [
   {
     n: "01",
-    title: "SwiftUI semantics, not a clone",
+    title: "SwiftUI semantics, not just its vibe",
     body:
       "Recursive parent-child layout. Graph-scoped state drives rendering, not the reverse. Modifier order matters because modifiers participate in layout and semantics. The terminal target does not bend the authoring story.",
     sym: "@MainActor · View · @State · Layout",
@@ -11,14 +11,14 @@ const points = [
     n: "02",
     title: "One app. Five host products.",
     body:
-      "The same App and Scene declarations can feed a terminal executable, a WASI browser deployment, a localhost WebHost launch, a host-managed SwiftUI surface, or a host-managed Android surface. The framework owns the cells; the host owns the chrome.",
+      "The same App and Scene declarations can feed a terminal executable, a WASI browser deployment, a localhost WebHost launch, a native SwiftUI surface, or a native Android surface. The framework drives the cells; the host owns the chrome.",
     sym: "SwiftTUI · SwiftTUIWASI · SwiftTUIWebHost · SwiftUIHost · SwiftTUIAndroidHost",
   },
   {
     n: "03",
     title: "Strict, inspectable pipeline",
     body:
-      "Seven phases — resolve, measure, place, semantics, draw, raster, commit — stay visible through DefaultRenderer and FrameArtifacts. Inspect a frame when you need to understand layout, routing, or final cells.",
+      "Seven phases — resolve, measure, place, semantics, draw, raster, commit — stay visible through DefaultRenderer and FrameArtifacts. Inspect a frame if you need to understand layout, routing, or final cells.",
     sym: "DefaultRenderer · FrameArtifacts",
   },
   {
@@ -48,13 +48,13 @@ const points = [
   <div class="shell">
     <header class="head">
       <span class="eyebrow"><span class="num">/00</span>Why this exists</span>
-      <h2>Built for engineers who want SwiftUI's authoring model in places SwiftUI doesn't ship.</h2>
+      <h2>Built to take SwiftUI's authoring model to places SwiftUI doesn't ship.</h2>
       <p class="lede">
         Most TUI frameworks invent a new authoring model for the terminal.
         SwiftTUI keeps the SwiftUI authoring model and reinterprets the
-        substrate. Same <span class="mono">View</span>, <span class="mono">@State</span>,
+        substrate. Same proven <span class="mono">View</span>, <span class="mono">@State</span>,
         <span class="mono">@FocusState</span>, <span class="mono">PreferenceKey</span>,
-        and <span class="mono">Layout</span> protocol you already know — drawn
+        <span class="mono">Layout</span> protocol, and gesture system — drawn
         as integer-cell glyphs instead of CoreAnimation layers.
       </p>
     </header>

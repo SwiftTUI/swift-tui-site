@@ -15,8 +15,8 @@ const authoring: Group[] = [
   {
     title: "Controls & primitives",
     rows: [
-      { name: "Text · TextFigure · Label · Image", note: "FIGlet figures · PNG / baseline JPEG images" },
-      { name: "Button · Link · Toggle · Slider · Stepper", note: "sanitized OSC 8 hyperlinks when supported" },
+      { name: "Text · TextFigure · Label · Image", note: "FIGlet figures · PNG / JPEG / GIF images" },
+      { name: "Gestures · Button · Link · Toggle · Slider · Stepper", note: "sanitized OSC 8 hyperlinks when supported" },
       { name: "TextField · TextEditor · SecureField · Picker · Menu", note: "" },
       { name: "ProgressView · DisclosureGroup · ControlGroup", note: "" },
     ],
@@ -67,9 +67,8 @@ const runtime: Group[] = [
       <span class="eyebrow"><span class="num">/04</span>Public surface</span>
       <h2>A deliberate subset of SwiftUI.</h2>
       <p class="lede">
-        Layout, state, focus, and presentation &mdash; plus the runtime and
-        scene types that drive them, and a peer charts product. Terminal-only
-        chrome that would bend the public authoring story stays out of core.
+        Layout, state, focus, gestures, and presentation &mdash; plus the runtime and
+        scene types that drive them, and a peer charts product.
         The full per-symbol reference lives in the DocC catalogs.
       </p>
     </header>

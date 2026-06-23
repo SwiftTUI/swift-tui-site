@@ -33,14 +33,11 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
         <span></span><span></span><span></span>
       </div>
       <div class="title mono">
-        <span class="origin">swifttui.sh</span>
-        <span class="sep">·</span>
         <span>{title}</span>
       </div>
       <div class="caps mono" aria-label="terminal capabilities">
         <span class="cap cap--unicode">UNICODE</span>
         <span class="cap cap--truecolor">TRUECOLOR</span>
-        <span class="cap cap--sab">SAB-STDIN</span>
         <span class="cap on">LIVE</span>
       </div>
     </div>
@@ -143,15 +140,6 @@ const { height = 560, id = "demo", title = "WebExample.wasm" } = Astro.props;
         <span class="path">target/wasm32-wasi</span>
         <span class="sep">·</span>
         <span class="phase">runtime: <em>SwiftTUIWASI</em></span>
-      </div>
-      <div class="mid">
-        <span class="phaseRing shed-1">resolve</span>
-        <span class="phaseRing shed-2">measure</span>
-        <span class="phaseRing shed-3">place</span>
-        <span class="phaseRing">semantics</span>
-        <span class="phaseRing">draw</span>
-        <span class="phaseRing">raster</span>
-        <span class="phaseRing on">commit</span>
       </div>
       <div class="right">
         <span class="kbd-row" aria-label="navigation hints">
