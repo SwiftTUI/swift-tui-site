@@ -85,6 +85,7 @@ type Tile = {
   subtitle: string;
   body: string;
   repo: string;
+  img: string;
 };
 
 const tiles: Tile[] = [
@@ -95,6 +96,7 @@ const tiles: Tile[] = [
     body:
       "A full GIF editor written as ordinary SwiftTUI Views. Click tools, paint on a canvas, scrub a timeline, export an animated GIF. Proves that sophisticated desktop-class UX fits inside integer-cell rendering.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
+    img: `${base}/showcase/gifeditor.png`,
   },
   {
     slug: "terminal-workspace",
@@ -103,6 +105,7 @@ const tiles: Tile[] = [
     body:
       "Multi-pane terminal workspace built on SwiftTUITerminalWorkspace. Persisted layouts, focused chrome, command palette, embedded pty sessions. The framework is large enough to host its own multiplexer.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace",
+    img: `${base}/showcase/terminal-workspace.png`,
   },
   {
     slug: "layouts-swiftui",
@@ -111,6 +114,7 @@ const tiles: Tile[] = [
     body:
       "Visual proof of API parity: identical layout code rendering identical compositions in two substrates. Run the example, drag the split, watch them stay in lockstep as the geometry changes.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/LayoutsSwiftUI",
+    img: `${base}/showcase/layouts-swiftui.svg`,
   },
   {
     slug: "gitviz",
@@ -119,6 +123,7 @@ const tiles: Tile[] = [
     body:
       "Seventeen subcommands rendering BarChart, ColumnChart, StackedBarChart, ComparisonChart, LineChart, Sparkline, Timeline, HeatStrip, CalendarHeatmap, BulletChart, ThresholdGauge, Meter, and Legend against the git history of whatever repo you point it at. Dashboards in a terminal.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gitviz",
+    img: `${base}/showcase/gitviz.svg`,
   },
 ];
 ---
@@ -283,7 +288,7 @@ const tiles: Tile[] = [
                   <a class="link" href={t.repo} rel="noreferrer noopener">
                     <div class="shot">
                       <img
-                        src={`${base}/showcase/${t.slug}.svg`}
+                        src={t.img}
                         alt={`${t.title} screenshot`}
                         loading="lazy"
                         width="1200"
