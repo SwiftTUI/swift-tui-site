@@ -76,10 +76,6 @@ test("cache-restored default input directory is recloned instead of treated as t
     `#!/usr/bin/env bash
 set -euo pipefail
 printf 'git %s\\n' "$*" >> "$FAKE_COMMAND_LOG"
-if [[ "$*" == "-C ${defaultExamplesRoot} rev-parse --git-dir" ]]; then
-  printf '${siteRoot}/.git\\n'
-  exit 0
-fi
 if [[ "$*" == "-C ${defaultExamplesRoot} rev-parse --show-toplevel" ]]; then
   printf '${siteRoot}\\n'
   exit 0
