@@ -53,8 +53,8 @@ const phases = [
       <p class="lede">
         Layout is recursive parent-child negotiation, not a global solver.
         Graph-scoped state drives rendering, not the reverse. The runtime keeps
-        each phase explicit, and <span class="mono">DefaultRenderer</span> exposes
-        <span class="mono">FrameArtifacts</span> when you want to inspect or
+        each phase explicit, and <span class="mono">DefaultRenderer</span> returns
+        a <span class="mono">RenderSnapshot</span> when you want to inspect or
         snapshot a frame.
       </p>
     </header>

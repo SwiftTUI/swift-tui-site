@@ -66,6 +66,7 @@ swift build --swift-sdk swift-6.3.1-RELEASE_wasm \
 
 <span class="cm">// host</span>
 <span class="kw">await</span> createWebHostApp(&#123;
+  mount: document.getElementById(<span class="s">"app"</span>)!,
   manifestUrl: <span class="s">"./scene-manifest.json"</span>,
   sceneRuntimeFactory: createWasmSceneRuntimeFactory(...)
 &#125;)</code></pre>
