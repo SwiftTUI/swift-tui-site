@@ -13,6 +13,11 @@
 /docs/documentation /docs/ 200
 /docs/documentation/* /docs/ 200
 
+# The Charts DocC archive is a second, self-contained shell mounted at
+# /docs/charts/ (built from SwiftTUI/swift-tui-charts). Same rewrite shape.
+/docs/charts/documentation /docs/charts/ 200
+/docs/charts/documentation/* /docs/charts/ 200
+
 # The /pipeline/ walkthrough cites swift-tui source files with repo-relative
 # links (e.g. ../../swift-tui/Sources/...), which resolve to /swift-tui/... at
 # the origin root. Route those to the source on GitHub so the citations work on

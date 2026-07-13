@@ -1,11 +1,15 @@
 current:
   swiftTUI: 0.1.4
+  charts: 0.1.5
   web: 0.1.4
   examplesRef: 0.1.4
 repos:
   swift-tui:
     url: https://github.com/SwiftTUI/swift-tui
     doccMount: docs
+  swift-tui-charts:
+    url: https://github.com/SwiftTUI/swift-tui-charts
+    doccMount: docs/charts
   swift-tui-swiftui:
     url: https://github.com/SwiftTUI/swift-tui-swiftui
   swift-tui-web:

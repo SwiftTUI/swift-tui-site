@@ -153,6 +153,7 @@ jobs:
           cp -R swift-tui-site/Website/dist/. "$ARTIFACT_ROOT/"
           cp -R swift-tui-site/Website/dist/docs/. "$DOCS_ROOT/"
           rm -rf "$DOCS_ROOT/documentation"
+          rm -rf "$DOCS_ROOT/charts/documentation"
           cp -R swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
           wasm_path="$WEBEXAMPLE_ROOT/TerminalApp/dist/assets/app.wasm"
           if [ ! -f "$wasm_path" ]; then

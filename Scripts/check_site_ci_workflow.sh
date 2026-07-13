@@ -47,12 +47,19 @@ require_text "brotli --test" "$deploy_workflow"
 require_text "WebAssembly.compile" "$deploy_workflow"
 require_text "CLOUDFLARE_PAGES_FILE_LIMIT" "$deploy_workflow"
 require_text ".swift-version" "$deploy_workflow"
+# Both DocC archives ship shell-copy-pruned: the framework mount and the
+# Charts mount each rely on the /docs*/documentation _redirects rewrites.
+require_text 'rm -rf "$DOCS_ROOT/documentation"' "$deploy_workflow"
+require_text 'rm -rf "$DOCS_ROOT/charts/documentation"' "$deploy_workflow"
+# The deploy stays clean-clone for siblings: no direct Charts checkout either.
+forbid_text "repository: SwiftTUI/swift-tui-charts" "$deploy_workflow"
 
 require_text "Scripts/check_site.sh" "$test_workflow"
 require_text ".swift-version" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui-examples" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui-web" "$test_workflow"
+forbid_text "repository: SwiftTUI/swift-tui-charts" "$test_workflow"
 forbid_text 'secrets.SWIFTTUI_CI_TOKEN || github.token' "$test_workflow"
 
 printf '[check_site_ci_workflow] ok\n'
