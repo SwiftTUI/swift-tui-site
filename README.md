@@ -40,6 +40,13 @@ The full composed artifact lays out as:
 /webexample/   WebExample WASI demo
 ```
 
+The Astro site also serves `/domrenderer`, a demo page that mounts the same
+WebExample wasm through `@swifttui/web`'s DOM surface renderer (`renderer:
+"dom"` — cells as absolutely positioned text elements instead of canvas
+pixels). It reuses the `/webexample` artifact at runtime, so it adds no second
+wasm build; the page's runtime comes from the `@swifttui/web` release tarball
+pinned in `Website/package.json`.
+
 ## WebExample and DocC inputs
 
 The `0.1.13` public beta build fetches the tagged `swift-tui-examples`

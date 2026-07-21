@@ -41,6 +41,11 @@ export default defineConfig({
       headers: isolationHeaders,
     },
     plugins: [localWebExamplePlugin()],
+    // The /domrenderer demo spawns the @swifttui/web WASI scene worker as a
+    // module worker (`?worker&url`); the worker chunk must stay ESM.
+    worker: {
+      format: "es",
+    },
   },
   build: {
     format: "directory",

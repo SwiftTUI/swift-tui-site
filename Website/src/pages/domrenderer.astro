@@ -1,0 +1,195 @@
+---
+import "../styles/site.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
+const canonical = `${site}${base || ""}/domrenderer/`;
+const ogImage = `${site}${base || ""}/og.png`;
+const title = "SwiftTUI DOM Renderer";
+const description =
+  "The same SwiftTUI app that powers the /webexample demo — same wasm, same scenes — presented through @swifttui/web's DOM surface renderer: real text elements instead of canvas pixels, with native font rendering and Alt-drag text selection.";
+const webDemoHref = `${base}/webexample/`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="SwiftTUI logo over a dark marketing card" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#0d1117" />
+    <ThemeScript />
+    <SiteIcons />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <SiteHeader />
+    <main>
+      <section class="domrenderer">
+        <div class="shell">
+          <header class="head">
+            <span class="eyebrow mono"><span class="num">/00</span>DOM renderer</span>
+            <h1>Cells as elements, not pixels.</h1>
+            <p class="lede">
+              This is the same SwiftTUI app that powers
+              the <a href={webDemoHref}>/webexample</a> demo — the
+              same <span class="mono">wasm32-wasi</span> binary, the same scenes —
+              mounted with <span class="mono">renderer: "dom"</span>. Every
+              cell run is a real, absolutely positioned text element: the
+              browser shapes the glyphs, zoom stays crisp, the tree is
+              inspectable in devtools, and the text is selectable.
+            </p>
+            <p class="hint mono">
+              Hold <kbd>⌥ Option</kbd> (Alt) and drag to select the app's
+              text — plain drags stay pointer input for the app.
+            </p>
+          </header>
+
+          <div class="demo-frame">
+            <div class="demo-topline">
+              <span class="demo-label mono">renderer: "dom"</span>
+              <nav class="scene-picker" aria-label="Scenes" data-domrenderer-scenes></nav>
+            </div>
+            <p class="demo-status mono" data-domrenderer-status>
+              Starting the WASI runtime…
+            </p>
+            <div class="demo-mount" data-domrenderer-mount></div>
+          </div>
+
+          <footer class="foot">
+            <p>
+              Prefer pixels? The canvas renderer — the default — draws the
+              identical frames at <a href={webDemoHref}>/webexample</a>. Both
+              presenters ship
+              in <a href="https://github.com/SwiftTUI/swift-tui-web">@swifttui/web</a>;
+              choose per app
+              with <span class="mono">createWebHostApp(&lbrace; renderer &rbrace;)</span>.
+            </p>
+          </footer>
+        </div>
+      </section>
+    </main>
+    <SiteFooter />
+
+    <script src="../scripts/domrenderer-mount.ts"></script>
+
+    <style>
+      .domrenderer {
+        padding: calc(var(--header-h, 64px) + 3rem) 0 4rem;
+      }
+      .shell {
+        width: min(1080px, calc(100% - 3rem));
+        margin: 0 auto;
+      }
+      .head {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .head h1 {
+        font-size: clamp(2rem, 4.5vw, 3.1rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .lede {
+        max-width: 62ch;
+        color: var(--ink-2);
+        margin: 0;
+      }
+      .hint {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--ink-3);
+      }
+      .hint kbd {
+        border: 1px solid var(--line, #30363d);
+        border-radius: 4px;
+        padding: 0.05rem 0.35rem;
+        font-family: inherit;
+      }
+      .demo-frame {
+        border: 1px solid var(--line, #30363d);
+        border-radius: 14px;
+        background: var(--panel, #0f141b);
+        padding: 0.9rem;
+        display: grid;
+        gap: 0.75rem;
+      }
+      .demo-topline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.6rem;
+      }
+      .demo-label {
+        font-size: 0.8rem;
+        color: var(--ink-3);
+      }
+      .scene-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .scene-picker :global(button) {
+        font: 500 0.78rem var(--font-mono);
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid var(--line, #30363d);
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem;
+        cursor: pointer;
+      }
+      .scene-picker :global(button:hover) {
+        color: var(--ink);
+      }
+      .scene-picker :global(button[aria-pressed="true"]) {
+        color: var(--ink);
+        border-color: var(--accent, #56b6c2);
+      }
+      .demo-status {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--ink-3);
+      }
+      .demo-status[data-state="error"] {
+        color: var(--warn, #ebb33c);
+      }
+      .demo-mount {
+        min-height: 62vh;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .foot {
+        margin-top: 2rem;
+        color: var(--ink-2);
+        max-width: 70ch;
+      }
+      .foot p {
+        margin: 0;
+      }
+    </style>
+  </body>
+</html>
