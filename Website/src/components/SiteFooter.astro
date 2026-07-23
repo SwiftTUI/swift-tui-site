@@ -1,153 +1,181 @@
 ---
 import Mark from "./Mark.astro";
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const year = new Date().getFullYear();
 ---
-<footer class="site-foot">
+
+<footer class="site-footer">
   <div class="shell">
-    <div class="row top">
-      <a class="brand" href={`${base}/`}>
-        <Mark size={20} />
-        <span class="wordmark">SwiftTUI</span>
-      </a>
-      <div class="cols">
-        <div class="col">
-          <h5 class="mono">framework</h5>
-          <a href={`${base}/pipeline/`}>rendering pipeline</a>
-          <a href={`${base}/docs/documentation/`}>DocC reference</a>
-          <a href={`${base}/docs/charts/documentation/swifttuicharts/`}>Charts DocC reference</a>
-          <a href="https://github.com/SwiftTUI/swift-tui" rel="noreferrer noopener">github / SwiftTUI</a>
-          <a href="https://github.com/SwiftTUI/swift-tui/issues" rel="noreferrer noopener">issues &amp; tracking</a>
-        </div>
-        <div class="col">
-          <h5 class="mono">runners</h5>
-          <a href="https://github.com/SwiftTUI/swift-tui/tree/0.1.15/Platforms/CLI" rel="noreferrer noopener">SwiftTUICLI</a>
-          <a href="https://github.com/SwiftTUI/swift-tui/tree/0.1.15/Platforms/WASI" rel="noreferrer noopener">SwiftTUIWASI</a>
-        </div>
-        <div class="col">
-          <h5 class="mono">hosts</h5>
-          <a href="https://github.com/SwiftTUI/swift-tui-swiftui/tree/0.1.15/Sources/SwiftUIHost" rel="noreferrer noopener">SwiftUIHost</a>
-          <a href="https://github.com/SwiftTUI/swift-tui/tree/0.1.15/Platforms/WebHost" rel="noreferrer noopener">SwiftTUIWebHost</a>
-          <a href="https://github.com/SwiftTUI/swift-tui/tree/0.1.15/Platforms/Android" rel="noreferrer noopener">SwiftTUIAndroidHost</a>
-        </div>
-        <div class="col">
-          <h5 class="mono">examples</h5>
-          <a href="https://github.com/SwiftTUI/swift-tui-examples/tree/0.1.15/gallery" rel="noreferrer noopener">gallery</a>
-          <a href="https://github.com/SwiftTUI/swift-tui-examples/tree/0.1.15/gifeditor" rel="noreferrer noopener">gifeditor</a>
-          <a href="https://github.com/SwiftTUI/swift-tui-examples/tree/0.1.15/WebExample" rel="noreferrer noopener">WebExample</a>
-          <a href="https://github.com/SwiftTUI/swift-tui-examples/tree/0.1.15/AndroidGallery" rel="noreferrer noopener">AndroidGallery</a>
-        </div>
+    <div class="footer-main">
+      <div class="footer-brand">
+        <a href={`${base}/`} aria-label="SwiftTUI home">
+          <Mark size={28} />
+          <span>SwiftTUI</span>
+        </a>
+        <p>SwiftUI semantics, drawn in terminal cells.</p>
       </div>
+
+      <nav class="footer-links" aria-label="Footer navigation">
+        <div>
+          <h2>Build</h2>
+          <a href={`${base}/#quickstart`}>Quickstart</a>
+          <a href={`${base}/docs/documentation/`}>DocC reference</a>
+          <a href={`${base}/showcase/`}>Examples</a>
+        </div>
+        <div>
+          <h2>Understand</h2>
+          <a href={`${base}/pipeline/`}>Rendering pipeline</a>
+          <a href={`${base}/domrenderer/`}>DOM renderer</a>
+          <a
+            href="https://github.com/SwiftTUI/swift-tui/blob/main/docs/HOSTS-AND-PLATFORMS.md"
+            rel="noreferrer noopener"
+          >
+            Hosts and platforms
+          </a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a
+            href="https://github.com/SwiftTUI/swift-tui"
+            rel="noreferrer noopener"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://github.com/SwiftTUI/swift-tui/releases"
+            rel="noreferrer noopener"
+          >
+            Releases
+          </a>
+          <a
+            href="https://github.com/SwiftTUI/swift-tui/issues"
+            rel="noreferrer noopener"
+          >
+            Issues
+          </a>
+        </div>
+      </nav>
     </div>
 
-    <div class="row bottom mono">
-      <span class="dim">© {year} GoodHats</span>
-      <span class="dim sep">·</span>
-      <span class="dim">Swift 6.3 package</span>
-      <span class="dim sep">·</span>
-      <a class="dim foot-link" href="https://github.com/SwiftTUI/swift-tui/blob/0.1.15/LICENSE" rel="noreferrer noopener">License</a>
-      <span class="grow"></span>
-      <span class="probe">
-        <span class="dim">resolve</span>
-        <span class="dim">·</span>
-        <span class="dim">measure</span>
-        <span class="dim">·</span>
-        <span class="dim">place</span>
-        <span class="dim">·</span>
-        <span class="dim">semantics</span>
-        <span class="dim">·</span>
-        <span class="dim">draw</span>
-        <span class="dim">·</span>
-        <span class="dim">raster</span>
-        <span class="dim">·</span>
-        <span class="active">commit</span>
-        <span class="cursor"></span>
-      </span>
+    <div class="footer-bottom">
+      <span>© {year} GoodHats</span>
+      <a
+        href="https://github.com/SwiftTUI/swift-tui/blob/0.1.15/LICENSE"
+        rel="noreferrer noopener"
+      >
+        MIT License
+      </a>
     </div>
   </div>
 </footer>
 
 <style>
-  .site-foot {
-    border-top: 1px solid var(--line);
-    margin-top: 80px;
-    padding: 56px 0 28px;
-    background: linear-gradient(180deg, transparent, var(--bg-soft));
+  .site-footer {
+    padding: 72px 0 28px;
+    border-top: 1px solid var(--line-strong);
+    background: var(--bg);
   }
-  .row.top {
+
+  .footer-main {
     display: grid;
-    grid-template-columns: minmax(160px, 220px) 1fr;
-    gap: 36px;
-    align-items: start;
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(50px, 9vw, 130px);
   }
-  .brand {
+
+  .footer-brand {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+  }
+
+  .footer-brand > a {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-self: start;
+    gap: 11px;
+    color: var(--ink);
+    font-weight: 650;
+    letter-spacing: -0.025em;
+  }
+
+  .footer-brand p {
+    max-width: 30ch;
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+  }
+
+  .footer-links > div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .footer-links h2 {
+    margin: 0 0 6px;
+    color: var(--ink-4);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .footer-links a {
+    color: var(--ink-2);
+    font-size: 12.5px;
+    line-height: 1.45;
+    transition: color 140ms ease;
+  }
+
+  .footer-links a:hover {
     color: var(--ink);
   }
-  .wordmark { font-weight: 500; letter-spacing: -0.005em; }
-  .cols {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
-  }
-  .col { display: flex; flex-direction: column; gap: 6px; }
-  .col h5 {
-    font-size: 10.5px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-4);
-    margin: 0 0 4px;
-  }
-  .col a {
-    font-size: 12.5px;
-    color: var(--ink-2);
-    transition: color 160ms ease;
-  }
-  .col a:hover { color: var(--ink); }
 
-  .row.bottom {
-    margin-top: 36px;
-    padding-top: 18px;
-    border-top: 1px dashed var(--line);
+  .footer-bottom {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 54px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-4);
+    font-family: var(--font-mono);
     font-size: 10.5px;
-    color: var(--ink-3);
   }
-  .row.bottom .dim { color: var(--ink-4); }
-  .row.bottom .sep { padding: 0 4px; }
-  .row.bottom .grow { flex: 1; }
-  .row.bottom .foot-link { transition: color 160ms ease; }
-  .row.bottom .foot-link:hover { color: var(--ink-2); }
-  .probe {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .probe .active { color: var(--accent); }
-  .probe .cursor {
-    display: inline-block;
-    width: 8px;
-    height: 12px;
-    background: var(--accent);
-    margin-left: 2px;
-    animation: blink 1.1s steps(2) infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
 
-  @media (max-width: 920px) {
-    .row.top { grid-template-columns: 1fr; }
-    .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-bottom a:hover {
+    color: var(--ink-2);
   }
-  @media (max-width: 540px) {
-    .cols { grid-template-columns: 1fr; }
+
+  @media (max-width: 760px) {
+    .footer-main {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .footer-links {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-links a {
+      transition: none;
+    }
   }
 </style>

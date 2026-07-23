@@ -11,11 +11,10 @@ import workerUrl from "./domrenderer-worker.ts?worker&url";
 
 const WEBEXAMPLE_DIST = "/webexample/TerminalApp/dist";
 
-// Match the /webexample embed's responsive sizing so narrow viewports keep
-// enough columns for the demo scenes (see WebExample's frontend.ts).
-const DEFAULT_FONT_SIZE = 15;
-const MIN_FONT_SIZE = 8;
-const TARGET_COLUMNS = 72;
+// Keep the single counter scene readable while still fitting narrow embeds.
+const DEFAULT_FONT_SIZE = 16;
+const MIN_FONT_SIZE = 12;
+const TARGET_COLUMNS = 40;
 const CELL_WIDTH_RATIO = 0.62;
 
 function responsiveFontSize(): number {

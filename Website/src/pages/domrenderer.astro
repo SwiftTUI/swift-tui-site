@@ -11,7 +11,7 @@ const canonical = `${site}${base || ""}/domrenderer/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI DOM Renderer";
 const description =
-  "The same SwiftTUI app that powers the /webexample demo — same wasm, same scenes — presented through @swifttui/web's DOM surface renderer: real text elements instead of canvas pixels, with native font rendering and Alt-drag text selection.";
+  "The same SwiftTUI counter that powers the /webexample demo, using the same wasm and scene manifest, presented through @swifttui/web's DOM surface renderer.";
 const webDemoHref = `${base}/webexample/`;
 ---
 <!doctype html>
@@ -52,9 +52,9 @@ const webDemoHref = `${base}/webexample/`;
             <span class="eyebrow mono"><span class="num">/00</span>DOM renderer</span>
             <h1>Cells as elements, not pixels.</h1>
             <p class="lede">
-              This is the same SwiftTUI app that powers
-              the <a href={webDemoHref}>/webexample</a> demo — the
-              same <span class="mono">wasm32-wasi</span> binary, the same scenes —
+              This is the same SwiftTUI counter that powers
+              the <a href={webDemoHref}>/webexample</a> demo, using the
+              same <span class="mono">wasm32-wasi</span> binary and scene manifest,
               mounted with <span class="mono">renderer: "dom"</span>. Every
               cell run is a real, absolutely positioned text element: the
               browser shapes the glyphs, zoom stays crisp, the tree is

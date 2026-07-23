@@ -1,0 +1,745 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<section class="product-proof" aria-labelledby="proof-title">
+  <div class="shell">
+    <header class="proof-head">
+      <h2 id="proof-title">Real tools, not toy demos.</h2>
+      <p>
+        The examples exercise workspaces, editors, charts, input, images, and
+        host integration against the same public framework.
+      </p>
+    </header>
+
+    <div class="proof-gallery">
+      <figure class="proof-item proof-item--wide">
+        <a
+          href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace"
+          rel="noreferrer noopener"
+        >
+          <img
+            src={`${base}/showcase/terminal-workspace.png`}
+            width="1600"
+            height="1000"
+            loading="lazy"
+            decoding="async"
+            alt="SwiftTUI Terminal Workspace with tabs, split panes, and a command palette"
+          />
+        </a>
+        <figcaption>
+          <strong>Terminal Workspace</strong>
+          <span>Tabs, splits, a command palette, persisted layout, and embedded PTYs.</span>
+        </figcaption>
+      </figure>
+
+      <figure class="proof-item">
+        <a
+          href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor"
+          rel="noreferrer noopener"
+        >
+          <img
+            src={`${base}/showcase/gifeditor.png`}
+            width="1600"
+            height="1000"
+            loading="lazy"
+            decoding="async"
+            alt="SwiftTUI GIF Editor with canvas, layers, tools, and a timeline"
+          />
+        </a>
+        <figcaption>
+          <strong>GIF Editor</strong>
+          <span>Layers, timeline, pointer tools, undo, and export.</span>
+        </figcaption>
+      </figure>
+
+      <figure class="proof-item">
+        <a
+          href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/gitviz"
+          rel="noreferrer noopener"
+        >
+          <img
+            src={`${base}/showcase/gitviz.png`}
+            width="1600"
+            height="1000"
+            loading="lazy"
+            decoding="async"
+            alt="SwiftTUI GitViz dashboard showing charts built from repository history"
+          />
+        </a>
+        <figcaption>
+          <strong>GitViz</strong>
+          <span>SwiftTUICharts primitives over actual repository history.</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <a class="proof-link" href={`${base}/showcase/`}>See every example and host</a>
+  </div>
+</section>
+
+<section class="why" id="why" aria-labelledby="why-title">
+  <div class="shell">
+    <div class="why-thesis">
+      <p>Swift is a language, not a platform.</p>
+      <h2 id="why-title">SwiftUI-shaped authoring. Terminal-native output.</h2>
+    </div>
+
+    <dl class="reason-list" id="surface">
+      <div>
+        <dt>Use the model you know.</dt>
+        <dd>
+          Compose <code>View</code>, <code>App</code>, and <code>Scene</code>{" "}
+          values with state, focus, layout, controls, and modifiers.
+        </dd>
+      </div>
+      <div>
+        <dt>Inspect the committed frame.</dt>
+        <dd>
+          Geometry, semantics, styled cells, and raster output move through a
+          strict pipeline that can be tested before presentation.
+        </dd>
+      </div>
+      <div>
+        <dt>Keep terminal behavior native.</dt>
+        <dd>
+          Capability-aware color, links, images, mouse input, alternate screens,
+          signals, and PTY-backed surfaces stay part of the system.
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="hosts" id="hosts" aria-labelledby="hosts-title">
+  <div class="shell">
+    <header class="hosts-head">
+      <h2 id="hosts-title">One authored tree. Thin host-specific bootstrap.</h2>
+      <p>
+        SwiftTUI keeps the view model and committed frame stable while each
+        platform owns the integration work that belongs to it.
+      </p>
+    </header>
+
+    <div class="host-map">
+      <div class="engine">
+        <span>SwiftTUI</span>
+        <strong>View tree to committed cells and semantics</strong>
+      </div>
+      <div class="host-list">
+        <span>Terminal executable</span>
+        <span>Static WASI browser app</span>
+        <span>Localhost WebHost</span>
+        <span>Native SwiftUI surface</span>
+        <span>Android Compose surface</span>
+      </div>
+    </div>
+
+    <p class="host-caveat">
+      The authored view tree is shared. Launch, lifecycle, input bridges,
+      accessibility presentation, and platform packaging remain host-specific.
+    </p>
+
+    <nav class="audience-paths" aria-label="Choose a SwiftTUI guide">
+      <a href={`${base}/docs/documentation/`}>
+        <span>I author Swift</span>
+        <strong>Views, state, focus, layout, and controls</strong>
+        <i>Open DocC</i>
+      </a>
+      <a
+        href="https://github.com/SwiftTUI/swift-tui/blob/main/docs/HOSTS-AND-PLATFORMS.md"
+        rel="noreferrer noopener"
+      >
+        <span>I build terminal tools</span>
+        <strong>Cells, input, PTYs, images, and capabilities</strong>
+        <i>Open the host guide</i>
+      </a>
+      <a href={`${base}/showcase/`}>
+        <span>I need proof</span>
+        <strong>Maintained applications across the host family</strong>
+        <i>Browse examples</i>
+      </a>
+    </nav>
+  </div>
+</section>
+
+<section class="confidence" aria-labelledby="confidence-title">
+  <div class="shell">
+    <div class="confidence-copy">
+      <p class="home-kicker">Engineering confidence</p>
+      <h2 id="confidence-title">A frame you can inspect before it reaches a screen.</h2>
+      <p>
+        Each update lowers through explicit phases. The pipeline page exposes
+        the same model with a runnable walkthrough and implementation links.
+      </p>
+      <a href={`${base}/pipeline/`}>Inspect the rendering pipeline</a>
+    </div>
+
+    <ol class="phase-sequence" aria-label="SwiftTUI rendering pipeline">
+      <li><span>Resolve</span><small>View graph</small></li>
+      <li><span>Measure</span><small>Size proposals</small></li>
+      <li><span>Place</span><small>Integer geometry</small></li>
+      <li><span>Semantics</span><small>Accessible meaning</small></li>
+      <li><span>Draw</span><small>Display commands</small></li>
+      <li><span>Raster</span><small>Styled cells</small></li>
+      <li class="phase-commit"><span>Commit</span><small>Host presentation</small></li>
+    </ol>
+  </div>
+</section>
+
+<section class="trust" aria-labelledby="trust-title">
+  <div class="shell trust-layout">
+    <div class="trust-copy">
+      <p class="home-kicker">Pre-release boundary</p>
+      <h2 id="trust-title">Useful now. Still allowed to change.</h2>
+      <p>
+        SwiftTUI 0.1.15 is pre-release software. Source-breaking changes are
+        expected before 1.0, and external consumer support begins at 0.9.0.
+      </p>
+      <div class="trust-links">
+        <a
+          href="https://github.com/SwiftTUI/swift-tui/releases"
+          rel="noreferrer noopener"
+        >
+          Read releases
+        </a>
+        <a
+          href="https://github.com/SwiftTUI/swift-tui/issues"
+          rel="noreferrer noopener"
+        >
+          Track issues
+        </a>
+      </div>
+    </div>
+
+    <div class="closing">
+      <h2>Build the first frame.</h2>
+      <div>
+        <a
+          class="home-button home-button--primary"
+          href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/three-hosts-demo"
+          rel="noreferrer noopener"
+        >
+          Clone the counter
+        </a>
+        <a class="home-button" href={`${base}/docs/documentation/`}>
+          Read the API reference
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .product-proof,
+  .why,
+  .hosts,
+  .confidence,
+  .trust {
+    padding: clamp(88px, 11vw, 150px) 0;
+  }
+
+  .proof-head,
+  .hosts-head {
+    display: grid;
+    gap: 20px;
+    max-width: 860px;
+    margin-bottom: 52px;
+  }
+
+  .proof-head h2,
+  .hosts-head h2,
+  .confidence h2,
+  .trust h2 {
+    font-size: clamp(44px, 6.5vw, 82px);
+    font-weight: 520;
+    line-height: 0.95;
+    letter-spacing: -0.062em;
+    text-wrap: balance;
+  }
+
+  .proof-head p,
+  .hosts-head p,
+  .confidence-copy > p:last-of-type,
+  .trust-copy > p:last-of-type {
+    max-width: 58ch;
+    color: var(--home-muted);
+    font-size: 17px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .proof-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--home-ink);
+    border-left: 1px solid var(--home-ink);
+  }
+
+  .proof-item {
+    min-width: 0;
+    margin: 0;
+    border-right: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .proof-item--wide {
+    grid-column: 1 / -1;
+  }
+
+  .proof-item a {
+    display: block;
+    overflow: hidden;
+    background: #101512;
+  }
+
+  .proof-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    transition: transform 260ms ease;
+  }
+
+  .proof-item a:hover img {
+    transform: scale(1.008);
+  }
+
+  .proof-item figcaption {
+    display: grid;
+    grid-template-columns: minmax(140px, 0.38fr) minmax(0, 1fr);
+    gap: 24px;
+    min-height: 78px;
+    padding: 17px 19px;
+  }
+
+  .proof-item figcaption strong {
+    font-size: 15px;
+  }
+
+  .proof-item figcaption span {
+    color: var(--home-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .proof-link,
+  .confidence-copy > a {
+    display: inline-block;
+    margin-top: 26px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--home-accent);
+    color: var(--home-accent-ink);
+    font-size: 14px;
+  }
+
+  .why {
+    border-top: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .why-thesis {
+    display: flex;
+    min-height: 480px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: clamp(80px, 10vw, 140px);
+  }
+
+  .why-thesis > p {
+    color: var(--home-accent-ink);
+    font-weight: 650;
+  }
+
+  .why-thesis h2 {
+    align-self: flex-end;
+    max-width: 12ch;
+    font-size: clamp(56px, 8.6vw, 118px);
+    font-weight: 480;
+    line-height: 0.91;
+    letter-spacing: -0.072em;
+    text-wrap: balance;
+  }
+
+  .reason-list {
+    margin: 0;
+    border-top: 1px solid var(--home-ink);
+  }
+
+  .reason-list > div {
+    display: grid;
+    grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(30px, 7vw, 110px);
+    padding: 30px 0;
+    border-bottom: 1px solid var(--home-line-strong);
+  }
+
+  .reason-list > div:last-child {
+    border-bottom: 0;
+  }
+
+  .reason-list dt {
+    font-size: clamp(24px, 2.7vw, 36px);
+    font-weight: 540;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  .reason-list dd {
+    max-width: 62ch;
+    margin: 0;
+    color: var(--home-muted);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .reason-list code {
+    color: var(--home-accent-ink);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  .hosts {
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .host-map {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+    border-top: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .engine {
+    display: flex;
+    min-height: 320px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px;
+    border-right: 1px solid var(--home-ink);
+    background: var(--home-accent);
+    color: var(--home-accent-on);
+  }
+
+  .engine span {
+    font-weight: 700;
+  }
+
+  .engine strong {
+    max-width: 14ch;
+    font-size: clamp(28px, 3vw, 38px);
+    line-height: 1.03;
+    letter-spacing: -0.045em;
+  }
+
+  .host-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .host-list span {
+    display: flex;
+    min-height: 104px;
+    align-items: flex-end;
+    padding: 20px;
+    border-right: 1px solid var(--home-line);
+    border-bottom: 1px solid var(--home-line);
+    color: var(--home-muted);
+  }
+
+  .host-list span:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .host-list span:last-child {
+    grid-column: 1 / -1;
+    border-bottom: 0;
+  }
+
+  .host-caveat {
+    max-width: 86ch;
+    margin: 15px 0 60px;
+    color: var(--home-quiet);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .audience-paths {
+    border-top: 1px solid var(--home-ink);
+  }
+
+  .audience-paths a {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.55fr) minmax(0, 1.35fr) auto;
+    gap: 30px;
+    align-items: center;
+    min-height: 104px;
+    border-bottom: 1px solid var(--home-line-strong);
+    transition: padding 160ms ease, color 160ms ease;
+  }
+
+  .audience-paths a:hover {
+    padding-left: 10px;
+    color: var(--home-accent-ink);
+  }
+
+  .audience-paths span {
+    color: var(--home-muted);
+  }
+
+  .audience-paths strong {
+    font-size: 19px;
+    letter-spacing: -0.025em;
+  }
+
+  .audience-paths i {
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--home-accent);
+    font-size: 13px;
+    font-style: normal;
+  }
+
+  .confidence {
+    background:
+      linear-gradient(var(--home-line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--home-line-soft) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .confidence-copy {
+    display: grid;
+    gap: 20px;
+    max-width: 900px;
+    padding: clamp(34px, 5vw, 70px);
+    border: 1px solid var(--home-ink);
+    background: var(--home-paper);
+  }
+
+  .phase-sequence {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    margin: 44px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+    list-style: none;
+  }
+
+  .phase-sequence li {
+    display: flex;
+    min-height: 126px;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 12px;
+    border-right: 1px solid var(--home-line);
+    background: var(--home-paper);
+  }
+
+  .phase-sequence li:last-child {
+    border-right: 0;
+  }
+
+  .phase-sequence span,
+  .phase-sequence small {
+    font-family: var(--font-mono);
+  }
+
+  .phase-sequence span {
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .phase-sequence small {
+    color: var(--home-quiet);
+    font-size: 9px;
+    line-height: 1.4;
+  }
+
+  .phase-sequence .phase-commit {
+    background: var(--home-accent);
+    color: var(--home-accent-on);
+  }
+
+  .phase-sequence .phase-commit small {
+    color: color-mix(in srgb, var(--home-accent-on), transparent 22%);
+  }
+
+  .trust {
+    border-top: 1px solid var(--home-ink);
+  }
+
+  .trust-layout {
+    display: grid;
+    gap: clamp(90px, 14vw, 180px);
+  }
+
+  .trust-copy {
+    display: grid;
+    gap: 20px;
+    max-width: 860px;
+  }
+
+  .trust-copy h2 {
+    max-width: 12ch;
+  }
+
+  .trust-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    margin-top: 4px;
+  }
+
+  .trust-links a {
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--home-accent);
+    color: var(--home-accent-ink);
+    font-size: 13px;
+  }
+
+  .closing {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 44px;
+    align-items: end;
+    padding-top: clamp(70px, 9vw, 120px);
+    border-top: 1px solid var(--home-ink);
+  }
+
+  .closing h2 {
+    max-width: 10ch;
+    font-size: clamp(60px, 9.5vw, 128px);
+  }
+
+  .closing > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 900px) {
+    .host-map {
+      grid-template-columns: 1fr;
+    }
+
+    .engine {
+      min-height: 230px;
+      border-right: 0;
+      border-bottom: 1px solid var(--home-ink);
+    }
+
+    .audience-paths a {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 22px 0;
+    }
+
+    .audience-paths i {
+      justify-self: start;
+      margin-top: 8px;
+    }
+
+    .phase-sequence {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .phase-sequence li:nth-child(4) {
+      border-right: 0;
+    }
+
+    .phase-sequence li:nth-child(-n + 4) {
+      border-bottom: 1px solid var(--home-line);
+    }
+
+    .closing {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .closing > div {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .proof-gallery {
+      grid-template-columns: 1fr;
+    }
+
+    .proof-item--wide {
+      grid-column: auto;
+    }
+
+    .proof-item figcaption {
+      grid-template-columns: 1fr;
+      gap: 5px;
+    }
+
+    .why-thesis {
+      min-height: 430px;
+    }
+
+    .why-thesis h2 {
+      font-size: clamp(50px, 15vw, 78px);
+    }
+
+    .reason-list > div {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .host-list {
+      grid-template-columns: 1fr;
+    }
+
+    .host-list span,
+    .host-list span:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .host-list span:last-child {
+      grid-column: auto;
+    }
+
+    .phase-sequence {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .phase-sequence li,
+    .phase-sequence li:nth-child(4) {
+      border-right: 1px solid var(--home-line);
+      border-bottom: 1px solid var(--home-line);
+    }
+
+    .phase-sequence li:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .phase-sequence li:last-child {
+      grid-column: 1 / -1;
+      border-right: 0;
+      border-bottom: 0;
+    }
+
+    .confidence-copy {
+      padding: 28px 20px;
+    }
+
+    .closing > div {
+      display: grid;
+    }
+
+    .closing .home-button {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof-item img {
+      transition: none;
+    }
+  }
+</style>

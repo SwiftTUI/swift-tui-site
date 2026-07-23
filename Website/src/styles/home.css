@@ -1,0 +1,200 @@
+:root {
+  --home-paper: #f5f7f3;
+  --home-paper-soft: #edf1ec;
+  --home-ink: #101512;
+  --home-muted: #58615b;
+  --home-quiet: #737d75;
+  --home-line: #cfd5cf;
+  --home-line-soft: rgb(16 21 18 / 6%);
+  --home-line-strong: #929b94;
+  --home-accent: #087b69;
+  --home-accent-ink: #05594d;
+  --home-accent-on: #f5f7f3;
+  --home-terminal-accent: #62d6bf;
+  --home-code: #29312c;
+  --home-code-type: #2f6458;
+  --home-code-string: #705a24;
+  --home-code-number: #6b526c;
+
+  --bg: var(--home-paper);
+  --bg-soft: var(--home-paper-soft);
+  --panel: var(--home-paper);
+  --panel-2: var(--home-paper-soft);
+  --inset: var(--home-paper-soft);
+  --line: var(--home-line);
+  --line-soft: #e1e6e0;
+  --line-strong: var(--home-line-strong);
+  --line-warm: #6f7a72;
+  --text: var(--home-ink);
+  --muted: var(--home-muted);
+  --quiet: var(--home-quiet);
+  --ink-4: #89928b;
+  --accent: var(--home-accent);
+  --accent-rgb: 8, 123, 105;
+  --accent-soft: rgb(8 123 105 / 10%);
+  --accent-dim: rgb(8 123 105 / 32%);
+  --accent-hover: #056555;
+  --on-accent: var(--home-accent-on);
+  --topbar-bg: rgb(245 247 243 / 92%);
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, sans-serif;
+  --font-mono: "SFMono-Regular", "SF Mono", Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+  --shell-max: 1380px;
+  --gutter: 24px;
+  --radius: 4px;
+  --radius-sm: 3px;
+}
+
+:root[data-theme="dark"] {
+  --home-paper: #101512;
+  --home-paper-soft: #151c17;
+  --home-ink: #e8eee9;
+  --home-muted: #a0aca3;
+  --home-quiet: #78847b;
+  --home-line: #2a342d;
+  --home-line-soft: rgb(232 238 233 / 5%);
+  --home-line-strong: #536158;
+  --home-accent: #62d6bf;
+  --home-accent-ink: #8be1cf;
+  --home-accent-on: #101512;
+  --home-terminal-accent: #62d6bf;
+  --home-code: #d5ddd7;
+  --home-code-type: #91cdbc;
+  --home-code-string: #d3be84;
+  --home-code-number: #c4abc6;
+
+  --line-soft: #202923;
+  --ink-4: #6f7c73;
+  --accent-rgb: 98, 214, 191;
+  --accent-soft: rgb(98 214 191 / 10%);
+  --accent-dim: rgb(98 214 191 / 30%);
+  --accent-hover: #8be1cf;
+  --topbar-bg: rgb(16 21 18 / 92%);
+}
+
+body.home-page {
+  min-width: 320px;
+  background: var(--home-paper);
+  color: var(--home-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: normal;
+}
+
+body.home-page .ambient,
+body.home-page .grain {
+  display: none;
+}
+
+body.home-page main {
+  overflow: clip;
+}
+
+body.home-page .shell {
+  width: min(100%, calc(var(--shell-max) + (var(--gutter) * 2)));
+}
+
+body.home-page h1,
+body.home-page h2,
+body.home-page h3 {
+  color: var(--home-ink);
+  font-family: var(--font-sans);
+}
+
+body.home-page p {
+  color: inherit;
+}
+
+body.home-page :focus-visible {
+  outline: 3px solid var(--home-accent);
+  outline-offset: 4px;
+}
+
+body.home-page ::selection {
+  background: var(--home-accent);
+  color: var(--home-accent-on);
+}
+
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--home-ink);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--home-ink);
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.home-button:hover {
+  border-color: var(--home-accent);
+  color: var(--home-accent-ink);
+}
+
+.home-button:active {
+  transform: translateY(1px);
+}
+
+.home-button--primary {
+  border-color: var(--home-ink);
+  background: var(--home-ink);
+  color: var(--home-paper);
+}
+
+.home-button--primary:hover {
+  border-color: var(--home-accent);
+  background: var(--home-accent);
+  color: var(--home-accent-on);
+}
+
+.home-kicker {
+  margin: 0;
+  color: var(--home-accent-ink) !important;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.skip-link {
+  position: fixed;
+  top: -90px;
+  left: 16px;
+  z-index: 100;
+  padding: 11px 15px;
+  background: var(--home-ink);
+  color: var(--home-paper);
+  font-size: 13px;
+}
+
+.skip-link:focus {
+  top: 14px;
+}
+
+@media (max-width: 920px) {
+  :root {
+    --gutter: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  :root {
+    --gutter: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-button {
+    transition: none;
+  }
+}

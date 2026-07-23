@@ -1,45 +1,79 @@
 ---
 import Mark from "./Mark.astro";
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const home = `${base}/`;
 ---
+
 <header class="site-header">
-  <div class="shell row">
-    <a class="brand" href={home}>
-      <Mark size={22} />
-      <span class="wordmark">SwiftTUI</span>
-      <span class="version mono">v0.1.15</span>
+  <div class="shell header-row">
+    <a class="brand" href={home} aria-label="SwiftTUI home">
+      <Mark size={24} />
+      <span>SwiftTUI</span>
     </a>
 
-    <nav class="nav mono" aria-label="primary">
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href={`${home}#demo`}>Demo</a>
       <a href={`${home}#why`}>Why</a>
-      <a href={`${home}#runtimes`}>Hosts</a>
-      <a href={`${home}#surface`}>Surface</a>
+      <a href={`${home}#hosts`}>Hosts</a>
       <a href={`${home}#quickstart`}>Quickstart</a>
-      ·
       <a href={`${base}/showcase/`}>Showcase</a>
       <a href={`${base}/pipeline/`}>Pipeline</a>
       <a href={`${base}/docs/documentation/`}>Docs</a>
     </nav>
 
-    <div class="actions">
-      <a class="ghost mono" href="https://github.com/SwiftTUI/swift-tui" rel="noreferrer noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-.99-.02-1.94-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.97 10.97 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.15 0 1.55-.01 2.81-.01 3.19 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg>
-        <span>GitHub</span>
+    <div class="header-actions">
+      <a
+        class="github-link"
+        href="https://github.com/SwiftTUI/swift-tui"
+        rel="noreferrer noopener"
+        aria-label="SwiftTUI on GitHub"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-.99-.02-1.94-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.97 10.97 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.15 0 1.55-.01 2.81-.01 3.19 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"></path>
+        </svg>
       </a>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode">
-        <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <button
+        class="theme-toggle"
+        id="theme-toggle"
+        type="button"
+        aria-label="Switch to light mode"
+        title="Switch to light mode"
+      >
+        <svg
+          class="icon icon-sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <circle cx="12" cy="12" r="4"></circle>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
         </svg>
-        <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg
+          class="icon icon-moon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
     </div>
   </div>
-  <div class="hairline"></div>
 </header>
 
 <style>
@@ -47,84 +81,128 @@ const home = `${base}/`;
     position: sticky;
     top: 0;
     z-index: 40;
+    border-bottom: 1px solid var(--line-strong);
     background: var(--topbar-bg);
-    backdrop-filter: saturate(140%) blur(14px);
-    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
   }
-  .row {
-    display: flex;
+
+  .header-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 24px;
-    height: 60px;
+    gap: 28px;
+    min-height: 68px;
   }
+
   .brand {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     color: var(--ink);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.025em;
   }
-  .wordmark {
-    font-size: 14.5px;
-  }
-  .version {
-    font-size: 11px;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid var(--line-strong);
-    color: var(--ink-3);
-    margin-left: 2px;
-  }
-  .nav {
+
+  .site-nav {
     display: flex;
-    gap: 18px;
-    margin-left: auto;
-    margin-right: auto;
+    justify-content: center;
+    gap: clamp(14px, 1.8vw, 26px);
+    min-width: 0;
     color: var(--ink-2);
-    font-size: 12.5px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
   }
-  .nav a {
-    transition: color 160ms ease;
+
+  .site-nav a {
     white-space: nowrap;
+    transition: color 140ms ease;
   }
-  .nav a:hover { color: var(--ink); }
-  @media (max-width: 1080px) {
-    .nav { gap: 14px; font-size: 12px; }
+
+  .site-nav a:hover {
+    color: var(--ink);
   }
-  .actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .ghost {
-    display: inline-flex;
+
+  .header-actions {
+    display: flex;
     align-items: center;
     gap: 7px;
-    padding: 7px 11px;
-    border-radius: 7px;
+  }
+
+  .github-link,
+  :global(.theme-toggle) {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
     border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    background: transparent;
     color: var(--ink-2);
-    font-size: 12px;
-    transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+    transition:
+      border-color 140ms ease,
+      color 140ms ease,
+      background 140ms ease;
   }
-  .ghost:hover { color: var(--ink); border-color: var(--line-warm); background: var(--panel-2); }
-  .hairline { height: 1px; background: var(--line); }
-  @media (max-width: 820px) {
-    .row { gap: 12px; }
-    /* keep section anchors reachable on mobile via a horizontal scroll row */
-    .nav {
-      gap: 16px;
-      font-size: 11.5px;
-      margin: 0 0 0 4px;
-      padding: 0 4px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
-              -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+
+  .github-link:hover,
+  :global(.theme-toggle:hover) {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  @media (max-width: 880px) {
+    .header-row {
+      gap: 12px;
     }
-    .nav::-webkit-scrollbar { display: none; }
+
+    .site-nav {
+      justify-content: flex-start;
+      gap: 18px;
+      overflow-x: auto;
+      padding: 0 4px;
+      scrollbar-width: none;
+      mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    .site-nav::-webkit-scrollbar {
+      display: none;
+    }
   }
-  @media (max-width: 480px) {
-    .version { display: none; }
-    .ghost span { display: none; }
-    .ghost { padding: 7px 9px; }
+
+  @media (max-width: 560px) {
+    .header-row {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      min-height: 62px;
+    }
+
+    .brand span {
+      display: none;
+    }
+
+    .site-nav {
+      font-size: 10.5px;
+    }
+
+    .site-nav a:nth-child(2),
+    .site-nav a:nth-child(3),
+    .site-nav a:nth-child(5),
+    .site-nav a:nth-child(6) {
+      display: none;
+    }
+
+    .github-link {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav a,
+    .github-link,
+    :global(.theme-toggle) {
+      transition: none;
+    }
   }
 </style>
