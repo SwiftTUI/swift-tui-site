@@ -11,6 +11,12 @@ name: Deploy Website to Cloudflare Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      examples_ref:
+        description: Public swift-tui-examples branch or tag to build
+        required: true
+        default: "0.1.15"
+        type: string
 
 permissions:
   contents: read
@@ -116,6 +122,8 @@ jobs:
       - name: Build WebExample
         shell: bash
         working-directory: swift-tui-site/Website
+        env:
+          SWIFTTUI_EXAMPLES_REF: ${{ inputs.examples_ref }}
         run: bun run build:wasm
 
       - name: Validate uploaded WebExample wasm parses in the browser API
