@@ -77,15 +77,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-  <span class="at">@FocusState</span> <span class="kw">private var</span> focused: <span class="ty">Bool</span>
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
       <span class="ty">Text</span>(<span class="str">"Count: \(count)"</span>).bold()
       <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123; count += <span class="num">1</span> &#125;
-        .focused($focused)
     &#125;
-    .onAppear &#123; focused = <span class="kw">true</span> &#125;
     .padding(<span class="num">2</span>)
   &#125;
 &#125;</code></pre>
@@ -98,8 +95,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     </div>
     <div class="quickstart-foot">
       <p>
-        Requires Swift 6.3. Version 0.1.15 is pre-release and can make
-        source-breaking changes before 1.0.
+        Requires Swift 6.3.
       </p>
       <a href={`${base}/docs/documentation/`}>Continue in the DocC reference</a>
     </div>
@@ -171,7 +167,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 <style>
   .home-quickstart {
-    padding: clamp(86px, 11vw, 150px) 0;
+    padding: clamp(57.333px, 7.333vw, 100px) 0
+      clamp(86px, 11vw, 150px);
     border-top: 1px solid var(--home-ink);
     border-bottom: 1px solid var(--home-ink);
   }
@@ -214,7 +211,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     align-items: center;
     gap: 12px;
     min-height: 62px;
-    margin-bottom: 18px;
     padding: 0 16px;
     border: 1px solid var(--home-ink);
     background: var(--home-ink);

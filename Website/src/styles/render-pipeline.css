@@ -76,7 +76,7 @@
 /* ------------------------------ lede ------------------------------- */
 
 .rp .lede {
-  padding: 36px 0 14px;
+  padding: 24px 0 14px;
 }
 
 .rp .eyebrow {
@@ -149,7 +149,7 @@
 /* --------------------------- doc sections -------------------------- */
 
 .rp .doc-section {
-  padding: 46px 0;
+  padding: 30.667px 0 46px;
   border-top: 1px solid var(--line-soft);
 }
 
