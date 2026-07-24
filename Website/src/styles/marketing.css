@@ -73,3 +73,45 @@
   --accent-hover: #8be1cf;
   --topbar-bg: rgb(16 21 18 / 92%);
 }
+
+body.marketing-subpage {
+  min-width: 320px;
+  background: var(--home-paper);
+  color: var(--home-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: normal;
+}
+
+body.marketing-subpage .ambient,
+body.marketing-subpage .grain {
+  display: none;
+}
+
+body.marketing-subpage .shell {
+  width: min(100%, calc(var(--shell-max) + (var(--gutter) * 2)));
+}
+
+body.marketing-subpage :focus-visible {
+  outline: 3px solid var(--home-accent);
+  outline-offset: 4px;
+}
+
+body.marketing-subpage ::selection {
+  background: var(--home-accent);
+  color: var(--home-accent-on);
+}
+
+.skip-link {
+  position: fixed;
+  top: -90px;
+  left: 16px;
+  z-index: 100;
+  padding: 11px 15px;
+  background: var(--home-ink);
+  color: var(--home-paper);
+  font-size: 13px;
+}
+
+.skip-link:focus {
+  top: 14px;
+}

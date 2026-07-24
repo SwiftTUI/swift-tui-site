@@ -22,7 +22,16 @@ const description =
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0d1117" />
+    <meta
+      name="theme-color"
+      content="#f5f7f3"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#101512"
+      media="(prefers-color-scheme: dark)"
+    />
     <ThemeScript />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
@@ -34,21 +43,13 @@ const description =
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={ogImage} />
     <SiteIcons />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
-    />
     <script is:inline defer src={`${base}/render-pipeline/app.js`}></script>
   </head>
-  <body>
-    <div class="ambient" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
-
+  <body class="marketing-subpage pipeline-page">
+    <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
 
-    <main class="rp">
+    <main class="rp" id="main">
       <div class="doc-shell" id="top">
         <aside class="toc" aria-label="On this page">
           <p class="toc-kicker">On this page</p>

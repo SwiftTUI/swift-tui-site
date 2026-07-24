@@ -2,10 +2,10 @@
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
-<section class="hosts" id="hosts" aria-labelledby="hosts-title">
+<section class="hosts" id="next" aria-labelledby="next-title">
   <div class="shell">
     <header class="hosts-head">
-      <h2 id="hosts-title">Where next?</h2>
+      <h2 id="next-title">Where next?</h2>
       <p>
         Get more information.
       </p>
@@ -22,8 +22,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         <i>Browse examples</i>
       </a>
       <a
-        href="${base}/pipeline/"
-        rel="noreferrer noopener"
+        href={`${base}/pipeline/`}
       >
         <span>The concepts</span>
         <strong>resolve → measure → place → semantics → draw → raster → commit</strong>

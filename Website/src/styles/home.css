@@ -91,21 +91,6 @@ body.home-page ::selection {
   text-transform: uppercase;
 }
 
-.skip-link {
-  position: fixed;
-  top: -90px;
-  left: 16px;
-  z-index: 100;
-  padding: 11px 15px;
-  background: var(--home-ink);
-  color: var(--home-paper);
-  font-size: 13px;
-}
-
-.skip-link:focus {
-  top: 14px;
-}
-
 @media (max-width: 920px) {
   :root {
     --gutter: 18px;
