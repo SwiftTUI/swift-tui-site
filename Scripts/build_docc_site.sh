@@ -27,6 +27,49 @@ checkout_variable_for_repo() {
   esac
 }
 
+# The `docc` swift-docc-plugin picks out of the toolchain is not always runnable
+# on the host. The swift-6.3.x macOS toolchains ship an **x86_64-only** `docc`
+# while every other binary in them is universal, so on Apple Silicon without
+# Rosetta the plugin's exec dies part-way through the build with a bare
+#
+#   error: Error Domain=NSPOSIXErrorDomain Code=86 "Bad CPU type in executable"
+#
+# that names neither the tool nor the reason. Probe the executable the plugin
+# would choose and, when it cannot run here, hand it one that can through
+# `DOCC_EXEC` (which the plugin honors ahead of its own toolchain lookup).
+#
+# This is inert on a healthy toolchain: a caller-set DOCC_EXEC is left alone,
+# and a runnable toolchain `docc` leaves the plugin's normal lookup untouched.
+docc_runs() {
+  [ -n "${1:-}" ] && [ -x "$1" ] && "$1" --help >/dev/null 2>&1
+}
+
+if [ -z "${DOCC_EXEC:-}" ]; then
+  if command -v swiftly >/dev/null 2>&1; then
+    # Matches the plugin's own resolution: `swiftly run` puts the active
+    # toolchain's bin directory ahead of everything else on PATH.
+    toolchain_docc="$(swiftly run which docc 2>/dev/null || true)"
+  else
+    toolchain_docc="$(command -v docc 2>/dev/null || true)"
+  fi
+
+  if [ -n "$toolchain_docc" ] && ! docc_runs "$toolchain_docc"; then
+    fallback_docc="$(xcrun --find docc 2>/dev/null || true)"
+    if docc_runs "$fallback_docc"; then
+      export DOCC_EXEC="$fallback_docc"
+      printf '[build_docc_site] toolchain docc cannot execute on this host (%s); using %s\n' \
+        "$toolchain_docc" "$fallback_docc" >&2
+    else
+      printf '[build_docc_site] no runnable docc found.\n' >&2
+      printf '[build_docc_site]   toolchain docc: %s (cannot execute here)\n' "$toolchain_docc" >&2
+      printf '[build_docc_site]   on Apple Silicon check `lipo -archs %s` — the 6.3.x toolchains ship an x86_64-only docc.\n' \
+        "$toolchain_docc" >&2
+      printf '[build_docc_site]   install the Xcode command line tools, or set DOCC_EXEC to a docc built for this architecture.\n' >&2
+      exit 1
+    fi
+  fi
+fi
+
 # Parse the manifest into one tab-separated record per swiftRepos entry.
 entries="$(
   python3 - "$manifest_path" <<'PY'
