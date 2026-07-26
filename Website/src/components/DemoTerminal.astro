@@ -32,8 +32,8 @@ const { id = "demo" } = Astro.props;
 <section class="demo" id={id} aria-label="Live SwiftTUI counter">
   <header class="demo-header">
     <div>
-      <strong>Committed frame</strong>
-      <span>SwiftTUIWASI in the browser</span>
+      <strong>SwiftTUI app</strong>
+      <span>Compiled for browser with SwiftTUIWASI</span>
     </div>
     <a href={webExampleHref}>Open separately</a>
   </header>
@@ -89,9 +89,6 @@ const { id = "demo" } = Astro.props;
           </div>
         </div>
 
-        <p class="demo-ready" data-state-view="ready" hidden aria-live="polite">
-          Live frame ready. Use Tab and Return to increment.
-        </p>
       </swift-tui-demo>
     )
   }

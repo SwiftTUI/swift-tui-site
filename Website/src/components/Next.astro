@@ -5,10 +5,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 <section class="hosts" id="next" aria-labelledby="next-title">
   <div class="shell">
     <header class="hosts-head">
-      <h2 id="next-title">Where next?</h2>
-      <p>
-        Get more information.
-      </p>
+      <h2 id="next-title">Further reading</h2>
     </header>
     <nav class="audience-paths" aria-label="Choose a SwiftTUI guide">
       <a href={`${base}/docs/documentation/`}>
@@ -17,14 +14,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         <i>Open DocC</i>
       </a>
       <a href={`${base}/showcase/`}>
-        <span>More Examples</span>
+        <span>Examples</span>
         <strong>Maintained applications across the host family</strong>
         <i>Browse examples</i>
       </a>
       <a
         href={`${base}/pipeline/`}
       >
-        <span>The concepts</span>
+        <span>Concepts</span>
         <strong>resolve → measure → place → semantics → draw → raster → commit</strong>
         <i>Read about the pipeline</i>
       </a>
@@ -32,8 +29,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         href="https://github.com/SwiftTUI/swift-tui/blob/main/docs/HOSTS-AND-PLATFORMS.md"
         rel="noreferrer noopener"
       >
-        <span>Hosts</span>
-        <strong>Cells, input, PTYs, images, and capabilities</strong>
+        <span>Capabilities &amp; platforms</span>
+        <strong>Rich cell-based UI on terminal, Web, Native iOS and macOS, Android.</strong>
         <i>Open the host guide</i>
       </a>
     </nav>

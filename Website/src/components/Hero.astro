@@ -39,21 +39,19 @@ const sourceHref =
       <article class="source-pane" aria-labelledby="counter-source-title">
         <header>
           <div>
-            <strong id="counter-source-title">CounterApp.swift</strong>
-            <span>Shared by every host</span>
+            <strong id="counter-source-title">Source</strong>
+            <span>CounterView.swift</span>
           </div>
           <a href={sourceHref} rel="noreferrer noopener">Open file</a>
         </header>
         <pre
           class="counter-source"
           tabindex="0"
-        ><code><span class="kw">public import</span> <span class="ty">SwiftTUIRuntime</span>
+        ><code><span class="kw">public import</span> <span class="ty">SwiftTUI</span>
 
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
 
-  <span class="at">@Environment</span>(\.terminalSize) <span class="kw">private var</span> terminalSize
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-  <span class="at">@State</span> <span class="kw">private var</span> rippleProgress: <span class="ty">Double</span> = <span class="num">1</span>
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
@@ -64,10 +62,7 @@ const sourceHref =
       &#125;
     &#125;
     .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
-    .background &#123;
-      <span class="ty">Rectangle</span>()
-        .fill(ripple)
-    &#125;
+    .background &#123; <span class="ty">Rectangle</span>().fill(ripple) &#125;
     .onChange(of: count) &#123;
       withAnimation(.<span class="ty">linear</span>(duration: .<span class="ty">milliseconds</span>(<span class="num">1600</span>))) &#123;
         rippleProgress = <span class="num">1</span>
@@ -75,39 +70,11 @@ const sourceHref =
     &#125;
   &#125;
 
-  <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123;
-    <span class="kw">let</span> horizontal = <span class="ty">Double</span>(terminalSize.width) / <span class="num">2</span>
-    <span class="kw">let</span> vertical = <span class="ty">Double</span>(terminalSize.height)
-    <span class="kw">return</span> (horizontal * horizontal + vertical * vertical).squareRoot()
-  &#125;
-
-  <span class="kw">private var</span> ripple: <span class="ty">RadialGradient</span> &#123;
-    <span class="kw">let</span> innerEdge = rippleProgress * reach
-    <span class="kw">return</span> <span class="ty">RadialGradient</span>(
-      gradient: <span class="ty">Gradient</span>(stops: [
-        .<span class="ty">init</span>(color: .<span class="ty">clear</span>, location: <span class="num">0</span>),
-        .<span class="ty">init</span>(
-          color: <span class="ty">Color</span>(red: <span class="num">0x00</span> / <span class="num">255</span>, green: <span class="num">0xE3</span> / <span class="num">255</span>, blue: <span class="num">0xAB</span> / <span class="num">255</span>),
-          location: <span class="num">0.5</span>
-        ),
-        .<span class="ty">init</span>(color: .<span class="ty">clear</span>, location: <span class="num">1</span>),
-      ]),
-      center: .<span class="ty">center</span>,
-      startRadius: innerEdge,
-      endRadius: innerEdge + <span class="num">14</span>
-    )
-  &#125;
+  <span class="at">@State</span> <span class="kw">private var</span> rippleProgress: <span class="ty">Double</span> = <span class="num">1</span>
+  <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123; <span class="cm">/* ... */</span> &#125;
+  <span class="kw">private var</span> ripple: <span class="ty">RadialGradient</span> &#123; <span class="cm">/* ... */</span> &#125;
 &#125;
-
-<span class="kw">public struct</span> <span class="ty">CounterApp</span>: <span class="ty">App</span> &#123;
-  <span class="kw">public init</span>() &#123;&#125;
-
-  <span class="kw">public var</span> body: <span class="kw">some</span> <span class="ty">Scene</span> &#123;
-    <span class="ty">WindowGroup</span>(<span class="str">"Counter"</span>, id: <span class="ty">WindowIdentifier</span>(<span class="str">"counter"</span>)) &#123;
-      <span class="ty">CounterView</span>()
-    &#125;
-  &#125;
-&#125;</code></pre>
+</code></pre>
       </article>
 
       <div class="render-pane">
@@ -260,6 +227,10 @@ const sourceHref =
 
   .counter-source .num {
     color: var(--home-code-number);
+  }
+
+  .counter-source .cm {
+    color: var(--home-quiet);
   }
 
   .render-pane {
