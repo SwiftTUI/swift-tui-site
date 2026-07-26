@@ -34,6 +34,30 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         <i>Open the host guide</i>
       </a>
     </nav>
+
+    <div class="closing">
+      <div class="closing-copy">
+        <p class="home-kicker">Pre-release</p>
+        <h2>Build the first frame.</h2>
+        <p>
+          SwiftTUI 0.3.3 is pre-release and pre-1.0. Source-breaking changes are
+          expected, and support for external consumers begins at 0.9.0. Bug
+          reports and contributions are warmly welcomed.
+        </p>
+      </div>
+      <div class="closing-actions">
+        <a
+          class="home-button home-button--primary"
+          href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/three-hosts-demo"
+          rel="noreferrer noopener"
+        >
+          Clone the counter
+        </a>
+        <a class="home-button" href={`${base}/docs/documentation/`}>
+          Read the API reference
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -162,6 +186,61 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     border-bottom: 1px solid var(--home-accent);
     font-size: 13px;
     font-style: normal;
+  }
+
+  .closing {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(40px, 7vw, 96px);
+    align-items: end;
+    margin-top: clamp(72px, 9vw, 118px);
+  }
+
+  .closing-copy {
+    display: grid;
+    gap: 17px;
+  }
+
+  .closing-copy h2 {
+    max-width: 13ch;
+    font-size: clamp(42px, 6vw, 76px);
+    font-weight: 520;
+    line-height: 0.96;
+    letter-spacing: -0.058em;
+    text-wrap: balance;
+  }
+
+  .closing-copy > p:last-child {
+    max-width: 54ch;
+    color: var(--home-muted);
+    font-size: 16px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .closing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding-bottom: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .closing {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .closing-actions {
+      display: grid;
+    }
+
+    .closing-actions .home-button {
+      width: 100%;
+    }
   }
 
   @media (max-width: 900px) {

@@ -1,0 +1,215 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Three maintained targets in swift-tui-examples, so every claim here is
+// checkable by cloning the repo. Each caption describes what its screenshot
+// actually shows — this pane's whole job is credibility, so an image that
+// undersells or overshoots its caption costs more than the tile is worth.
+// `wide` promotes a tile to a full-width row; the rest pair up beneath it.
+//
+// terminal-workspace is deliberately absent despite having the best one-line
+// claim ("large enough to host its own multiplexer"): the committed
+// screenshot captures four empty panes, before any PTY attaches. Recapture it
+// with live sessions and it earns a slot back.
+type ProofItem = {
+  slug: string;
+  title: string;
+  body: string;
+  alt: string;
+  repo: string;
+  wide?: boolean;
+};
+
+const items: ProofItem[] = [
+  {
+    slug: "layouts-swiftui",
+    title: "Layouts, side by side",
+    body:
+      "Native SwiftUI on the left, SwiftTUI on the right, running the same layout code. Fifty-six cases, from alignment guides to fixed-size propagation.",
+    alt: "The same layout rendered by native SwiftUI and by SwiftTUI side by side, with both sources below",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/LayoutsSwiftUI",
+    wide: true,
+  },
+  {
+    slug: "gifeditor",
+    title: "GIF Editor",
+    body:
+      "A canvas, layers, a scrubbable timeline, pointer tools, undo, and animated GIF export.",
+    alt: "SwiftTUI GIF Editor with canvas, layers, tools, and a timeline",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
+  },
+  {
+    slug: "gitviz",
+    title: "gitviz",
+    body:
+      "Commit timelines, heat strips, and sparklines from SwiftTUICharts, drawn against the history of whatever repository you point it at.",
+    alt: "SwiftTUI gitviz rendering a commit timeline from repository history",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gitviz",
+  },
+];
+---
+
+<section class="proof" id="proof" aria-labelledby="proof-title">
+  <div class="shell">
+    <header class="proof-head">
+      <p class="home-kicker">Built with SwiftTUI</p>
+      <h2 id="proof-title">Real tools, not toy demos.</h2>
+      <p>
+        The counter above fits on one screen. These do not. Each is a maintained
+        example in <code>swift-tui-examples</code> — clone the repo and they all
+        build and run with one command.
+      </p>
+    </header>
+
+    <div class="proof-gallery">
+      {
+        items.map((item) => (
+          <figure class:list={["proof-item", item.wide && "proof-item--wide"]}>
+            <a href={item.repo} rel="noreferrer noopener">
+              <img
+                src={`${base}/showcase/${item.slug}.png`}
+                width="1600"
+                height="1000"
+                loading="lazy"
+                decoding="async"
+                alt={item.alt}
+              />
+            </a>
+            <figcaption>
+              <strong>{item.title}</strong>
+              <span>{item.body}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+
+    <a class="proof-link" href={`${base}/showcase/`}>
+      Browse every example and host
+    </a>
+  </div>
+</section>
+
+<style>
+  .proof {
+    padding: clamp(57.333px, 7.333vw, 100px) 0 clamp(86px, 11vw, 150px);
+  }
+
+  .proof-head {
+    display: grid;
+    gap: 17px;
+    max-width: 780px;
+    margin-bottom: 46px;
+  }
+
+  .proof-head h2 {
+    font-size: clamp(42px, 6vw, 76px);
+    font-weight: 520;
+    line-height: 0.96;
+    letter-spacing: -0.058em;
+    text-wrap: balance;
+  }
+
+  .proof-head > p:last-child {
+    max-width: 57ch;
+    color: var(--home-muted);
+    font-size: 17px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .proof-head code {
+    color: var(--home-accent-ink);
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+  }
+
+  .proof-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--home-ink);
+    border-left: 1px solid var(--home-ink);
+  }
+
+  .proof-item {
+    min-width: 0;
+    margin: 0;
+    border-right: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .proof-item--wide {
+    grid-column: 1 / -1;
+  }
+
+  .proof-item a {
+    display: block;
+    overflow: hidden;
+    background: #101512;
+  }
+
+  .proof-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    transition: transform 260ms ease;
+  }
+
+  .proof-item a:hover img {
+    transform: scale(1.008);
+  }
+
+  .proof-item figcaption {
+    display: grid;
+    gap: 7px;
+    min-height: 78px;
+    padding: 17px 19px;
+  }
+
+  .proof-item figcaption strong {
+    font-size: 15px;
+    letter-spacing: -0.015em;
+  }
+
+  .proof-item figcaption span {
+    max-width: 62ch;
+    color: var(--home-muted);
+    font-size: 13px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .proof-link {
+    display: inline-block;
+    margin-top: 26px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--home-accent);
+    color: var(--home-accent-ink);
+    font-size: 14px;
+  }
+
+  .proof-link:hover {
+    border-color: var(--home-ink);
+    color: var(--home-ink);
+  }
+
+  @media (max-width: 720px) {
+    .proof-gallery {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .proof-item--wide {
+      grid-column: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof-item img,
+    .proof-item a:hover img {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
