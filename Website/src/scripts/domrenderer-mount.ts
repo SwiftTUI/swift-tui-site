@@ -35,7 +35,7 @@ async function bootstrap(): Promise<void> {
     manifestUrl: new URL(`${WEBEXAMPLE_DIST}/scene-manifest.json`, window.location.href),
     renderer: "dom",
     style: { fontSize: responsiveFontSize() },
-    environment: { TUIGUI_APP_NAME: "DomRendererDemo" },
+    environment: { SWIFTTUI_APP_NAME: "DomRendererDemo" },
     sceneRuntimeFactory: createWasmSceneRuntimeFactory(
       new URL(`${WEBEXAMPLE_DIST}/assets/app.wasm`, window.location.href),
       { workerModuleURL: new URL(workerUrl, window.location.href) },
