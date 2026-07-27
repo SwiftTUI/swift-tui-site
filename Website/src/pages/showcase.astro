@@ -14,7 +14,7 @@ const canonical = `${site}${base || ""}/showcase/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Showcase";
 const description =
-  "One SwiftTUI component gallery, rendered by every host — macOS and iOS through SwiftUIHost, Android through SwiftTUIAndroidHost, the browser through WASI, the terminal natively — plus maintained example apps you can clone and run.";
+  "One SwiftTUI component gallery rendered by every host, Sextant as a standalone terminal product, and maintained example apps you can clone and run.";
 
 // Live WebExample embed. The whole origin is cross-origin isolated (public/_headers
 // applies COOP/COEP to /*), so the iframe's SharedArrayBuffer-backed stdin works on
@@ -169,7 +169,7 @@ const tiles: Tile[] = [
             <p class="lede">
               The framework already runs real, non-trivial apps — and runs the
               same one on every host. Below: one component gallery rendered five
-              ways, then maintained example apps in
+              ways, a standalone terminal product, then maintained example apps in
               <span class="mono">swift-tui-examples</span> you can clone and run
               with a single command.
             </p>
@@ -272,10 +272,48 @@ const tiles: Tile[] = [
             </div>
           </section>
 
-          <!-- ── /02 · maintained example apps ───────────────────────────── -->
+          <!-- ── /02 · standalone products ──────────────────────────────── -->
+          <section class="products" aria-labelledby="products-title">
+            <header class="sub-head">
+              <span class="eyebrow mono"><span class="num">/02</span>Product</span>
+              <h2 id="products-title">Built to keep.</h2>
+              <p class="sub-lede">
+                Sextant began as an example and graduated into its own product:
+                independently versioned, tested against real terminal input, and
+                useful without optional tools.
+              </p>
+            </header>
+
+            <a class="product-feature" href={`${base}/sextant/`}>
+              <div class="product-shot">
+                <img
+                  src={`${base}/showcase/sextant.png`}
+                  alt="Sextant inspecting its own README in a split terminal browser"
+                  loading="lazy"
+                  width="1400"
+                height="560"
+                />
+              </div>
+              <div class="product-meta">
+                <div>
+                  <span class="product-index mono">SXT · 001</span>
+                  <h3>Sextant</h3>
+                  <p class="product-sub">A preview-first terminal inspector.</p>
+                </div>
+                <p class="product-body">
+                  Navigate directory columns, inspect bounded text, binary,
+                  metadata, and directory previews, then open or edit the file
+                  when you have your bearing. Read-only by design.
+                </p>
+                <span class="cta mono">see the product and journey →</span>
+              </div>
+            </a>
+          </section>
+
+          <!-- ── /03 · maintained example apps ───────────────────────────── -->
           <section class="examples" aria-labelledby="examples-title">
             <header class="sub-head">
-              <span class="eyebrow mono"><span class="num">/02</span>Example apps</span>
+              <span class="eyebrow mono"><span class="num">/03</span>Example apps</span>
               <h2 id="examples-title">Built in the open.</h2>
               <p class="sub-lede">
                 Maintained example apps in
@@ -417,6 +455,11 @@ const tiles: Tile[] = [
   }
 
   .hosts {
+    padding: 32px 0 64px;
+    border-bottom: 1px solid var(--home-ink);
+  }
+
+  .products {
     padding: 32px 0 64px;
     border-bottom: 1px solid var(--home-ink);
   }
@@ -731,6 +774,75 @@ const tiles: Tile[] = [
     color: var(--home-ink);
   }
 
+  /* ── standalone product ───────────────────────────────────────── */
+  .product-feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.42fr) minmax(280px, 0.58fr);
+    border: 1px solid var(--home-ink);
+    color: inherit;
+  }
+
+  .product-shot {
+    min-width: 0;
+    border-right: 1px solid var(--home-ink);
+    background: #101312;
+    overflow: hidden;
+  }
+
+  .product-shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-meta {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: clamp(22px, 3vw, 38px);
+    transition: background 140ms ease;
+  }
+
+  .product-index {
+    display: inline-block;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--home-accent);
+    color: var(--home-accent-ink);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .product-meta h3 {
+    margin: clamp(54px, 8vw, 108px) 0 0;
+    color: var(--home-ink);
+    font-size: clamp(30px, 3.8vw, 50px);
+    font-weight: 520;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+  }
+
+  .product-sub {
+    margin: 8px 0 0;
+    color: var(--home-muted);
+    font-size: 15px;
+  }
+
+  .product-body {
+    margin: 28px 0 0;
+    color: var(--home-muted);
+    font-size: 13.5px;
+    line-height: 1.62;
+  }
+
+  .product-feature:hover .product-meta {
+    background: var(--home-paper-soft);
+  }
+
+  .product-feature:hover .cta {
+    border-color: var(--home-accent);
+  }
+
   /* ── example app grid ─────────────────────────────────────────── */
   .grid {
     display: grid;
@@ -823,6 +935,19 @@ const tiles: Tile[] = [
     }
 
     .grid { grid-template-columns: 1fr; }
+
+    .product-feature {
+      grid-template-columns: 1fr;
+    }
+
+    .product-shot {
+      border-right: 0;
+      border-bottom: 1px solid var(--home-ink);
+    }
+
+    .product-meta h3 {
+      margin-top: 36px;
+    }
   }
 
   @media (max-width: 720px) {
@@ -839,6 +964,10 @@ const tiles: Tile[] = [
       min-height: 0;
     }
 
+    .product-meta {
+      padding: 20px;
+    }
+
     .web-id {
       align-items: flex-start;
       flex-direction: column;
@@ -853,6 +982,7 @@ const tiles: Tile[] = [
   @media (prefers-reduced-motion: reduce) {
     .device-meta,
     .meta,
+    .product-meta,
     .web-actions a,
     .web-poster {
       transition: none;
