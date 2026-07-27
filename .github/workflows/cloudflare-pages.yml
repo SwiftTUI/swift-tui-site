@@ -30,7 +30,14 @@ jobs:
   deploy:
     name: Build and deploy to Cloudflare Pages
     runs-on: macos-26
-    timeout-minutes: 30
+    # 60, not 30: the two heavy steps are Swift builds from scratch whenever the
+    # SwiftPM/Bun cache keys move, which every version bump does. The 0.3.8
+    # release measured 859s for `Build WebExample` and 743s for `Build DocC
+    # archive` on a cold cache, against 456s/408s warm the day before — enough to
+    # blow a 30-minute budget. A timeout is also self-perpetuating here: the job
+    # is cancelled before its `Post Cache` steps run, so the cache it just paid
+    # to populate is never saved and the retry is cold again.
+    timeout-minutes: 60
 
     env:
       CF_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'swift-tui' }}
