@@ -80,7 +80,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
-      <span class="ty">Text</span>(<span class="str">"Count: \(count)"</span>).bold()
+      <span class="ty">TextFigure</span>(<span class="str">"\(count)"</span>, font: .future)
+        .frame(minWidth: <span class="num">14</span>, alignment: .center)
       <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123; count += <span class="num">1</span> &#125;
     &#125;
     .padding(<span class="num">2</span>)

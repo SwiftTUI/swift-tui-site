@@ -52,27 +52,32 @@ const sourceHref =
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
 
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
+  <span class="at">@State</span> <span class="kw">private var</span> rippleIDs: [<span class="ty">Int</span>] = []
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
-      <span class="ty">Text</span>(<span class="str">"Count: \(count)"</span>).bold()
+      <span class="ty">TextFigure</span>(<span class="str">"\(count)"</span>, font: .future)
+        .frame(minWidth: <span class="num">14</span>, alignment: .center)
       <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123;
         count += <span class="num">1</span>
-        rippleProgress = <span class="num">0</span>
+        rippleIDs.append(count)
       &#125;
     &#125;
     .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
-    .background &#123; <span class="ty">Rectangle</span>().fill(ripple) &#125;
-    .onChange(of: count) &#123;
-      withAnimation(.<span class="ty">linear</span>(duration: .<span class="ty">milliseconds</span>(<span class="num">1600</span>))) &#123;
-        rippleProgress = <span class="num">1</span>
+    .background &#123;
+      <span class="ty">ZStack</span> &#123;
+        <span class="ty">ForEach</span>(rippleIDs, id: \.self) &#123; id <span class="kw">in</span>
+          <span class="ty">RippleLayer</span>(reach: reach) &#123;
+            rippleIDs.removeAll &#123; $<span class="num">0</span> == id &#125;
+          &#125;
+          .blendMode(.screen)
+        &#125;
       &#125;
+      .compositingGroup()
     &#125;
   &#125;
 
-  <span class="at">@State</span> <span class="kw">private var</span> rippleProgress: <span class="ty">Double</span> = <span class="num">1</span>
   <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123; <span class="cm">/* ... */</span> &#125;
-  <span class="kw">private var</span> ripple: <span class="ty">RadialGradient</span> &#123; <span class="cm">/* ... */</span> &#125;
 &#125;
 </code></pre>
       </article>
