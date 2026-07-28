@@ -15,7 +15,7 @@ on:
       examples_ref:
         description: Public swift-tui-examples branch or tag to build
         required: true
-        default: "0.3.8"
+        default: "0.4.0"
         type: string
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
     name: Build and deploy to Cloudflare Pages
     runs-on: macos-26
     # 60, not 30: the two heavy steps are Swift builds from scratch whenever the
-    # SwiftPM/Bun cache keys move, which every version bump does. The 0.3.8
+    # SwiftPM/Bun cache keys move, which every version bump does. The 0.4.0
     # release measured 859s for `Build WebExample` and 743s for `Build DocC
     # archive` on a cold cache, against 456s/408s warm the day before — enough to
     # blow a 30-minute budget. A timeout is also self-perpetuating here: the job

@@ -49,7 +49,7 @@ pinned in `Website/package.json`.
 
 ## WebExample and DocC inputs
 
-The `0.3.8` public beta build fetches the tagged `swift-tui-examples`
+The `0.4.0` public beta build fetches the tagged `swift-tui-examples`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -61,7 +61,7 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
 
 DocC inputs are listed in [`docs/docc-repos.yml`](docs/docc-repos.yml); release
 versions are pinned in [`docs/releases.yml`](docs/releases.yml). Both track the
-current org release (`0.3.8`) in lockstep — bump them with the org release, not
+current org release (`0.4.0`) in lockstep — bump them with the org release, not
 by hand here.
 
 ## License
