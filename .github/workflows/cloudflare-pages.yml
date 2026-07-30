@@ -15,7 +15,7 @@ on:
       examples_ref:
         description: Public swift-tui-examples branch or tag to build
         required: true
-        default: "0.4.3"
+        default: "0.4.4"
         type: string
 
 permissions:
