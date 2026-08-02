@@ -223,18 +223,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     color: var(--home-terminal-accent);
   }
 
+  .quickstart-command code,
+  .quickstart-command button {
+    color: var(--home-paper);
+  }
+
   .quickstart-command button {
     min-height: 38px;
     padding: 0 12px;
-    border: 1px solid #536158;
+    border: 1px solid var(--home-line-strong);
     border-radius: 3px;
-    color: #dbe3dd;
     font-size: 11px;
   }
 
   .quickstart-command button:hover {
     border-color: var(--home-terminal-accent);
-    color: #fff;
   }
 
   .quickstart-files {
