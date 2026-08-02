@@ -5,9 +5,9 @@ Astro site that frames the
 WASI demo in an iframe.
 Deployed at <https://swifttui.sh>.
 
-The site copy is the public marketing layer for the framework. Keep state,
-runtime, capability negotiation, and terminal-presentation safety claims
-aligned with the repo docs and DocC catalogs.
+The site copy is the public marketing layer for the framework. Keep its state,
+runtime, capability-negotiation, and terminal-safety claims consistent with the
+repository documentation and DocC catalogs.
 
 The deploy workflow (`.github/workflows/cloudflare-pages.yml`) composes a
 single Cloudflare Pages artifact:
@@ -18,8 +18,8 @@ single Cloudflare Pages artifact:
 /webexample/   <- WebExample WASI demo
 ```
 
-The iframe loads `/webexample/`, which is same-origin, so cross-origin
-isolation propagates from the COOP/COEP headers in `public/_headers`.
+The iframe loads `/webexample/` from the same origin. Thus, the COOP/COEP
+headers in `public/_headers` also isolate the iframe.
 
 ## Local
 
@@ -35,6 +35,7 @@ bun run build:dev      # debug WebExample + DocC + Astro dist/
 
 By default, wasm scripts fetch the tagged public WebExample input recorded in
 `../docs/releases.yml` into `../.build/public-inputs/`. Set `WEBEXAMPLE_DIR` to
-point at a specific WebExample checkout only when testing unpublished local
-inputs. The full website builds generate DocC from the repositories listed in
-`../docs/docc-repos.yml` and copy the archive into `Website/dist/docs/`.
+the path of a WebExample checkout only for unpublished local inputs. Full
+website builds generate DocC from the repositories in
+`../docs/docc-repos.yml`. Then the builds copy the archive to
+`Website/dist/docs/`.

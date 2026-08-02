@@ -9,18 +9,18 @@ documentation.
 | Path | Role |
 | --- | --- |
 | [`Website/`](Website) | The **Astro** app (`swift-tui-website`) — most site work happens here |
-| `docs/` | DocC composition config: `docc-repos.yml`, `releases.yml` |
+| `docs/` | DocC composition files: `docc-repos.yml`, `releases.yml` |
 | `Scripts/` | Gates + build: `build_docc_site.sh`, `check_site.sh` |
 
-The Astro build embeds the live browser demo by building and compressing
-WebExample wasm. Public builds fetch tagged examples/web artifacts by default.
-Use `WEBEXAMPLE_DIR` only as an explicit local override for unpublished inputs.
+The Astro build compiles and compresses the WebExample wasm for the live browser
+demo. Public builds fetch tagged example and web artifacts by default. Use
+`WEBEXAMPLE_DIR` only for unpublished local inputs.
 
 ## Toolchains
 
-- **Bun** for the Astro app and scripts (run commands `--cwd Website`).
-- **`swiftly`** Swift 6.3.x for the WASI build that `build:wasm` triggers.
-- **Binaryen/Brotli** for wasm compression.
+- Use **Bun** for the Astro app and scripts. Run commands with `--cwd Website`.
+- Use **`swiftly`** Swift 6.3.x for the WASI build that `build:wasm` starts.
+- Use **Binaryen/Brotli** for wasm compression.
 
 ## Commands
 
@@ -38,5 +38,6 @@ Scripts/build_docc_site.sh        # compose DocC (also via Website build:docc)
 
 ## Conventions
 
-`AGENTS.md` is the real file; `CLAUDE.md` is a symlink to it. Edit `AGENTS.md`.
-Keep the site buildable with the Astro/Bun workflow — it's a hard org invariant.
+`AGENTS.md` is the real file. `CLAUDE.md` is a symlink to it. Edit `AGENTS.md`.
+Keep the site compatible with the Astro/Bun workflow. This compatibility is an
+organization requirement.

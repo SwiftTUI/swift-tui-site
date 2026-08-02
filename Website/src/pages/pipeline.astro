@@ -13,7 +13,7 @@ const canonical = `${site}${base || ""}/pipeline/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Render Pipeline — a developer walkthrough";
 const description =
-  "A source-grounded walkthrough of the SwiftTUI render pipeline: from authored View code through the runtime stages, the seven phase products, change propagation, isolation, commit policy, and host handoff.";
+  "A source-based guide to the SwiftTUI render pipeline, from authored View code to host handoff.";
 ---
 <!doctype html>
 <html lang="en">
@@ -64,23 +64,23 @@ const description =
           <!-- ===================== INTRO ===================== -->
           <section class="lede" id="intro">
             <p class="eyebrow">Onboarding walkthrough</p>
-            <h1>What happens between your <code>View</code> and the terminal.</h1>
+            <h1>What happens between your <code>View</code> and the terminal</h1>
             <p class="lede-copy">
               A SwiftTUI frame is not "draw the view." It is a short chain of typed,
-              immutable products produced under a deliberate scheduling and isolation
-              model. This page follows one small view through that chain, explains why
-              the engine is shaped the way it is, and points at the exact source that
-              implements each step. It is written for engineers reading the framework
-              for the first time, and as a refresher for people changing the renderer.
+              immutable products. The runtime creates these products with defined
+              scheduling and isolation rules. This page follows one small view through
+              that chain. It explains the engine structure and links each step to its
+              source. New framework developers can use it as an introduction. Renderer
+              developers can use it as a reference.
             </p>
             <dl class="lede-facts">
               <div>
                 <dt>Two pipelines, one frame</dt>
-                <dd>A 7-product <em>data</em> model and a 5-stage <em>scheduling</em> model that are intentionally not the same shape.</dd>
+                <dd>A 7-product <em>data</em> model and a 5-stage <em>scheduling</em> model have different structures.</dd>
               </div>
               <div>
                 <dt>Source-grounded</dt>
-                <dd>Every claim links to a file and line in <code>swift-tui</code>; nothing here is invented.</dd>
+                <dd>Each claim links to its source in <code>swift-tui</code>.</dd>
               </div>
               <div>
                 <dt>Current at <code>HEAD</code></dt>
@@ -96,10 +96,9 @@ const description =
               <div>
                 <h2>The mental model: two views of one frame</h2>
                 <p class="section-lead">
-                  The most common point of confusion is that SwiftTUI documentation
-                  talks about <em>seven phases</em> in some places and <em>five
-                  stages</em> in others. These are two descriptions of the same frame,
-                  kept separate on purpose.
+                  SwiftTUI documentation describes <em>seven phases</em> and <em>five
+                  stages</em>. These are two views of one frame. They stay separate
+                  because they serve different purposes.
                 </p>
               </div>
             </div>
@@ -108,27 +107,29 @@ const description =
               <article class="prose-card">
                 <h3>Phase products — the data model</h3>
                 <p>
-                  Phase products are the values the engine computes, in order. Each is an
-                  immutable type owned by <code>SwiftTUICore</code>. Later products are
-                  <em>derived</em> from earlier ones; nothing earlier is mutated.
+                  Phase products are the values that the engine computes in order. Each
+                  product is an immutable type from <code>SwiftTUICore</code>. The engine
+                  derives later products from earlier products. It does not change the
+                  earlier products.
                 </p>
                 <p class="mono-flow">resolve → measure → place → semantics → draw → raster → commit</p>
                 <p>
-                  You can reason about correctness purely in these terms: given a resolved
-                  tree, layout is a function; given placement, drawing is a function.
+                  The products define the correctness model. Layout is a function of a
+                  resolved tree. Drawing is a function of placement.
                 </p>
               </article>
               <article class="prose-card">
                 <h3>Runtime stages — the scheduling model</h3>
                 <p>
-                  Runtime stages are the boundaries an interactive session schedules work
-                  across. They are owned by <code>SwiftTUIRuntime</code> and exist to place
-                  cancellation points, animation sampling, and an off-actor boundary.
+                  Runtime stages are the boundaries across which an interactive session
+                  schedules work. <code>SwiftTUIRuntime</code> owns these stages. They
+                  provide cancellation points, animation sampling, and an off-actor
+                  boundary.
                 </p>
                 <p class="mono-flow">head → animationInjection → latePreferenceReconciliation → fusedFrameTail → commit</p>
                 <p>
-                  <code>fusedFrameTail</code> deliberately collapses five phase products
-                  into one scheduling node so that pure work can leave the main actor.
+                  <code>fusedFrameTail</code> combines five phase products in one scheduling
+                  node. Thus, pure work can leave the main actor.
                 </p>
               </article>
             </div>
@@ -137,22 +138,22 @@ const description =
               <div class="mapping-board" id="mapping-board"></div>
               <figcaption id="mapping-cap">
                 The mapping is not one-to-one. <strong>head</strong> covers
-                <code>resolve</code>; <strong>animationInjection</strong> and
-                <strong>latePreferenceReconciliation</strong> adjust the in-flight draft
-                without introducing a new product; <strong>fusedFrameTail</strong> spans
-                <code>measure</code>→<code>raster</code>; <strong>commit</strong> covers
-                <code>commit</code>. That difference is the whole point of having two
-                models — see <a href="#isolation">isolation</a>.
+                <code>resolve</code>. <strong>animationInjection</strong> and
+                <strong>latePreferenceReconciliation</strong> change the current draft
+                without a new product. <strong>fusedFrameTail</strong> spans
+                <code>measure</code>→<code>raster</code>. <strong>commit</strong> covers
+                <code>commit</code>. The two models differ because each model has a
+                different purpose. See <a href="#isolation">isolation</a>.
               </figcaption>
             </figure>
 
             <aside class="callout">
               <p class="callout-tag">Why this matters</p>
               <p>
-                The fused tail is a <em>scheduling optimization over distinct products</em>,
-                not a different data model. If you remember one sentence from this page,
-                remember that one: it explains the cancellation, the off-actor boundary,
-                and why a single state change can still produce zero visible frames.
+                The fused tail is a <em>scheduling optimization over distinct products</em>.
+                It is not a different data model. This distinction explains cancellation
+                and the off-actor boundary. It also explains why a state change can
+                produce zero visible frames.
               </p>
             </aside>
           </section>
@@ -165,9 +166,9 @@ const description =
                 <h2>Walk a frame through the runtime stages</h2>
                 <p class="section-lead">
                   Step through the five runtime stages. The left panel highlights the
-                  authored lines being interpreted, the center describes the stage, and the
-                  right panel shows the products that exist <em>so far</em> — honestly: no
-                  terminal cells exist until <code>raster</code> inside the fused tail.
+                  authored lines that the runtime reads. The center panel describes the
+                  stage. The right panel shows the available products. Terminal cells do
+                  not exist before <code>raster</code> in the fused tail.
                 </p>
               </div>
             </div>
@@ -233,9 +234,9 @@ const description =
               <div>
                 <h2>The seven phase products</h2>
                 <p class="section-lead">
-                  Each product answers one question about the frame and is gathered, in
-                  full, onto <code>FrameArtifacts</code>. Hosts consume committed contracts
-                  rather than reaching into renderer-private state.
+                  Each product answers one question about the frame.
+                  <code>FrameArtifacts</code> contains all products. Hosts consume committed
+                  contracts and do not access the private renderer state.
                 </p>
               </div>
             </div>
@@ -253,10 +254,10 @@ const description =
               <div>
                 <h2>How a change becomes a frame</h2>
                 <p class="section-lead">
-                  State writes, input, signals, and deadlines never call the renderer
-                  directly. They record <em>intent</em>. A scheduler coalesces that intent,
-                  and the run loop pulls one frame's worth of work at a time — which is why
-                  ten mutations in a tick render once, not ten times.
+                  State writes, input, signals, and deadlines do not call the renderer
+                  directly. They record <em>intent</em>. A scheduler combines that intent.
+                  The run loop then gets one frame of work at a time. Thus, ten mutations
+                  in one tick produce one render operation.
                 </p>
               </div>
             </div>
@@ -265,10 +266,10 @@ const description =
               <p class="callout-tag">Common misconception</p>
               <p>
                 A <code>@State</code> write does not "trigger a re-render." It marks the
-                owning graph node dirty and asks the scheduler for a frame. The scheduler
-                decides <em>when</em>, and may merge your write with others into a single
-                <code>ScheduledFrame</code>. The renderer then re-evaluates only the dirty
-                frontier, not the whole tree.
+                owner graph node as dirty and requests a frame. The scheduler selects the
+                time. It can combine the write with other writes in one
+                <code>ScheduledFrame</code>. The renderer then evaluates only the dirty
+                frontier. It does not evaluate the complete tree.
               </p>
             </aside>
           </section>
@@ -281,9 +282,9 @@ const description =
                 <h2>What runs where</h2>
                 <p class="section-lead">
                   Authored <code>View</code>, <code>Scene</code>, and <code>App</code> values
-                  are main-actor APIs. The fused tail is pure over already-resolved products,
-                  so it can run off the main actor when the strategy allows. That boundary is
-                  the reason the scheduling model exists at all.
+                  are main-actor APIs. The fused tail uses only resolved products. Thus, it
+                  can run off the main actor when the strategy permits. This boundary is
+                  the reason for the scheduling model.
                 </p>
               </div>
             </div>
@@ -302,9 +303,9 @@ const description =
               <div>
                 <h2>Four fates of a frame</h2>
                 <p class="section-lead">
-                  Computing a frame's products is not the same as showing it. Commit applies
-                  completed-frame policy, and a candidate can take one of four paths. This is
-                  the honest answer to "I changed state but nothing on screen changed."
+                  The computation of frame products does not display the frame. Commit
+                  applies the completed-frame policy. A candidate can take one of four
+                  paths. These paths explain why a state change can have no visible result.
                 </p>
               </div>
             </div>
@@ -323,8 +324,8 @@ const description =
                 <h2>Crossing into the host</h2>
                 <p class="section-lead">
                   Commit produces data, not output. <code>RunLoop</code> presents a committed
-                  frame according to the configured output mode and the roles the surface
-                  implements. Terminal bytes live entirely below this boundary.
+                  frame according to the output mode and surface roles. Terminal bytes
+                  exist only below this boundary.
                 </p>
               </div>
             </div>
@@ -336,8 +337,8 @@ const description =
             <div class="handoff" id="handoff-flow"></div>
             <p class="source-line">
               Dispatched in
-              <a href="../../swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift">RunLoop+Presentation.swift</a>;
-              the host contract lives in
+              <a href="../../swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift">RunLoop+Presentation.swift</a>.
+              The host contract is in
               <a href="../../swift-tui/Sources/SwiftTUIRuntime/Terminal/PresentationSurface.swift">PresentationSurface.swift</a>.
             </p>
           </section>
@@ -349,9 +350,8 @@ const description =
               <div>
                 <h2>Read the real code</h2>
                 <p class="section-lead">
-                  The walkthrough above is grounded in these excerpts. Use the tabs to inspect
-                  the points where data changes shape. Highlighted lines are the ones the prose
-                  refers to.
+                  These excerpts support the walkthrough. Use the tabs to examine the points
+                  where data changes shape. The prose refers to the highlighted lines.
                 </p>
               </div>
             </div>
@@ -370,16 +370,17 @@ const description =
               <div>
                 <h2>Observing the pipeline</h2>
                 <p class="section-lead">
-                  You do not have to read the source to see what the renderer did. With a
-                  diagnostics sink installed, the runtime emits a <code>RuntimeFrameSample</code>
-                  per committed frame, zero-artifact outcome, and elision.
+                  You can examine renderer activity without reading the source. If you
+                  install a diagnostics sink, the runtime emits a
+                  <code>RuntimeFrameSample</code> for each result. A result is a committed
+                  frame, a zero-artifact outcome, or an elision.
                 </p>
               </div>
             </div>
             <div class="diag" id="diag"></div>
             <p class="source-line">
-              <code>SwiftTUIProfiling</code> turns these neutral samples into consumer-facing
-              records and summaries; the runtime does not depend on the profiling product.
+              <code>SwiftTUIProfiling</code> converts these neutral samples into public
+              records and summaries. The runtime does not depend on the profiling product.
             </p>
           </section>
 
@@ -390,8 +391,8 @@ const description =
               <div>
                 <h2>Where to look next</h2>
                 <p class="section-lead">
-                  Start from the question you actually have. These are the framework's own
-                  entry points, plus a glossary of the types named throughout this page.
+                  Start with your question. This section lists the framework entry points.
+                  It also defines the types that this page uses.
                 </p>
               </div>
             </div>

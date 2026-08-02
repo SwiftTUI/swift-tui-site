@@ -12,8 +12,8 @@ site that explains and demos that. For the org-wide build and pin model, see the
 
 The site is an Astro/Bun app in [`Website/`](Website). DocC composition and
 release pins live in [`docs/`](docs)
-([`docc-repos.yml`](docs/docc-repos.yml), [`releases.yml`](docs/releases.yml));
-build and gate scripts live in [`Scripts/`](Scripts).
+([`docc-repos.yml`](docs/docc-repos.yml), [`releases.yml`](docs/releases.yml)).
+Build and gate scripts live in [`Scripts/`](Scripts).
 
 ## Local development
 
@@ -27,12 +27,12 @@ bun run --cwd Website build       # site only — fast, no wasm
 bun run --cwd Website build:full  # full artifact — wasm demo + site + DocC
 ```
 
-`dev`, `check`, and `build` need only Bun. `build:full` (and `build:wasm`) also
-build and compress the WebExample wasm, so they require Swift 6.3.x (via
-`swiftly`) plus Binaryen and Brotli — without those, expect `build:full` to fail
+`dev`, `check`, and `build` need only Bun. `build:full` and `build:wasm` also
+compile and compress the WebExample wasm. These commands require Swift 6.3.x
+through `swiftly`, Binaryen, and Brotli. If a tool is absent, `build:full` stops
 at the wasm step.
 
-The full composed artifact lays out as:
+The full artifact has this layout:
 
 ```text
 /              Astro site
@@ -40,12 +40,12 @@ The full composed artifact lays out as:
 /webexample/   WebExample WASI demo
 ```
 
-The Astro site also serves `/domrenderer`, a demo page that mounts the same
-WebExample wasm through `@swifttui/web`'s DOM surface renderer (`renderer:
-"dom"` — cells as absolutely positioned text elements instead of canvas
-pixels). It reuses the `/webexample` artifact at runtime, so it adds no second
-wasm build; the page's runtime comes from the `@swifttui/web` release tarball
-pinned in `Website/package.json`.
+The Astro site also serves `/domrenderer`. This demo page mounts the same
+WebExample wasm through the `@swifttui/web` DOM surface renderer. With `renderer:
+"dom"`, cells are absolutely positioned text elements instead of
+canvas pixels. The page reuses the `/webexample` artifact, so it adds no second
+wasm build. The page runtime comes from the `@swifttui/web` release tarball in
+`Website/package.json`.
 
 ## WebExample and DocC inputs
 
@@ -59,13 +59,13 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
   bun run --cwd Website build:wasm
 ```
 
-DocC inputs are listed in [`docs/docc-repos.yml`](docs/docc-repos.yml); release
-versions are pinned in [`docs/releases.yml`](docs/releases.yml). Both track the
-current org release (`0.4.6`) in lockstep — bump them with the org release, not
-by hand here.
+[`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
+[`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
+track the current organization release (`0.4.6`) in lockstep. Update them only
+as part of an organization release.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The composed DocC archive under `/docs/` is built
-from the separately-tracked [`swift-tui`](https://github.com/SwiftTUI/swift-tui)
-repository (also MIT).
+MIT — see [LICENSE](LICENSE). The build creates the DocC archive under `/docs/`
+from the separate [`swift-tui`](https://github.com/SwiftTUI/swift-tui)
+repository. That repository also uses the MIT license.
