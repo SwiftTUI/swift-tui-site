@@ -40,19 +40,20 @@ const sourceHref =
         <header>
           <div>
             <strong id="counter-source-title">Source</strong>
-            <span>CounterView.swift</span>
+            <span>CounterApp.swift</span>
           </div>
           <a href={sourceHref} rel="noreferrer noopener">Open file</a>
         </header>
         <pre
           class="counter-source"
           tabindex="0"
-        ><code><span class="kw">public import</span> <span class="ty">SwiftTUI</span>
+        ><code><span class="kw">public import</span> <span class="ty">SwiftTUIRuntime</span>
 
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
 
+  <span class="at">@Environment</span>(\.terminalSize) <span class="kw">private var</span> terminalSize
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-  <span class="at">@State</span> <span class="kw">private var</span> rippleIDs: [<span class="ty">Int</span>] = []
+  <span class="at">@State</span> <span class="kw">private var</span> activeRipple: <span class="ty">Bool</span> = <span class="kw">false</span>
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
@@ -60,24 +61,28 @@ const sourceHref =
         .frame(minWidth: <span class="num">14</span>, alignment: .center)
       <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123;
         count += <span class="num">1</span>
-        rippleIDs.append(count)
       &#125;
     &#125;
     .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
+    .onChange(of: count) &#123;
+      <span class="kw">if</span> !activeRipple &#123;
+        activeRipple = <span class="kw">true</span>
+      &#125;
+    &#125;
     .background &#123;
-      <span class="ty">ZStack</span> &#123;
-        <span class="ty">ForEach</span>(rippleIDs, id: \.self) &#123; id <span class="kw">in</span>
-          <span class="ty">RippleLayer</span>(reach: reach) &#123;
-            rippleIDs.removeAll &#123; $<span class="num">0</span> == id &#125;
-          &#125;
-          .blendMode(.screen)
+      <span class="kw">if</span> activeRipple &#123;
+        <span class="ty">RippleLayer</span>(reach: reach) &#123;
+          activeRipple = <span class="kw">false</span>
         &#125;
       &#125;
-      .compositingGroup()
     &#125;
   &#125;
 
-  <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123; <span class="cm">/* ... */</span> &#125;
+  <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123;
+    <span class="kw">let</span> horizontal = <span class="ty">Double</span>(terminalSize.width) / <span class="num">2</span>
+    <span class="kw">let</span> vertical = <span class="ty">Double</span>(terminalSize.height)
+    <span class="kw">return</span> (horizontal * horizontal + vertical * vertical).squareRoot()
+  &#125;
 &#125;
 </code></pre>
       </article>
