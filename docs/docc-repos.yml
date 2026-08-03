@@ -1,13 +1,13 @@
 swiftRepos:
   - name: swift-tui
     repository: SwiftTUI/swift-tui
-    ref: 0.4.7
+    ref: 0.5.0
     doccCommand: Scripts/build_docc_archive.sh --hosting-base-path docs --output-path .build-docs
     outputPath: .build-docs
     mountPath: docs
   - name: swift-tui-charts
     repository: SwiftTUI/swift-tui-charts
-    ref: 0.4.7
+    ref: 0.5.0
     doccCommand: Scripts/build_docc_archive.sh --hosting-base-path docs/charts --output-path .build-docs
     outputPath: .build-docs
     mountPath: docs/charts
