@@ -4,10 +4,9 @@ Source for **[swifttui.sh](https://swifttui.sh)** — the public SwiftTUI site, 
 combined DocC archive, and the in-browser WebExample demo, composed into one
 deployable artifact. See it live: <https://swifttui.sh>
 
-SwiftTUI is SwiftUI semantics, drawn in terminal cells — author your `App` once
-and ship it across five hosts: terminal executable, static WASI bundle, localhost
-WebHost, native SwiftUI surface, and native Android surface. This repo builds the
-site that explains and demos that. For the org-wide build and pin model, see the
+This repo builds the site that explains and demos
+[SwiftTUI](https://github.com/SwiftTUI/swift-tui). For the org-wide build and
+pin model, see the
 [org root](https://github.com/SwiftTUI/swift-tui-org).
 
 The site is an Astro/Bun app in [`Website/`](Website). DocC composition and
@@ -40,12 +39,6 @@ The full artifact has this layout:
 /webexample/   WebExample WASI demo
 ```
 
-The Astro site also serves `/domrenderer`. This demo page mounts the same
-WebExample wasm through the `@swifttui/web` DOM surface renderer. With `renderer:
-"dom"`, cells are absolutely positioned text elements instead of
-canvas pixels. The page reuses the `/webexample` artifact, so it adds no second
-wasm build. The page runtime comes from the `@swifttui/web` release tarball in
-`Website/package.json`.
 
 ## WebExample and DocC inputs
 

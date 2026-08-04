@@ -925,16 +925,16 @@ const codemap = [
 const glossary = [
   { term: "Lowering", def: "Translating the UI from one representation into a lower-level one — keeping the meaning, changing the vocabulary, discarding what the next consumer does not need. Borrowed from compilers; each frame runs the full ladder of lowerings." },
   { term: "PrimitiveView", def: "A package-internal view with Body == Never — the floor of the authoring vocabulary. Primitives lower themselves into resolved nodes; everything else is composition that peels down to them." },
-  { term: "DrawCommand", def: "One paint instruction in the draw tree: a text run, fill, stroke, rule, border, canvas payload, or clip over a cell rectangle. The first representation with no view-ness left." },
-  { term: "RasterCell", def: "One terminal cell in the rasterized surface: character, span width, continuation marker, resolved style, and optional hyperlink." },
+  { term: "DrawCommand", docc: "swifttuicore/drawcommand", def: "One paint instruction in the draw tree: a text run, fill, stroke, rule, border, canvas payload, or clip over a cell rectangle. The first representation with no view-ness left." },
+  { term: "RasterCell", docc: "swifttuiprimitives/rastercell", def: "One terminal cell in the rasterized surface: character, span width, continuation marker, resolved style, and optional hyperlink." },
   { term: "FrameHeadDraft", def: "The output of head: resolved tree, frame-tail input, staged transaction, generation, and frame context. Abortable until commit." },
   { term: "FrameArtifacts", def: "The committed bundle of all seven phase products plus diagnostics, presentation damage, and the commit plan." },
-  { term: "ScheduledFrame", def: "One consumed frame request: every pending wake cause, the unioned invalidated identities, deadlines, and the coalesced intent count." },
-  { term: "WakeCause", def: "Why a frame was scheduled: input, invalidation, signal, external, or deadline." },
-  { term: "FrameScheduler", def: "Coalesces invalidations, input, signals, and deadlines into frame work; consumeReadyFrame drains them into one ScheduledFrame." },
-  { term: "RenderGeneration", def: "A monotonic id allocated in head. Lets later stages detect that a newer frame supersedes this one, enabling drop and cancel." },
-  { term: "PresentationDamage", def: "Host-facing changed rows/ranges, re-derived by RunLoop against the surface last presented to that host." },
-  { term: "SemanticHostFrame", def: "The committed contract a non-terminal host consumes: raster, semantics, focused identity, damage, and preferred size." },
+  { term: "ScheduledFrame", docc: "swifttuigraph/scheduledframe", def: "One consumed frame request: every pending wake cause, the unioned invalidated identities, deadlines, and the coalesced intent count." },
+  { term: "WakeCause", docc: "swifttuigraph/wakecause", def: "Why a frame was scheduled: input, invalidation, signal, external, or deadline." },
+  { term: "FrameScheduler", docc: "swifttuigraph/framescheduler", def: "Coalesces invalidations, input, signals, and deadlines into frame work; consumeReadyFrame drains them into one ScheduledFrame." },
+  { term: "RenderGeneration", docc: "swifttuicore/rendergeneration", def: "A monotonic id allocated in head. Lets later stages detect that a newer frame supersedes this one, enabling drop and cancel." },
+  { term: "PresentationDamage", docc: "swifttuicore/presentationdamage", def: "Host-facing changed rows/ranges, re-derived by RunLoop against the surface last presented to that host." },
+  { term: "SemanticHostFrame", docc: "swifttuiruntime/semantichostframe", def: "The committed contract a non-terminal host consumes: raster, semantics, focused identity, damage, and preferred size." },
 ];
 
 /* ================================================================== */
@@ -1433,13 +1433,16 @@ function renderCodemap() {
 
 function renderGlossary() {
   document.getElementById("glossary").innerHTML = glossary
-    .map(
-      (g) => `
+    .map((g) => {
+      const name = g.docc
+        ? `<a href="../docs/documentation/${g.docc}"><code>${g.term}</code></a>`
+        : `<code>${g.term}</code>`;
+      return `
       <div class="glossary-row">
-        <code>${g.term}</code>
+        ${name}
         <p>${g.def}</p>
-      </div>`
-    )
+      </div>`;
+    })
     .join("");
 }
 
