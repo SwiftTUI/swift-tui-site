@@ -18,6 +18,11 @@
 /docs/charts/documentation /docs/charts/ 200
 /docs/charts/documentation/* /docs/charts/ 200
 
+# The dedicated Sextant product page was retired; Sextant is now one of the
+# example tiles on /showcase/. Keep the previously published URL working.
+/sextant /showcase/ 301
+/sextant/* /showcase/ 301
+
 # The /pipeline/ walkthrough cites swift-tui source files with repo-relative
 # links (e.g. ../../swift-tui/Sources/...), which resolve to /swift-tui/... at
 # the origin root. Route those to the source on GitHub so the citations work on
