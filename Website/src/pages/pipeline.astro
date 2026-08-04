@@ -13,7 +13,7 @@ const canonical = `${site}${base || ""}/pipeline/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Render Pipeline — a developer walkthrough";
 const description =
-  "A source-based guide to the SwiftTUI render pipeline, from authored View code to host handoff.";
+  "A source-based guide to the SwiftTUI render pipeline: how an authored View is lowered, level by level, from a Swift value to terminal cells and host output.";
 ---
 <!doctype html>
 <html lang="en">
@@ -66,17 +66,18 @@ const description =
             <p class="eyebrow">Onboarding walkthrough</p>
             <h1>What happens between your <code>View</code> and the terminal</h1>
             <p class="lede-copy">
-              A SwiftTUI frame is not "draw the view." It is a short chain of typed,
-              immutable products. The runtime creates these products with defined
-              scheduling and isolation rules. This page follows one small view through
-              that chain. It explains the engine structure and links each step to its
-              source. New framework developers can use it as an introduction. Renderer
-              developers can use it as a reference.
+              A SwiftTUI frame is not "draw the view." It is a compiler-style
+              pipeline: the value you author is <em>lowered</em>, step by step,
+              through a chain of typed, immutable representations — each one closer
+              to the terminal, each one able to answer a question the one before it
+              could not. This page follows one small view down that ladder and links
+              each step to its source. New framework developers can use it as an
+              introduction. Renderer developers can use it as a reference.
             </p>
             <dl class="lede-facts">
               <div>
-                <dt>Two pipelines, one frame</dt>
-                <dd>A 7-product <em>data</em> model and a 5-stage <em>scheduling</em> model have different structures.</dd>
+                <dt>One view, seven representations</dt>
+                <dd>From a <code>some View</code> value to styled cells and host bytes — every frame re-derives the chain.</dd>
               </div>
               <div>
                 <dt>Source-grounded</dt>
@@ -94,11 +95,17 @@ const description =
             <div class="section-head">
               <span class="section-no">01</span>
               <div>
-                <h2>The mental model: two views of one frame</h2>
+                <h2>The mental model: lowering, and who schedules it</h2>
                 <p class="section-lead">
-                  SwiftTUI documentation describes <em>seven phases</em> and <em>five
-                  stages</em>. These are two views of one frame. They stay separate
-                  because they serve different purposes.
+                  <em>Lowering</em> is a compiler idea: translate a program from one
+                  representation into a lower-level one — keep the meaning, change the
+                  vocabulary, discard whatever the next consumer does not need. A
+                  compiler lowers source to an AST, the AST to an IR, the IR to machine
+                  code. SwiftTUI treats your view the same way: the <code>View</code>
+                  value is the source program, and the terminal cells are the machine
+                  code. The framework's documentation describes this as <em>seven
+                  phases</em> scheduled across <em>five stages</em> — two views of one
+                  frame, kept separate because they serve different purposes.
                 </p>
               </div>
             </div>
@@ -107,7 +114,8 @@ const description =
               <article class="prose-card">
                 <h3>Phase products — the data model</h3>
                 <p>
-                  Phase products are the values that the engine computes in order. Each
+                  Phase products are the values that the engine computes in order —
+                  the rungs of the lowering ladder, plus its side products. Each
                   product is an immutable type from <code>SwiftTUICore</code>. The engine
                   derives later products from earlier products. It does not change the
                   earlier products.
@@ -158,14 +166,63 @@ const description =
             </aside>
           </section>
 
-          <!-- ===================== INTERACTIVE WALKTHROUGH ===================== -->
-          <section class="doc-section" id="explorer">
+          <!-- ===================== LOWERING LADDER ===================== -->
+          <section class="doc-section" id="ladder">
             <div class="section-head">
               <span class="section-no">02</span>
               <div>
+                <h2>The lowering ladder: what "the view" is at each level</h2>
+                <p class="section-lead">
+                  Follow one authored line — <code>Text("Deploy Queue").bold()</code>
+                  from the example below — down every representation the framework
+                  gives it during a frame. Each rung is a level: it gains the answers
+                  the next consumer needs and gives up the vocabulary it no longer
+                  needs. The arrows between rungs are the pipeline phases. Two
+                  products hang off the ladder rather than sitting on it: the
+                  semantic snapshot is a <em>projection</em> and the commit plan
+                  is an <em>effect package</em>.
+                </p>
+              </div>
+            </div>
+
+            <div class="ladder" id="ladder-board"></div>
+
+            <div class="twocol ladder-notes">
+              <aside class="callout">
+                <p class="callout-tag">Lowering is one-way</p>
+                <p>
+                  Every arrow is a pure derivation. You cannot reconstruct a
+                  <code>View</code> from a <code>DrawNode</code>, or a draw tree from
+                  cells — each level has discarded exactly the information that made
+                  the level above it expressive. That is why a new frame starts by
+                  re-resolving the dirty part of the authored tree, and why reuse
+                  works by <em>retaining</em> previous products, never by editing them.
+                </p>
+              </aside>
+              <aside class="callout">
+                <p class="callout-tag">Identity is the thread that survives</p>
+                <p>
+                  One thing rides the ladder all the way down: identity. Resolved,
+                  measured, placed, and draw nodes all carry it, and the rasterizer
+                  collects the identities it actually paints. When a key press or
+                  pointer event arrives — or damage is diffed — that thread is what
+                  maps low-level artifacts back to your views.
+                </p>
+              </aside>
+            </div>
+          </section>
+
+          <!-- ===================== INTERACTIVE WALKTHROUGH ===================== -->
+          <section class="doc-section" id="explorer">
+            <div class="section-head">
+              <span class="section-no">03</span>
+              <div>
                 <h2>Walk a frame through the runtime stages</h2>
                 <p class="section-lead">
-                  Step through the five runtime stages. The left panel highlights the
+                  The ladder is the data story; the runtime schedules it. Step through
+                  the five runtime stages: <code>head</code> runs the first lowering on
+                  the main actor, the fused tail descends the rest, and
+                  <code>commit</code> publishes. The left panel highlights the
                   authored lines that the runtime reads. The center panel describes the
                   stage. The right panel shows the available products. Terminal cells do
                   not exist before <code>raster</code> in the fused tail.
@@ -230,13 +287,15 @@ const description =
           <!-- ===================== PHASE PRODUCTS ===================== -->
           <section class="doc-section" id="products">
             <div class="section-head">
-              <span class="section-no">03</span>
+              <span class="section-no">04</span>
               <div>
                 <h2>The seven phase products</h2>
                 <p class="section-lead">
-                  Each product answers one question about the frame.
-                  <code>FrameArtifacts</code> contains all products. Hosts consume committed
-                  contracts and do not access the private renderer state.
+                  Each product answers one question about the frame. Five are levels
+                  of the lowering ladder; the semantic snapshot and commit plan are
+                  its side products. <code>FrameArtifacts</code> contains all seven.
+                  Hosts consume committed contracts and do not access the private
+                  renderer state.
                 </p>
               </div>
             </div>
@@ -250,7 +309,7 @@ const description =
           <!-- ===================== CHANGE PROPAGATION ===================== -->
           <section class="doc-section" id="propagation">
             <div class="section-head">
-              <span class="section-no">04</span>
+              <span class="section-no">05</span>
               <div>
                 <h2>How a change becomes a frame</h2>
                 <p class="section-lead">
@@ -277,14 +336,16 @@ const description =
           <!-- ===================== ISOLATION ===================== -->
           <section class="doc-section" id="isolation">
             <div class="section-head">
-              <span class="section-no">05</span>
+              <span class="section-no">06</span>
               <div>
                 <h2>What runs where</h2>
                 <p class="section-lead">
                   Authored <code>View</code>, <code>Scene</code>, and <code>App</code> values
-                  are main-actor APIs. The fused tail uses only resolved products. Thus, it
-                  can run off the main actor when the strategy permits. This boundary is
-                  the reason for the scheduling model.
+                  are main-actor APIs, so the first lowering must run on the main actor.
+                  Every later lowering is a pure function over an already-derived,
+                  immutable product — which is exactly why the fused tail can leave the
+                  main actor when the strategy permits. This boundary is the reason for
+                  the scheduling model.
                 </p>
               </div>
             </div>
@@ -299,7 +360,7 @@ const description =
           <!-- ===================== COMMIT / FRAME FATES ===================== -->
           <section class="doc-section" id="commit">
             <div class="section-head">
-              <span class="section-no">06</span>
+              <span class="section-no">07</span>
               <div>
                 <h2>Four fates of a frame</h2>
                 <p class="section-lead">
@@ -319,12 +380,13 @@ const description =
           <!-- ===================== HANDOFF ===================== -->
           <section class="doc-section" id="handoff">
             <div class="section-head">
-              <span class="section-no">07</span>
+              <span class="section-no">08</span>
               <div>
-                <h2>Crossing into the host</h2>
+                <h2>Crossing into the host: the last lowering</h2>
                 <p class="section-lead">
-                  Commit produces data, not output. <code>RunLoop</code> presents a committed
-                  frame according to the output mode and surface roles. Terminal bytes
+                  Commit produces data, not output. <code>RunLoop</code> performs the
+                  ladder's final step — lowering the committed, host-neutral surface into
+                  whatever the output mode and surface roles consume. Terminal bytes
                   exist only below this boundary.
                 </p>
               </div>
@@ -346,7 +408,7 @@ const description =
           <!-- ===================== SOURCE DEEP DIVE ===================== -->
           <section class="doc-section" id="source">
             <div class="section-head">
-              <span class="section-no">08</span>
+              <span class="section-no">09</span>
               <div>
                 <h2>Read the real code</h2>
                 <p class="section-lead">
@@ -366,7 +428,7 @@ const description =
           <!-- ===================== DIAGNOSTICS ===================== -->
           <section class="doc-section" id="diagnostics">
             <div class="section-head">
-              <span class="section-no">09</span>
+              <span class="section-no">10</span>
               <div>
                 <h2>Observing the pipeline</h2>
                 <p class="section-lead">
@@ -387,7 +449,7 @@ const description =
           <!-- ===================== CODE MAP / GLOSSARY ===================== -->
           <section class="doc-section" id="map">
             <div class="section-head">
-              <span class="section-no">10</span>
+              <span class="section-no">11</span>
               <div>
                 <h2>Where to look next</h2>
                 <p class="section-lead">

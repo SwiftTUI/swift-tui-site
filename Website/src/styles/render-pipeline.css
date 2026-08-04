@@ -451,6 +451,281 @@
   font-size: 14px;
 }
 
+/* -------------------------- lowering ladder ------------------------ */
+
+.rp .ladder {
+  display: grid;
+  gap: 0;
+}
+
+.rp .rung {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  border: 1px solid var(--home-line-strong);
+  border-radius: 3px;
+  background: var(--home-paper);
+}
+
+.rp .rung-info {
+  min-width: 0;
+  padding: 16px 18px;
+}
+
+.rp .rung-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rp .rung-no {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 24px;
+  border: 1px solid var(--home-ink);
+  border-radius: 2px;
+  background: var(--home-paper-soft);
+  color: var(--home-accent-ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rp .rung-top h3 {
+  font-size: 15px;
+  font-weight: 640;
+  color: var(--home-ink);
+}
+
+.rp .rung-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rp .rung-meta code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--tok-type);
+}
+
+.rp .rung-owner {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--quiet);
+}
+
+.rp .rung-q {
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.rp .rung-facts {
+  display: grid;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.rp .rung-facts > div {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+}
+
+.rp .rung-facts dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--quiet);
+  padding-top: 2px;
+}
+
+.rp .rung-facts dd {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.rp .rung-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+
+.rp .rung-field {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.rp .rung-field-none {
+  font-style: italic;
+  color: var(--quiet);
+}
+
+.rp .rung-src {
+  font-family: var(--mono);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.rp .rung-repr {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  border-left: 1px solid var(--home-line);
+  background: var(--home-paper-soft);
+  color: var(--code-fg);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.rp .rung-repr code {
+  font-size: inherit;
+}
+
+.rp .ladder-step {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  margin-left: 28px;
+  padding: 13px 0 13px 0;
+  border-left: 2px solid var(--home-line-strong);
+}
+
+.rp .ladder-step > * {
+  margin-left: 14px;
+}
+
+.rp .step-phase {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 3px 10px;
+  border: 1px solid var(--home-accent);
+  border-radius: 999px;
+  color: var(--home-accent-ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.rp .step-body {
+  grid-column: 1 / -1;
+  max-width: 82ch;
+}
+
+.rp .step-label {
+  font-size: 13px;
+  font-weight: 640;
+  color: var(--text);
+}
+
+.rp .step-desc {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.rp .step-src {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.rp .ladder-branch {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  margin-left: 28px;
+  padding: 12px 0;
+  border-left: 2px dashed var(--home-line-strong);
+}
+
+.rp .branch-tag {
+  margin-left: 14px;
+  align-self: start;
+  padding: 3px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  color: var(--quiet);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.rp .branch-body {
+  max-width: 74ch;
+  padding-right: 16px;
+}
+
+.rp .branch-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.rp .branch-head code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--tok-type);
+}
+
+.rp .branch-label {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--quiet);
+}
+
+.rp .branch-body > p:not(.branch-head):not(.branch-meta) {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.rp .branch-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 7px;
+}
+
+.rp .branch-field {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.rp .branch-src {
+  font-family: var(--mono);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.rp .ladder-notes {
+  margin-top: 4px;
+}
+
+.rp .ladder-notes .callout {
+  margin-top: 18px;
+}
+
 /* ----------------------------- explorer ---------------------------- */
 
 .rp .explorer-controls {
@@ -870,6 +1145,26 @@ body.is-playing .rp .pause-label {
   color: var(--muted);
   font-size: 13px;
   font-style: italic;
+}
+
+.rp .product-ladder {
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.rp .product-ladder.is-level {
+  border: 1px solid var(--home-accent);
+  color: var(--home-accent-ink);
+}
+
+.rp .product-ladder.is-side {
+  border: 1px dashed var(--line-strong);
+  color: var(--quiet);
 }
 
 .rp .product-owns {
@@ -1428,6 +1723,10 @@ body.is-playing .rp .pause-label {
     display: none;
   }
 
+  .rp .rung {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  }
+
   .rp .explorer-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1479,6 +1778,29 @@ body.is-playing .rp .pause-label {
   .rp .diag,
   .rp .glossary {
     grid-template-columns: 1fr;
+  }
+
+  .rp .rung {
+    grid-template-columns: 1fr;
+  }
+
+  .rp .rung-repr {
+    border-left: 0;
+    border-top: 1px solid var(--home-line);
+  }
+
+  .rp .ladder-step,
+  .rp .ladder-branch {
+    margin-left: 12px;
+  }
+
+  .rp .ladder-branch {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .rp .branch-body {
+    margin-left: 14px;
   }
 
   .rp .lede-facts div {

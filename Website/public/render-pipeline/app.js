@@ -27,9 +27,243 @@ const viewLines = [
   "      }",
   "    }",
   "    .padding(1)",
-  "    .border(.rounded)",
+  "    .border(set: .rounded)",
   "  }",
   "}",
+];
+
+/* ------------------------------------------------------------------ */
+/* The lowering ladder — representation levels of one view             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The ladder tracks a single authored line — `Text("Deploy Queue").bold()`
+ * from the example above — through every representation the framework gives
+ * it during one frame. Rungs are levels; the arrows between rungs are the
+ * pipeline phases. Every field named in a `repr` block exists on the real
+ * type at the cited source location.
+ */
+
+const LADDER = [
+  {
+    key: "authored",
+    level: 0,
+    name: "Authored view value",
+    type: "some View",
+    owner: "SwiftTUIViews",
+    artifact: null,
+    question: "What should exist?",
+    adds:
+      "Declarative structure, encoded in the type system: containers, modifier order, and state wrappers. Cheap to build — it is a value, not an object graph.",
+    forgets:
+      "It knows nothing yet: no identity, no geometry, no cells. body has not run.",
+    repr: [
+      'Text("Deploy Queue").bold()',
+      "",
+      "// the body's static type spells the whole",
+      "// subtree out at compile time:",
+      "ModifiedContent<ModifiedContent<",
+      "  VStack<TupleView<(Text, Divider,",
+      "    ProgressView, LabeledContent, Button)>>,",
+      "  PaddingModifier>, BorderModifier>",
+    ],
+    source: "swift-tui/Sources/SwiftTUIViews/Foundation/ViewProtocols.swift:22",
+  },
+  {
+    key: "resolved",
+    level: 1,
+    name: "ResolvedNode — the semantic tree",
+    type: "ResolvedNode",
+    owner: "SwiftTUIGraph",
+    artifact: "resolvedTree",
+    question: "What is in the tree, and who owns it?",
+    adds:
+      "Identity, state ownership, the merged environment, lifecycle and handler metadata, and a draw payload. This is the tree the retained ViewGraph reconciles.",
+    forgets:
+      "The Swift types. BuildSummary no longer exists — only kind names, payloads, and metadata remain.",
+    repr: [
+      "ResolvedNode",
+      '  kind:           .view("Text")',
+      "  identity:       …/VStack[0]/Text[0]",
+      "  structuralPath: mirrors the identity",
+      "  environment:    merged snapshot",
+      '  drawPayload:    .text("Deploy Queue")',
+      "  drawMetadata:   emphasis: bold",
+      "  children:       []",
+    ],
+    source: "swift-tui/Sources/SwiftTUIGraph/Resolve/ResolvedNode.swift:14",
+  },
+  {
+    key: "measured",
+    level: 2,
+    name: "MeasuredNode — negotiated sizes",
+    type: "MeasuredNode",
+    owner: "SwiftTUICore",
+    artifact: "measuredTree",
+    question: "How big does each subtree want to be?",
+    adds: "A concrete size for every node, negotiated under its parent's proposal.",
+    forgets:
+      "Everything except identity and sizes. This is a thin parallel geometry tree, not an enriched copy — identity is carried only to correlate with the other levels.",
+    repr: [
+      "MeasuredNode",
+      "  identity:     …/VStack[0]/Text[0]",
+      "  proposal:     24 × 1   (from the VStack)",
+      "  measuredSize: 12 × 1",
+      "  childMeasurements: []",
+    ],
+    source: "swift-tui/Sources/SwiftTUICore/Measure/MeasuredNode.swift:142",
+  },
+  {
+    key: "placed",
+    level: 3,
+    name: "PlacedNode — final geometry",
+    type: "PlacedNode",
+    owner: "SwiftTUICore",
+    artifact: "placedTree",
+    question: "Where does everything land?",
+    adds:
+      "Final integer-cell frames, content bounds, clipping, and z-order. The authority for interaction regions.",
+    forgets:
+      "Nothing new — but the resolved metadata it shows is a mirrored projection, refreshed from the resolved tree, never a second source of truth.",
+    repr: [
+      "PlacedNode",
+      "  identity:      …/VStack[0]/Text[0]",
+      "  bounds:        (x 2, y 1) 12 × 1",
+      "  contentBounds: (x 2, y 1) 12 × 1",
+      "  zIndex:        0",
+      "  + resolved metadata, as a projection",
+    ],
+    source: "swift-tui/Sources/SwiftTUICore/Place/PlacedNode.swift:152",
+    branch: {
+      type: "SemanticSnapshot",
+      artifact: "semanticSnapshot",
+      label: "projection, not a rung",
+      body:
+        "Focus, routing, accessibility, and interaction regions are extracted from the placed tree into SemanticSnapshot. The paint path never reads it — draw derives from the placed tree directly. It is a side product for input, focus, and hosts.",
+      source: "swift-tui/Sources/SwiftTUICore/Semantics/Semantics.swift:3",
+    },
+  },
+  {
+    key: "draw",
+    level: 4,
+    name: "DrawNode — the paint program",
+    type: "DrawNode",
+    owner: "SwiftTUICore",
+    artifact: "drawTree",
+    question: "What paint commands describe the frame?",
+    adds:
+      "Explicit paint instructions in paint order: text runs, fills, borders, rules, canvas payloads.",
+    forgets:
+      "View-ness. Nothing at this level knows it used to be a Text — there are only commands over cell rectangles.",
+    repr: [
+      "DrawNode",
+      "  identity: …/VStack[0]/Text[0]",
+      "  bounds:   (x 2, y 1) 12 × 1",
+      "  commands: [",
+      "    .text(bounds: …,",
+      '          content: "Deploy Queue",',
+      "          style: bold, …)",
+      "  ]",
+    ],
+    source: "swift-tui/Sources/SwiftTUICore/Draw/DrawTreeTypes.swift:281",
+  },
+  {
+    key: "raster",
+    level: 5,
+    name: "RasterSurface — the cell grid",
+    type: "RasterSurface",
+    owner: "SwiftTUICore",
+    artifact: "rasterSurface",
+    question: "What does the screen look like?",
+    adds:
+      "Styled terminal cells, wide-glyph continuation cells, image attachments, and an ordered presentation-layer sidecar.",
+    forgets:
+      "The tree. Structure is flattened away — the grid is all that remains, which is exactly what makes it host-neutral.",
+    repr: [
+      "RasterSurface   26 × 8 cells",
+      "  row 1, columns 2…13:",
+      "  [D][e][p][l][o][y][ ][Q][u][e][u][e]",
+      "  each: RasterCell(character:,",
+      "        spanWidth: 1, style: bold)",
+    ],
+    source: "swift-tui/Sources/SwiftTUICore/Raster/RasterTypes.swift:78",
+  },
+  {
+    key: "host",
+    level: 6,
+    name: "Host output — bytes, DOM, pixels",
+    type: "per host",
+    owner: "RunLoop + presentation surface",
+    artifact: null,
+    question: "What do we say to this host?",
+    adds:
+      "Host-specific encoding: escape sequences and synchronized-output wrappers for a terminal, DOM patches for the web host, texture updates for embedded hosts.",
+    forgets:
+      "This level never enters FrameArtifacts. It exists only below the commit boundary, and only for the host that asked.",
+    repr: [
+      "ESC[2;3H ESC[1m Deploy Queue ESC[22m",
+      "// cursor move · bold on · text · bold off",
+      "",
+      "// the web host lowers the same surface",
+      "// to DOM patches instead of bytes",
+    ],
+    source: "swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift:15",
+  },
+];
+
+/* The arrows between rungs. `phase` names the pipeline phase that is the
+ * transformation; the last arrow crosses the commit boundary instead. */
+const LADDER_STEPS = [
+  {
+    phase: "resolve",
+    label: "peel bodies down to primitives",
+    body:
+      "The resolver asks each view: does it conform to the package-internal ResolvableView? If yes, it lowers itself into resolved nodes. If not, its body is evaluated and the walk continues. Primitives like Text and VStack have Body == Never — they are the floor of the authoring vocabulary, and this loop is where your own view types disappear.",
+    source: "swift-tui/Sources/SwiftTUIViews/Foundation/ViewFoundation.swift:262",
+  },
+  {
+    phase: "measure",
+    label: "negotiate sizes under proposals",
+    body:
+      "LayoutEngine proposes a size to each subtree; each subtree answers with the size it wants. No final coordinates exist yet.",
+    source: "swift-tui/Sources/SwiftTUIRuntime/Rendering/FrameTailRenderer+InlineStages.swift:4",
+  },
+  {
+    phase: "place",
+    label: "assign integer-cell frames",
+    body:
+      "The measured answers become final frames in cell space. Placement is the moment geometry stops being a negotiation and becomes a fact.",
+    source: "swift-tui/Sources/SwiftTUIRuntime/Rendering/FrameTailRenderer+InlineStages.swift:4",
+  },
+  {
+    phase: "draw",
+    label: "lower geometry + metadata to paint commands",
+    body:
+      "The draw extractor walks the placed tree and emits commands: borders, backgrounds, effects, and each node's payload as explicit paint instructions.",
+    source: "swift-tui/Sources/SwiftTUIRuntime/Rendering/FrameTailRenderer+InlineStages.swift:4",
+  },
+  {
+    phase: "raster",
+    label: "paint commands into styled cells",
+    body:
+      "The rasterizer executes the paint program into a cell grid, reusing parts of the previous surface when the draw-tree diff proves it safe.",
+    source: "swift-tui/Sources/SwiftTUICore/Raster/Rasterizer.swift:183",
+  },
+  {
+    phase: "commit · present",
+    label: "publish, then speak the host's language",
+    body:
+      "The products are bundled into FrameArtifacts and the four-fates policy runs (see below). Only after a frame commits does RunLoop perform the final lowering, into whatever the presentation surface consumes.",
+    source: "swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift:15",
+    branch: {
+      type: "CommitPlan",
+      artifact: "commitPlan",
+      label: "effect package, not a rung",
+      body:
+        "Lifecycle entries, handler installations, and transaction work ride alongside the visual products. CommitPlan is not a representation of the view — it is the list of side effects the runtime applies when the frame commits.",
+      source: "swift-tui/Sources/SwiftTUICore/Commit/FrameArtifacts.swift",
+    },
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -41,6 +275,7 @@ const PHASES = [
     key: "resolve",
     type: "ResolvedNode",
     field: "resolvedTree",
+    ladder: "level 1",
     question: "What is in the tree, and who owns it?",
     owns:
       "Authored bodies lowered to nodes, plus the identity projection, StructuralPath, optional entity identity, state ownership, merged environment, view metadata, and runtime registrations.",
@@ -49,6 +284,7 @@ const PHASES = [
     key: "measure",
     type: "MeasuredNode",
     field: "measuredTree",
+    ladder: "level 2",
     question: "How big does each subtree want to be?",
     owns:
       "Subtree sizes negotiated by LayoutEngine under a ProposedSize. No final coordinates exist yet.",
@@ -57,6 +293,7 @@ const PHASES = [
     key: "place",
     type: "PlacedNode",
     field: "placedTree",
+    ladder: "level 3",
     question: "Where does everything land?",
     owns:
       "Final integer-cell frames, content bounds, and placement-time metadata. This is the authority for interaction regions.",
@@ -65,14 +302,16 @@ const PHASES = [
     key: "semantics",
     type: "SemanticSnapshot",
     field: "semanticSnapshot",
+    ladder: "projection",
     question: "How do focus, pointers, and accessibility route?",
     owns:
-      "Focus, interaction, action, selection, scroll, named coordinate spaces, and pointer routing — derived from the placed tree.",
+      "Focus, interaction, action, selection, scroll, named coordinate spaces, and pointer routing — derived from the placed tree. A side product for input and hosts, not a rung of the lowering ladder: the paint path never reads it.",
   },
   {
     key: "draw",
     type: "DrawNode",
     field: "drawTree",
+    ladder: "level 4",
     question: "What paint commands describe the frame?",
     owns:
       "Placed nodes lowered into draw commands: borders, backgrounds, effects, and payload paint instructions.",
@@ -81,6 +320,7 @@ const PHASES = [
     key: "raster",
     type: "RasterSurface",
     field: "rasterSurface",
+    ladder: "level 5",
     question: "What does the cell grid look like?",
     owns:
       "Styled terminal cells, continuation-cell handling, and image attachments. Host-neutral grid data — still not terminal bytes.",
@@ -89,9 +329,10 @@ const PHASES = [
     key: "commit",
     type: "CommitPlan",
     field: "commitPlan",
+    ladder: "effect package",
     question: "What side effects must the runtime apply?",
     owns:
-      "Lifecycle entries, handler installations, the semantic snapshot, and transaction work the runtime applies after the products are published.",
+      "Lifecycle entries, handler installations, the semantic snapshot, and transaction work the runtime applies after the products are published. Not a representation of the view — the ledger of effects that ride with one.",
   },
 ];
 
@@ -108,7 +349,7 @@ const STAGES = [
     covers: ["resolve"],
     codeLines: [3, 4, 5, 6, 7, 8, 9],
     actor: "main",
-    headline: "Resolve the dirty frontier into a draft.",
+    headline: "Run the first lowering: resolve the dirty frontier into a draft.",
     consumes: "Resolve context, proposal, environment, invalidation set, reuse policy.",
     produces:
       "A FrameHeadDraft: the resolved tree, frame-tail input, staged transaction, render generation, timing clock, and frame context for commit.",
@@ -158,12 +399,12 @@ const STAGES = [
     covers: ["measure", "place", "semantics", "draw", "raster"],
     codeLines: [5, 6, 7, 8, 9, 13, 14],
     actor: "tail",
-    headline: "Compute five products as one scheduling node.",
+    headline: "Descend the rest of the ladder as one scheduling node.",
     consumes: "The resolved tree and retained frame-tail inputs.",
     produces:
       "Five distinct products in order — measure, place, semantics, draw, raster — plus timing and reuse diagnostics.",
     does:
-      "Runs measure → place → semantics → draw → raster. May run inline or on a frame-tail worker depending on strategy and platform. This is the performance node that can leave the main actor because every input is already resolved.",
+      "Runs measure → place → semantics → draw → raster: the remaining lowerings plus the semantic projection. May run inline or on a frame-tail worker depending on strategy and platform. This is the performance node that can leave the main actor because every input is already resolved.",
     not:
       "Does not collapse the products into one type. The five values keep distinct ownership and diagnostics; only their scheduling is fused.",
     source:
@@ -441,6 +682,34 @@ const sourceTabs = [
     ],
   },
   {
+    id: "lowering",
+    label: "lowering",
+    title: "resolveViewElements",
+    file: "swift-tui/Sources/SwiftTUIViews/Foundation/ViewFoundation.swift:262",
+    role: "The first lowering: peeling authored bodies down to primitives",
+    snippet: [
+      "@MainActor",
+      "package func resolveViewElements<V: View>(",
+      "  _ view: V,",
+      "  in context: ResolveContext",
+      ") -> [ResolvedNode] {",
+      "  let erased: Any = view",
+      "  if let resolvable = erased as? any ResolvableView {",
+      "    return resolvable.resolveElements(in: context)",
+      "  }",
+      "  return view.resolveBody(in: context) {",
+      "    view.body",
+      "  }",
+      "}",
+    ],
+    hot: [7, 8, 10, 11],
+    notes: [
+      "This small loop is the entire authored-to-resolved lowering. Views that conform to the package-internal ResolvableView — Text, VStack, every primitive with Body == Never — lower themselves into ResolvedNode values.",
+      "Every other view is composition: its body is evaluated and the resolver recurses. Your own view types are peeled away here, one body at a time, and never appear in any later representation.",
+      "Because lowering to primitives is package-internal, external view libraries compose on the same authoring surface without ever constructing render nodes directly.",
+    ],
+  },
+  {
     id: "head",
     label: "head",
     title: "computeFrameHead",
@@ -630,6 +899,13 @@ const codemap = [
     ],
   },
   {
+    q: "Where does an authored view lower to primitives?",
+    files: [
+      "swift-tui/Sources/SwiftTUIViews/Foundation/ViewFoundation.swift:262",
+      "swift-tui/Sources/SwiftTUIViews/Foundation/ViewProtocols.swift:39",
+    ],
+  },
+  {
     q: "Where do measure → raster run?",
     files: ["swift-tui/Sources/SwiftTUIRuntime/Rendering/FrameTailRenderer+InlineStages.swift:4"],
   },
@@ -647,6 +923,10 @@ const codemap = [
 ];
 
 const glossary = [
+  { term: "Lowering", def: "Translating the UI from one representation into a lower-level one — keeping the meaning, changing the vocabulary, discarding what the next consumer does not need. Borrowed from compilers; each frame runs the full ladder of lowerings." },
+  { term: "PrimitiveView", def: "A package-internal view with Body == Never — the floor of the authoring vocabulary. Primitives lower themselves into resolved nodes; everything else is composition that peels down to them." },
+  { term: "DrawCommand", def: "One paint instruction in the draw tree: a text run, fill, stroke, rule, border, canvas payload, or clip over a cell rectangle. The first representation with no view-ness left." },
+  { term: "RasterCell", def: "One terminal cell in the rasterized surface: character, span width, continuation marker, resolved style, and optional hyperlink." },
   { term: "FrameHeadDraft", def: "The output of head: resolved tree, frame-tail input, staged transaction, generation, and frame context. Abortable until commit." },
   { term: "FrameArtifacts", def: "The committed bundle of all seven phase products plus diagnostics, presentation damage, and the commit plan." },
   { term: "ScheduledFrame", def: "One consumed frame request: every pending wake cause, the unioned invalidated identities, deadlines, and the coalesced intent count." },
@@ -701,7 +981,7 @@ function highlightSwift(value) {
       '<span class="tok-kw">$1</span>'
     )
     .replace(
-      /\b(View|VStack|HStack|Text|Divider|ProgressView|LabeledContent|Button|BuildSummary|ResolvedNode|MeasuredNode|PlacedNode|SemanticSnapshot|DrawNode|RasterSurface|CommitPlan|FrameArtifacts|FrameHeadDraft|ScheduledFrame|FrameScheduler|Identity)\b/g,
+      /\b(View|VStack|HStack|Text|Divider|ProgressView|LabeledContent|Button|BuildSummary|ResolvedNode|MeasuredNode|PlacedNode|SemanticSnapshot|DrawNode|RasterSurface|CommitPlan|FrameArtifacts|FrameHeadDraft|ScheduledFrame|FrameScheduler|Identity|ModifiedContent|TupleView|PaddingModifier|BorderModifier|ResolvableView|ResolveContext|RasterCell|DrawCommand|Never)\b/g,
       '<span class="tok-type">$1</span>'
     )
     .replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
@@ -731,15 +1011,16 @@ function sourceAnchor(path, extraClass) {
 /* --- TOC --- */
 const tocItems = [
   ["overview", "01 · The mental model"],
-  ["explorer", "02 · Walkthrough"],
-  ["products", "03 · Phase products"],
-  ["propagation", "04 · Change propagation"],
-  ["isolation", "05 · What runs where"],
-  ["commit", "06 · Four fates"],
-  ["handoff", "07 · Host handoff"],
-  ["source", "08 · Source"],
-  ["diagnostics", "09 · Diagnostics"],
-  ["map", "10 · Where to look next"],
+  ["ladder", "02 · The lowering ladder"],
+  ["explorer", "03 · Walkthrough"],
+  ["products", "04 · Phase products"],
+  ["propagation", "05 · Change propagation"],
+  ["isolation", "06 · What runs where"],
+  ["commit", "07 · Four fates"],
+  ["handoff", "08 · Host handoff"],
+  ["source", "09 · Source"],
+  ["diagnostics", "10 · Diagnostics"],
+  ["map", "11 · Where to look next"],
 ];
 
 function renderToc() {
@@ -931,13 +1212,81 @@ function setupExplorerControls() {
   });
 }
 
+/* --- the lowering ladder --- */
+function renderLadderBranch(branch) {
+  return `
+    <aside class="ladder-branch">
+      <span class="branch-tag">↳ side product</span>
+      <div class="branch-body">
+        <p class="branch-head"><code>${branch.type}</code><span class="branch-label">${branch.label}</span></p>
+        <p>${branch.body}</p>
+        <p class="branch-meta">
+          ${branch.artifact ? `<code class="branch-field">FrameArtifacts.${branch.artifact}</code>` : ""}
+          ${sourceAnchor(branch.source, "branch-src")}
+        </p>
+      </div>
+    </aside>`;
+}
+
+function renderLadder() {
+  const board = document.getElementById("ladder-board");
+  const parts = [];
+
+  LADDER.forEach((rung, i) => {
+    const artifact = rung.artifact
+      ? `<code class="rung-field">FrameArtifacts.${rung.artifact}</code>`
+      : `<span class="rung-field rung-field-none">${
+          rung.level === 0
+            ? "never leaves your code"
+            : "below the commit boundary — never enters FrameArtifacts"
+        }</span>`;
+
+    parts.push(`
+      <article class="rung" id="ladder-${rung.key}">
+        <div class="rung-info">
+          <div class="rung-top">
+            <span class="rung-no">L${rung.level}</span>
+            <h3>${rung.name}</h3>
+          </div>
+          <p class="rung-meta"><code>${rung.type}</code><span class="rung-owner">${rung.owner}</span></p>
+          <p class="rung-q">“${rung.question}”</p>
+          <dl class="rung-facts">
+            <div><dt>gains</dt><dd>${rung.adds}</dd></div>
+            <div><dt>gives up</dt><dd>${rung.forgets}</dd></div>
+          </dl>
+          <p class="rung-foot">${artifact} ${sourceAnchor(rung.source, "rung-src")}</p>
+        </div>
+        <pre class="rung-repr" aria-label="Representation at this level"><code>${rung.repr
+          .map((line) => highlightSwift(line))
+          .join("\n")}</code></pre>
+      </article>`);
+
+    if (rung.branch) parts.push(renderLadderBranch(rung.branch));
+
+    const step = LADDER_STEPS[i];
+    if (step) {
+      parts.push(`
+        <div class="ladder-step">
+          <span class="step-phase">${step.phase}</span>
+          <div class="step-body">
+            <p class="step-label">${step.label}</p>
+            <p class="step-desc">${step.body} ${sourceAnchor(step.source, "step-src")}</p>
+          </div>
+        </div>`);
+      if (step.branch) parts.push(renderLadderBranch(step.branch));
+    }
+  });
+
+  board.innerHTML = parts.join("");
+}
+
 /* --- static reference sections --- */
 function renderProductTable() {
   document.getElementById("product-table").innerHTML = PHASES.map(
     (p, i) => `
       <article class="product-row">
         <div class="product-key"><span class="product-no">${i + 1}</span><span>${p.key}</span></div>
-        <div class="product-type"><code>${p.type}</code><span class="product-q">${p.question}</span></div>
+        <div class="product-type"><code>${p.type}</code><span class="product-q">${p.question}</span><span class="product-ladder ${p.ladder.startsWith("level") ? "is-level" : "is-side"}">${p.ladder}</span></div>
         <p class="product-owns">${p.owns}</p>
         <code class="product-field">FrameArtifacts.${p.field}</code>
       </article>`
@@ -1102,6 +1451,7 @@ function init() {
   renderToc();
   renderViewCode();
   renderMapping();
+  renderLadder();
   renderStageRail();
   setupExplorerControls();
   renderProductTable();
