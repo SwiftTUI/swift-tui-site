@@ -49,7 +49,7 @@ wasm build. The page runtime comes from the `@swifttui/web` release tarball in
 
 ## WebExample and DocC inputs
 
-The `0.6.0` public beta build fetches the tagged `swift-tui-examples`
+The `0.6.1` public beta build fetches the tagged `swift-tui-examples`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -61,7 +61,7 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.6.0`) in lockstep. Update them only
+track the current organization release (`0.6.1`) in lockstep. Update them only
 as part of an organization release.
 
 ## License
