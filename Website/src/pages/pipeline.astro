@@ -55,7 +55,7 @@ const description =
           <p class="toc-kicker">On this page</p>
           <nav id="toc-nav"></nav>
           <p class="toc-note">
-            Code references are repo-relative paths into the
+            Code references are repo-relative paths into the{" "}
             <code>swift-tui</code> package and open the cited source on GitHub.
           </p>
         </aside>
@@ -101,7 +101,7 @@ const description =
                   representation into a lower-level one — keep the meaning, change the
                   vocabulary, discard whatever the next consumer does not need. A
                   compiler lowers source to an AST, the AST to an IR, the IR to machine
-                  code. SwiftTUI treats your view the same way: the <code>View</code>
+                  code. SwiftTUI treats your view the same way: the <code>View</code>{" "}
                   value is the source program, and the terminal cells are the machine
                   code. The framework's documentation describes this as <em>seven
                   phases</em> scheduled across <em>five stages</em> — two views of one
@@ -145,11 +145,11 @@ const description =
             <figure class="mapping" aria-labelledby="mapping-cap">
               <div class="mapping-board" id="mapping-board"></div>
               <figcaption id="mapping-cap">
-                The mapping is not one-to-one. <strong>head</strong> covers
-                <code>resolve</code>. <strong>animationInjection</strong> and
+                The mapping is not one-to-one. <strong>head</strong> covers{" "}
+                <code>resolve</code>. <strong>animationInjection</strong> and{" "}
                 <strong>latePreferenceReconciliation</strong> change the current draft
-                without a new product. <strong>fusedFrameTail</strong> spans
-                <code>measure</code>→<code>raster</code>. <strong>commit</strong> covers
+                without a new product. <strong>fusedFrameTail</strong> spans{" "}
+                <code>measure</code>→<code>raster</code>. <strong>commit</strong> covers{" "}
                 <code>commit</code>. The two models differ because each model has a
                 different purpose. See <a href="#isolation">isolation</a>.
               </figcaption>
@@ -173,7 +173,7 @@ const description =
               <div>
                 <h2>The lowering ladder: what "the view" is at each level</h2>
                 <p class="section-lead">
-                  Follow one authored line — <code>Text("Deploy Queue").bold()</code>
+                  Follow one authored line — <code>Text("Deploy Queue").bold()</code>{" "}
                   from the example below — down every representation the framework
                   gives it during a frame. Each rung is a level: it gains the answers
                   the next consumer needs and gives up the vocabulary it no longer
@@ -191,7 +191,7 @@ const description =
               <aside class="callout">
                 <p class="callout-tag">Lowering is one-way</p>
                 <p>
-                  Every arrow is a pure derivation. You cannot reconstruct a
+                  Every arrow is a pure derivation. You cannot reconstruct a{" "}
                   <code>View</code> from a <code>DrawNode</code>, or a draw tree from
                   cells — each level has discarded exactly the information that made
                   the level above it expressive. That is why a new frame starts by
@@ -221,7 +221,7 @@ const description =
                 <p class="section-lead">
                   The ladder is the data story; the runtime schedules it. Step through
                   the five runtime stages: <code>head</code> runs the first lowering on
-                  the main actor, the fused tail descends the rest, and
+                  the main actor, the fused tail descends the rest, and{" "}
                   <code>commit</code> publishes. The left panel highlights the
                   authored lines that the runtime reads. The center panel describes the
                   stage. The right panel shows the available products. Terminal cells do
@@ -301,7 +301,7 @@ const description =
             </div>
             <div class="product-table" id="product-table"></div>
             <p class="source-line">
-              Defined in
+              Defined in{" "}
               <a href="../../swift-tui/Sources/SwiftTUICore/Commit/FrameArtifacts.swift">SwiftTUICore/Commit/FrameArtifacts.swift</a>.
             </p>
           </section>
@@ -326,7 +326,7 @@ const description =
               <p>
                 A <code>@State</code> write does not "trigger a re-render." It marks the
                 owner graph node as dirty and requests a frame. The scheduler selects the
-                time. It can combine the write with other writes in one
+                time. It can combine the write with other writes in one{" "}
                 <code>ScheduledFrame</code>. The renderer then evaluates only the dirty
                 frontier. It does not evaluate the complete tree.
               </p>
@@ -372,7 +372,7 @@ const description =
             </div>
             <div class="fates" id="fates"></div>
             <p class="source-line">
-              Decided in
+              Decided in{" "}
               <a href="../../swift-tui/Sources/SwiftTUIRuntime/Rendering/DefaultRenderer+CompletedFrameCandidates.swift">DefaultRenderer+CompletedFrameCandidates.swift</a>.
             </p>
           </section>
@@ -398,9 +398,9 @@ const description =
             <h3 class="sub-h">Presentation paths</h3>
             <div class="handoff" id="handoff-flow"></div>
             <p class="source-line">
-              Dispatched in
+              Dispatched in{" "}
               <a href="../../swift-tui/Sources/SwiftTUIRuntime/RunLoop/RunLoop+Presentation.swift">RunLoop+Presentation.swift</a>.
-              The host contract is in
+              The host contract is in{" "}
               <a href="../../swift-tui/Sources/SwiftTUIRuntime/Terminal/PresentationSurface.swift">PresentationSurface.swift</a>.
             </p>
           </section>
@@ -433,7 +433,7 @@ const description =
                 <h2>Observing the pipeline</h2>
                 <p class="section-lead">
                   You can examine renderer activity without reading the source. If you
-                  install a diagnostics sink, the runtime emits a
+                  install a diagnostics sink, the runtime emits a{" "}
                   <code>RuntimeFrameSample</code> for each result. A result is a committed
                   frame, a zero-artifact outcome, or an elision.
                 </p>
