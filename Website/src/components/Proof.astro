@@ -1,7 +1,7 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Three maintained targets in swift-tui-examples, so every claim here is
+// Five maintained targets in swift-tui-examples, so every claim here is
 // checkable by cloning the repo. Each caption describes what its screenshot
 // actually shows — this pane's whole job is credibility, so an image that
 // undersells or overshoots its caption costs more than the tile is worth.
@@ -28,14 +28,39 @@ const items: ProofItem[] = [
       "A canvas, layers, a scrubbable timeline, pointer tools, undo, and animated GIF export.",
     alt: "SwiftTUI GIF Editor with canvas, layers, tools, and a timeline",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
+    wide: true,
   },
   {
     slug: "git-viz",
     title: "git-viz",
     body:
-      "Commit timelines, heat strips, and sparklines from SwiftTUICharts, drawn against the history of whatever repository you point it at.",
-    alt: "SwiftTUI git-viz rendering a commit timeline from repository history",
+      "One command — git viz deltas — charts a repository's insertions and deletions over time with SwiftTUICharts.",
+    alt: "git viz deltas charting insertions and deletions in a terminal",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/git-viz",
+  },
+  {
+    slug: "mrkdwn",
+    title: "mrkdwn",
+    body:
+      "Markdown as a responsive terminal document — here reading the SwiftTUI README.",
+    alt: "mrkdwn rendering the SwiftTUI README in the terminal",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/mrkdwn",
+  },
+  {
+    slug: "csvui",
+    title: "csvui",
+    body:
+      "A 34,000-row GeoNames city table, browsed and edited safely in place.",
+    alt: "csvui displaying a large tab-separated table of world cities",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
+  },
+  {
+    slug: "sextant-browse",
+    title: "Sextant",
+    body:
+      "Miller-column file browsing with inline previews, pointed at the swift-tui-examples checkout.",
+    alt: "Sextant browsing swift-tui-examples with a Package.swift preview",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/sextant",
   },
 ];
 ---
