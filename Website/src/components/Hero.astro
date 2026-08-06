@@ -2,8 +2,9 @@
 import DemoTerminal from "./DemoTerminal.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const demoRepoHref = "https://github.com/SwiftTUI/swift-tui-counter-demo";
 const sourceHref =
-  "https://github.com/SwiftTUI/swift-tui-counter-demo/blob/main/counter/Sources/CounterCore/CounterApp.swift";
+  `${demoRepoHref}/blob/main/counter/Sources/CounterCore/CounterApp.swift`;
 ---
 
 <section class="home-hero" aria-labelledby="hero-title">
@@ -18,8 +19,8 @@ const sourceHref =
           SwiftUI semantics, drawn in terminal cells.
         </p>
         <div class="hero-actions">
-          <a class="home-button home-button--primary" href="#quickstart">
-            Start with SwiftPM
+          <a class="home-button home-button--primary" href="#demo">
+            Try the web demo
           </a>
           <a
             class="home-button"
@@ -91,6 +92,16 @@ const sourceHref =
         <DemoTerminal id="demo" />
       </div>
     </div>
+    <div class="demo-local">
+      <p>Run this same counter in the terminal, SwiftUI, or a browser.</p>
+      <a
+        class="home-button home-button--primary"
+        href={demoRepoHref}
+        rel="noreferrer noopener"
+      >
+        Clone the counter
+      </a>
+    </div>
   </div>
 </section>
 
@@ -155,6 +166,24 @@ const sourceHref =
     min-height: 520px;
     border: 1px solid var(--home-ink);
     background: var(--home-paper);
+  }
+
+  .demo-local {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 78px;
+    padding: 14px 16px;
+    border-right: 1px solid var(--home-ink);
+    border-bottom: 1px solid var(--home-ink);
+    border-left: 1px solid var(--home-ink);
+  }
+
+  .demo-local p {
+    color: var(--home-muted);
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   .source-pane,
@@ -299,6 +328,16 @@ const sourceHref =
 
     .code-to-frame {
       min-height: 0;
+    }
+
+    .demo-local {
+      display: grid;
+      align-items: stretch;
+      padding: 16px;
+    }
+
+    .demo-local .home-button {
+      width: 100%;
     }
 
     .render-pane {

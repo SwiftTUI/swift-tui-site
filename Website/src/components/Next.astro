@@ -44,14 +44,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
           reports and contributions are warmly welcomed.
         </p>
       </div>
-      <div class="closing-actions">
-        <a
-          class="home-button home-button--primary"
-          href="https://github.com/SwiftTUI/swift-tui-counter-demo"
-          rel="noreferrer noopener"
-        >
-          Clone the counter
-        </a>
+      <div class="closing-action">
         <a class="home-button" href={`${base}/docs/documentation/`}>
           Read the API reference
         </a>
@@ -217,7 +210,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     text-wrap: pretty;
   }
 
-  .closing-actions {
+  .closing-action {
     display: flex;
     flex-wrap: wrap;
     gap: 9px;
@@ -233,11 +226,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   }
 
   @media (max-width: 620px) {
-    .closing-actions {
+    .closing-action {
       display: grid;
     }
 
-    .closing-actions .home-button {
+    .closing-action .home-button {
       width: 100%;
     }
   }
