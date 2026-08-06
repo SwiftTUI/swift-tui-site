@@ -42,13 +42,13 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.6.3` public beta build fetches the tagged `swift-tui-examples`
+The `0.6.3` public beta build fetches the tagged `swift-tui-counter-demo`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
 
 ```bash
-WEBEXAMPLE_DIR=/path/to/swift-tui-examples/WebExample \
+WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
   bun run --cwd Website build:wasm
 ```
 

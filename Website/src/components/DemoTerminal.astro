@@ -6,11 +6,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const iframeSrc = `${base}/webexample/?embed=marketing`;
 const webExampleHref = `${base}/webexample/`;
 const sourceHref =
-  "https://github.com/SwiftTUI/swift-tui-examples/tree/main/WebExample";
+  "https://github.com/SwiftTUI/swift-tui-counter-demo/tree/main/WebExample";
 const isDev = import.meta.env.DEV;
 const webExampleDir =
   process.env.WEBEXAMPLE_DIR ??
-  "../.build/public-inputs/swift-tui-examples/WebExample";
+  "../.build/public-inputs/swift-tui-counter-demo/WebExample";
 const hasLocalArtifact =
   existsSync(resolve(process.cwd(), webExampleDir, "pages-dist/index.html")) &&
   existsSync(

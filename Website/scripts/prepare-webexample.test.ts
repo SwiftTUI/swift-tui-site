@@ -13,9 +13,9 @@ import { join, resolve } from "node:path";
 
 const websiteRoot = resolve(import.meta.dir, "..");
 const siteRoot = resolve(websiteRoot, "..");
-const defaultExamplesRoot = resolve(
+const defaultCounterDemoRoot = resolve(
   siteRoot,
-  ".build/public-inputs/swift-tui-examples",
+  ".build/public-inputs/swift-tui-counter-demo",
 );
 const tempRoots: string[] = [];
 
@@ -25,34 +25,34 @@ afterEach(async () => {
       .splice(0)
       .map((root) => rm(root, { recursive: true, force: true })),
   );
-  await rm(defaultExamplesRoot, { recursive: true, force: true });
+  await rm(defaultCounterDemoRoot, { recursive: true, force: true });
 });
 
 test("overlay WebExample inputs install without a frozen lockfile", async () => {
-  const { examplesRoot, logPath, env } = await makeFixture();
+  const { counterDemoRoot, logPath, env } = await makeFixture();
 
   const result = runPrepareWebExample({
     env: {
       ...env,
-      SWIFTTUI_EXAMPLES_CHECKOUT: examplesRoot,
+      SWIFTTUI_COUNTER_DEMO_CHECKOUT: counterDemoRoot,
     },
   });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
-  expect(log).toContain(`cwd=${examplesRoot}`);
+  expect(log).toContain(`cwd=${counterDemoRoot}`);
   expect(log).toContain("args=install");
   expect(log).not.toContain("--frozen-lockfile");
 });
 
 test("plain WebExample overrides keep frozen lockfile installs", async () => {
-  const { examplesRoot, logPath, env } = await makeFixture();
+  const { counterDemoRoot, logPath, env } = await makeFixture();
 
   const result = runPrepareWebExample({ env });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
-  expect(log).toContain(`cwd=${examplesRoot}`);
+  expect(log).toContain(`cwd=${counterDemoRoot}`);
   expect(log).toContain("args=install --frozen-lockfile");
 });
 
@@ -67,8 +67,8 @@ test("cache-restored default input directory is recloned instead of treated as t
   const fakeBun = join(fakeBin, "bun");
   const logPath = join(root, "commands.log");
 
-  await rm(defaultExamplesRoot, { recursive: true, force: true });
-  await mkdir(join(defaultExamplesRoot, "node_modules"), { recursive: true });
+  await rm(defaultCounterDemoRoot, { recursive: true, force: true });
+  await mkdir(join(defaultCounterDemoRoot, "node_modules"), { recursive: true });
   await mkdir(fakeBin, { recursive: true });
 
   await writeFile(
@@ -76,7 +76,7 @@ test("cache-restored default input directory is recloned instead of treated as t
     `#!/usr/bin/env bash
 set -euo pipefail
 printf 'git %s\\n' "$*" >> "$FAKE_COMMAND_LOG"
-if [[ "$*" == "-C ${defaultExamplesRoot} rev-parse --show-toplevel" ]]; then
+if [[ "$*" == "-C ${defaultCounterDemoRoot} rev-parse --show-toplevel" ]]; then
   printf '${siteRoot}\\n'
   exit 0
 fi
@@ -102,23 +102,23 @@ printf 'bun cwd=%s args=%s\\n' "$PWD" "$*" >> "$FAKE_COMMAND_LOG"
     env: {
       PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
       FAKE_COMMAND_LOG: logPath,
-      SWIFTTUI_EXAMPLES_REF: "0.6.3",
+      SWIFTTUI_COUNTER_DEMO_REF: "0.6.3",
     },
   });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
   expect(log).toContain(
-    "git clone --depth 1 --branch 0.6.3 https://github.com/SwiftTUI/swift-tui-examples.git",
+    "git clone --depth 1 --branch 0.6.3 https://github.com/SwiftTUI/swift-tui-counter-demo.git",
   );
-  expect(log).not.toContain(`git -C ${defaultExamplesRoot} fetch`);
+  expect(log).not.toContain(`git -C ${defaultCounterDemoRoot} fetch`);
   expect(log).toContain(
-    `bun cwd=${defaultExamplesRoot} args=install --frozen-lockfile`,
+    `bun cwd=${defaultCounterDemoRoot} args=install --frozen-lockfile`,
   );
 });
 
 async function makeFixture(): Promise<{
-  examplesRoot: string;
+  counterDemoRoot: string;
   logPath: string;
   env: Record<string, string>;
 }> {
@@ -127,8 +127,8 @@ async function makeFixture(): Promise<{
   );
   tempRoots.push(root);
 
-  const examplesRoot = join(root, "swift-tui-examples");
-  const webExampleDir = join(examplesRoot, "WebExample");
+  const counterDemoRoot = join(root, "swift-tui-counter-demo");
+  const webExampleDir = join(counterDemoRoot, "WebExample");
   const fakeBin = join(root, "bin");
   const fakeBun = join(fakeBin, "bun");
   const logPath = join(root, "bun.log");
@@ -153,7 +153,7 @@ set -euo pipefail
     WEBEXAMPLE_DIR: webExampleDir,
   };
 
-  return { examplesRoot, logPath, env };
+  return { counterDemoRoot, logPath, env };
 }
 
 function runPrepareWebExample(options: {

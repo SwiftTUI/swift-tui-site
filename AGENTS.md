@@ -13,7 +13,8 @@ documentation.
 | `Scripts/` | Gates + build: `build_docc_site.sh`, `check_site.sh` |
 
 The Astro build compiles and compresses the WebExample wasm for the live browser
-demo. Public builds fetch tagged example and web artifacts by default. Use
+demo (from the tagged `swift-tui-counter-demo` repo). Public builds fetch tagged
+counter-demo and web artifacts by default. Use
 `WEBEXAMPLE_DIR` only for unpublished local inputs.
 
 ## Toolchains

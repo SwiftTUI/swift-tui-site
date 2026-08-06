@@ -2,7 +2,7 @@
 set -euo pipefail
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
-webexample_dir="${WEBEXAMPLE_DIR:-${site_root}/.build/public-inputs/swift-tui-examples/WebExample}"
+webexample_dir="${WEBEXAMPLE_DIR:-${site_root}/.build/public-inputs/swift-tui-counter-demo/WebExample}"
 website_dir="${site_root}/Website"
 
 fail() {

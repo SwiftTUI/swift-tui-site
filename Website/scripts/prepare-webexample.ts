@@ -5,41 +5,41 @@ import { fileURLToPath } from "node:url";
 const websiteRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const siteRoot = resolve(websiteRoot, "..");
 const releasesPath = resolve(siteRoot, "docs/releases.yml");
-const defaultExamplesRoot = resolve(siteRoot, ".build/public-inputs/swift-tui-examples");
-const examplesRepository = "https://github.com/SwiftTUI/swift-tui-examples.git";
+const defaultCounterDemoRoot = resolve(siteRoot, ".build/public-inputs/swift-tui-counter-demo");
+const counterDemoRepository = "https://github.com/SwiftTUI/swift-tui-counter-demo.git";
 
 const webExampleOverride = process.env.WEBEXAMPLE_DIR;
-const examplesRef = process.env.SWIFTTUI_EXAMPLES_REF ?? await readExamplesRef();
+const counterDemoRef = process.env.SWIFTTUI_COUNTER_DEMO_REF ?? await readCounterDemoRef();
 
 if (webExampleOverride) {
   const webExampleDir = resolve(process.cwd(), webExampleOverride);
-  const examplesRoot = resolve(webExampleDir, "..");
-  await installExamplesDependencies(examplesRoot, {
-    frozenLockfile: !usesCoordinationOverlay(examplesRoot),
+  const counterDemoRoot = resolve(webExampleDir, "..");
+  await installWorkspaceDependencies(counterDemoRoot, {
+    frozenLockfile: !usesCoordinationOverlay(counterDemoRoot),
   });
   console.log(`[prepare-webexample] using WEBEXAMPLE_DIR=${webExampleDir}`);
 } else {
-  await ensurePublicExamplesCheckout(defaultExamplesRoot, examplesRef);
-  await installExamplesDependencies(defaultExamplesRoot, { frozenLockfile: true });
-  console.log(`[prepare-webexample] prepared swift-tui-examples ${examplesRef}`);
+  await ensurePublicCounterDemoCheckout(defaultCounterDemoRoot, counterDemoRef);
+  await installWorkspaceDependencies(defaultCounterDemoRoot, { frozenLockfile: true });
+  console.log(`[prepare-webexample] prepared swift-tui-counter-demo ${counterDemoRef}`);
 }
 
-async function readExamplesRef(): Promise<string> {
+async function readCounterDemoRef(): Promise<string> {
   const releases = await readFile(releasesPath, "utf8");
-  const match = releases.match(/^\s*examplesRef:\s*(\S+)\s*$/m);
+  const match = releases.match(/^\s*counterDemoRef:\s*(\S+)\s*$/m);
   if (!match) {
-    throw new Error(`missing current.examplesRef in ${releasesPath}`);
+    throw new Error(`missing current.counterDemoRef in ${releasesPath}`);
   }
   return match[1];
 }
 
-async function ensurePublicExamplesCheckout(
+async function ensurePublicCounterDemoCheckout(
   checkoutRoot: string,
   ref: string
 ): Promise<void> {
   await mkdir(dirname(checkoutRoot), { recursive: true });
 
-  if (await isExpectedExamplesCheckout(checkoutRoot)) {
+  if (await isExpectedCounterDemoCheckout(checkoutRoot)) {
     run(["git", "-C", checkoutRoot, "fetch", "--tags", "--force", "origin", ref]);
     run(["git", "-C", checkoutRoot, "checkout", "--force", ref]);
     run(["git", "-C", checkoutRoot, "clean", "-fdx"]);
@@ -54,12 +54,12 @@ async function ensurePublicExamplesCheckout(
     "1",
     "--branch",
     ref,
-    examplesRepository,
+    counterDemoRepository,
     checkoutRoot,
   ]);
 }
 
-async function isExpectedExamplesCheckout(path: string): Promise<boolean> {
+async function isExpectedCounterDemoCheckout(path: string): Promise<boolean> {
   const topLevelResult = Bun.spawnSync({
     cmd: ["git", "-C", path, "rev-parse", "--show-toplevel"],
     stdout: "pipe",
@@ -88,31 +88,31 @@ async function isExpectedExamplesCheckout(path: string): Promise<boolean> {
   }
 
   const origin = new TextDecoder().decode(originResult.stdout).trim();
-  return normalizeGitRemote(origin) === normalizeGitRemote(examplesRepository);
+  return normalizeGitRemote(origin) === normalizeGitRemote(counterDemoRepository);
 }
 
 function normalizeGitRemote(remote: string): string {
   return remote.replace(/\/+$/, "").replace(/\.git$/, "");
 }
 
-function usesCoordinationOverlay(examplesRoot: string): boolean {
-  const overlayExamplesCheckout = process.env.SWIFTTUI_EXAMPLES_CHECKOUT;
-  if (!overlayExamplesCheckout) {
+function usesCoordinationOverlay(counterDemoRoot: string): boolean {
+  const overlayCounterDemoCheckout = process.env.SWIFTTUI_COUNTER_DEMO_CHECKOUT;
+  if (!overlayCounterDemoCheckout) {
     return false;
   }
 
-  return examplesRoot === resolve(process.cwd(), overlayExamplesCheckout);
+  return counterDemoRoot === resolve(process.cwd(), overlayCounterDemoCheckout);
 }
 
-async function installExamplesDependencies(
-  examplesRoot: string,
+async function installWorkspaceDependencies(
+  counterDemoRoot: string,
   options: { frozenLockfile: boolean }
 ): Promise<void> {
   const command = ["bun", "install"];
   if (options.frozenLockfile) {
     command.push("--frozen-lockfile");
   }
-  run(command, { cwd: examplesRoot });
+  run(command, { cwd: counterDemoRoot });
 }
 
 function run(

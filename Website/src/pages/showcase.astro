@@ -22,7 +22,7 @@ const description =
 // wasm artifact the route 404s, so fall back to the poster — mirrors DemoTerminal.
 const isDev = import.meta.env.DEV;
 const webExampleDir =
-  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-examples/WebExample";
+  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-counter-demo/WebExample";
 const hasLocalWebExampleArtifact =
   existsSync(resolve(process.cwd(), webExampleDir, "pages-dist/index.html")) &&
   existsSync(
@@ -32,7 +32,7 @@ const showWebStub = isDev && !hasLocalWebExampleArtifact;
 const webIframeSrc = `${base}/webexample/?embed=marketing`;
 const webDemoHref = `${base}/webexample/`;
 const webSourceHref =
-  "https://github.com/SwiftTUI/swift-tui-examples/tree/main/WebExample";
+  "https://github.com/SwiftTUI/swift-tui-counter-demo/tree/main/WebExample";
 
 type Host = {
   slug: string;

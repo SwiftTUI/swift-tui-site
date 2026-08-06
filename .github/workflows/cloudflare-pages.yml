@@ -7,13 +7,13 @@ name: Deploy Website to Cloudflare Pages
 # Layout of the uploaded artifact:
 #   /              <- Astro site (swift-tui-site/Website/dist/)
 #   /docs/         <- DocC archive
-#   /webexample/   <- swift-tui-examples/WebExample/pages-dist/
+#   /webexample/   <- swift-tui-counter-demo/WebExample/pages-dist/
 
 on:
   workflow_dispatch:
     inputs:
-      examples_ref:
-        description: Public swift-tui-examples branch or tag to build
+      counter_demo_ref:
+        description: Public swift-tui-counter-demo branch or tag to build
         required: true
         default: "0.6.3"
         type: string
@@ -100,8 +100,8 @@ jobs:
           path: |
             ~/.bun/install/cache
             swift-tui-site/Website/node_modules
-            swift-tui-site/.build/public-inputs/swift-tui-examples/node_modules
-            swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample/node_modules
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/node_modules
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/node_modules
           key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}
           restore-keys: |
             ${{ runner.os }}-bun-cfpages-
@@ -130,12 +130,12 @@ jobs:
         shell: bash
         working-directory: swift-tui-site/Website
         env:
-          SWIFTTUI_EXAMPLES_REF: ${{ inputs.examples_ref }}
+          SWIFTTUI_COUNTER_DEMO_REF: ${{ inputs.counter_demo_ref }}
         run: bun run build:wasm
 
       - name: Validate uploaded WebExample wasm parses in the browser API
         shell: bash
-        working-directory: swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample
+        working-directory: swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample
         run: |
           set -euo pipefail
           wasm_path="./pages-dist/TerminalApp/dist/assets/app.wasm"
@@ -169,7 +169,7 @@ jobs:
           cp -R swift-tui-site/Website/dist/docs/. "$DOCS_ROOT/"
           rm -rf "$DOCS_ROOT/documentation"
           rm -rf "$DOCS_ROOT/charts/documentation"
-          cp -R swift-tui-site/.build/public-inputs/swift-tui-examples/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
+          cp -R swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
           wasm_path="$WEBEXAMPLE_ROOT/TerminalApp/dist/assets/app.wasm"
           if [ ! -f "$wasm_path" ]; then
             echo "::error::Missing WebExample wasm at $wasm_path"

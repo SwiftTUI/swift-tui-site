@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 
 const webExampleDir = resolve(
   process.cwd(),
-  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-examples/WebExample"
+  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-counter-demo/WebExample"
 );
 const websiteDist = resolve(
   process.cwd(),

@@ -3,6 +3,7 @@ current:
   charts: 0.6.3
   web: 0.6.3
   examplesRef: 0.6.3
+  counterDemoRef: 0.6.3
 repos:
   swift-tui:
     url: https://github.com/SwiftTUI/swift-tui
@@ -19,3 +20,5 @@ repos:
       - "@swifttui/build"
   swift-tui-examples:
     url: https://github.com/SwiftTUI/swift-tui-examples
+  swift-tui-counter-demo:
+    url: https://github.com/SwiftTUI/swift-tui-counter-demo
