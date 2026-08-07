@@ -4,4 +4,3 @@ _cf-pages-artifact/
 Website/.astro/
 Website/dist/
 Website/node_modules/
-bazel-*
