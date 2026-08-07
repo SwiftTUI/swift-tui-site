@@ -12,7 +12,11 @@ const repo = "https://github.com/SwiftTUI/swift-tui";
 // Each label names the destination the way that page names itself: the homepage
 // showcase section is a preview of /showcase/, so only the page gets a nav item.
 const navGroups = [
-  [{ href: `${home}#demo`, label: "Demo" }],
+  [
+    { href: `${home}#demo`, label: "Demo" },
+    { href: `${home}#get-started`, label: "Get started" },
+    { href: `${home}#why`, label: "Why SwiftTUI" },
+  ],
   [
     { href: `${base}/showcase/`, label: "Showcase" },
     { href: `${base}/pipeline/`, label: "How it works" },

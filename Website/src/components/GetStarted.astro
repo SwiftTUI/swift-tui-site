@@ -1,0 +1,249 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
+---
+
+<section class="start" id="get-started" aria-labelledby="start-title">
+  <div class="shell">
+    <header class="start-head">
+      <p class="home-kicker">Get started</p>
+      <h2 id="start-title">A terminal and a toolchain. That's it.</h2>
+      <p>
+        SwiftTUI apps are plain SwiftPM packages: any Swift 6.3+ toolchain
+        builds and runs them from the command line, on macOS or Linux. No
+        Xcode project, no simulator, no app store. If you already run a
+        current Xcode, its bundled toolchain is all you need.
+      </p>
+    </header>
+
+    <div class="start-grid">
+      <article class="start-run" aria-labelledby="start-run-title">
+        <header>
+          <div>
+            <strong id="start-run-title">Run the counter</strong>
+            <span>swift-tui-counter-demo</span>
+          </div>
+          <a href={demoRepo} rel="noreferrer noopener">Open repo</a>
+        </header>
+        <pre tabindex="0"><code><span class="cm"># macOS or Linux — any Swift 6.3+ toolchain</span>
+git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
+cd swift-tui-counter-demo
+swift run --package-path counter counter</code></pre>
+        <p class="start-note">
+          The same counter as the live demo above, drawn in your own terminal.{" "}
+          <span class="mono">Space</span> increments;{" "}
+          <span class="mono">Ctrl-C</span> quits.
+        </p>
+      </article>
+
+      <div class="start-side">
+        <article aria-labelledby="start-toolchain-title">
+          <h3 id="start-toolchain-title">Pick a toolchain</h3>
+          <p>
+            <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a> —
+            Swift's official toolchain installer for macOS and Linux —
+            puts <span class="mono">swift</span> on your path in one step, no
+            Xcode involved. On a Mac with a current Xcode, skip it: the
+            toolchain is already installed.
+          </p>
+        </article>
+
+        <article aria-labelledby="start-package-title">
+          <h3 id="start-package-title">Add it to your app</h3>
+          <pre tabindex="0"><code><span class="cm">// Package.swift</span>
+.package(
+  url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
+  .upToNextMinor(from: <span class="str">"0.7.1"</span>)
+),
+<span class="cm">// in your executable target:</span>
+.product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>
+          <a class="start-docs-link" href={`${base}/docs/documentation/`}>
+            Read the API reference
+          </a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .start {
+    padding: clamp(57.333px, 7.333vw, 100px) 0 clamp(64px, 8vw, 110px);
+  }
+
+  .start-head {
+    display: grid;
+    gap: 17px;
+    max-width: 780px;
+    margin-bottom: 46px;
+  }
+
+  .start-head h2 {
+    font-size: clamp(42px, 6vw, 76px);
+    font-weight: 520;
+    line-height: 0.96;
+    letter-spacing: -0.058em;
+    text-wrap: balance;
+  }
+
+  .start-head > p:last-child {
+    max-width: 57ch;
+    color: var(--home-muted);
+    font-size: 17px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .start-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+    border: 1px solid var(--home-ink);
+    background: var(--home-paper);
+  }
+
+  .start-run {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-width: 0;
+    border-right: 1px solid var(--home-line-strong);
+  }
+
+  .start-run > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 60px;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--home-line);
+    font-family: var(--font-mono);
+  }
+
+  .start-run > header > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .start-run > header strong,
+  .start-run > header span,
+  .start-run > header a {
+    font-size: 11px;
+  }
+
+  .start-run > header strong {
+    font-weight: 600;
+  }
+
+  .start-run > header span {
+    color: var(--home-muted);
+  }
+
+  .start-run > header a,
+  .start-docs-link {
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--home-line-strong);
+    color: var(--home-muted);
+  }
+
+  .start-run > header a:hover,
+  .start-docs-link:hover {
+    border-color: var(--home-accent);
+    color: var(--home-ink);
+  }
+
+  pre {
+    margin: 0;
+    padding: 22px 20px;
+    overflow-x: auto;
+    color: var(--home-code);
+    font-family: var(--font-mono);
+    font-size: clamp(11px, 0.95vw, 12.5px);
+    line-height: 1.75;
+    tab-size: 2;
+  }
+
+  pre .cm {
+    color: var(--home-quiet);
+  }
+
+  pre .str {
+    color: var(--home-code-string);
+  }
+
+  .start-note {
+    padding: 14px 15px 16px;
+    border-top: 1px solid var(--home-line);
+    color: var(--home-muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .start-note .mono {
+    color: var(--home-ink);
+    font-size: 0.92em;
+  }
+
+  .start-side {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .start-side article {
+    padding: 18px 19px 20px;
+  }
+
+  .start-side article:first-child {
+    border-bottom: 1px solid var(--home-line-strong);
+  }
+
+  .start-side h3 {
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+  }
+
+  .start-side article > p {
+    margin-top: 9px;
+    max-width: 52ch;
+    color: var(--home-muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .start-side article > p a {
+    padding-bottom: 1px;
+    border-bottom: 1px solid var(--home-line-strong);
+    color: var(--home-ink);
+  }
+
+  .start-side article > p a:hover {
+    border-color: var(--home-accent);
+  }
+
+  .start-side article > p .mono {
+    color: var(--home-ink);
+    font-size: 0.92em;
+  }
+
+  .start-side pre {
+    padding: 14px 0 16px;
+  }
+
+  .start-docs-link {
+    display: inline-block;
+    font-size: 13px;
+  }
+
+  @media (max-width: 900px) {
+    .start-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .start-run {
+      border-right: 0;
+      border-bottom: 1px solid var(--home-line-strong);
+    }
+  }
+</style>
