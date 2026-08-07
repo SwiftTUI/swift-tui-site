@@ -37,8 +37,9 @@ const cards = [
 
 // Cells carry an explicit state (yes | partial | no) decoupled from their
 // label, so a "—" can still carry a qualifier (e.g. "— immediate-mode").
-// Verdicts fact-checked June 2026 against each framework's current release;
-// see the legend below for versions.
+// Verdicts fact-checked August 2026 against each framework's current release
+// (see the legend below for versions). When re-stamping, re-check the
+// releases — and Ratzilla's home, which moved from orhun/ to the ratatui org.
 const headers = [
   "Terminal rendering",
   "Declarative UI",
@@ -166,12 +167,13 @@ const rows = [
     </div>
 
     <p class="compare-foot mono">
-      Verified June 2026 against current releases — Bubble Tea 2.0 ·
-      Textual 8.2 · Ratatui 0.30 · Ink 7.0. <span class="lk">✓</span>&nbsp;first-party
-      · <span class="lk">~</span>&nbsp;partial, third-party, or raw mouse events
-      · <span class="lk">—</span>&nbsp;none. Ratzilla is an ecosystem crate;
-      Textual's browser host streams a server-side process through xterm.js.
-      SwiftTUI's browser paths render to the DOM with a real accessibility tree.
+      Verified August 2026 against current releases — Bubble Tea 2.0 ·
+      Textual 8.2 · Ratatui 0.30 · Ink 7.1. <span class="lk">✓</span>&nbsp;first-party
+      · <span class="lk">~</span>&nbsp;partial, separate package, or raw mouse events
+      · <span class="lk">—</span>&nbsp;none. Ratzilla is a separate crate in the
+      Ratatui org; Textual's browser host streams a server-side process through
+      xterm.js. SwiftTUI's browser paths render to the DOM with a real
+      accessibility tree.
     </p>
 
     <p class="why-hosts">
