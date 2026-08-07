@@ -54,7 +54,7 @@ const sourceHref =
 
   <span class="at">@Environment</span>(\.terminalSize) <span class="kw">private var</span> terminalSize
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-  <span class="at">@State</span> <span class="kw">private var</span> activeRipple: <span class="ty">Bool</span> = <span class="kw">false</span>
+  <span class="at">@State</span> <span class="kw">private var</span> activeRippleID: <span class="ty">Int</span>? = <span class="kw">nil</span>
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
@@ -66,15 +66,18 @@ const sourceHref =
     &#125;
     .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
     .onChange(of: count) &#123;
-      <span class="kw">if</span> !activeRipple &#123;
-        activeRipple = <span class="kw">true</span>
+      <span class="kw">if</span> activeRippleID == <span class="kw">nil</span> &#123;
+        activeRippleID = count
       &#125;
     &#125;
     .background &#123;
-      <span class="kw">if</span> activeRipple &#123;
+      <span class="kw">if let</span> rippleID = activeRippleID &#123;
         <span class="ty">RippleLayer</span>(reach: reach) &#123;
-          activeRipple = <span class="kw">false</span>
+          <span class="kw">if</span> activeRippleID == rippleID &#123;
+            activeRippleID = <span class="kw">nil</span>
+          &#125;
         &#125;
+        .id(rippleID)
       &#125;
     &#125;
   &#125;
