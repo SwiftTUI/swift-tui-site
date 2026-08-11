@@ -9,7 +9,7 @@ const cards = [
     n: "01",
     title: "State in, screen out",
     body:
-      "No draw loop, no buffer diffing, no repaint bookkeeping. Views are a pure function of your app's state: change a value and the runtime recomputes layout and rewrites exactly the cells that changed. SwiftUI has spent seven years hardening that model in production — here it is the entire programming model.",
+      "There is no draw loop, no buffer diffing, and no repaint bookkeeping. Views are a pure function of your app's state: change a value and the runtime recomputes layout and rewrites exactly the cells that changed. SwiftUI has spent seven years hardening that model in production; here it is the entire programming model.",
     sym: "View · @State · @Observable · body",
   },
   {
@@ -23,14 +23,14 @@ const cards = [
     n: "03",
     title: "The terminal, negotiated for you",
     body:
-      "Truecolor, Kitty and Sixel images, OSC 8 hyperlinks, and mouse reporting are probed per session and degrade gracefully — one binary is correct in kitty, a bare SSH session, or CI. You write views, never escape codes.",
+      "Truecolor, Kitty and Sixel images, OSC 8 hyperlinks, and mouse reporting are probed per session and degrade gracefully: one binary is correct in kitty, a bare SSH session, or CI. You write views, never escape codes.",
     sym: "TerminalCapabilityProfile · Kitty · Sixel · OSC 8",
   },
   {
     n: "04",
     title: "One compiled binary",
     body:
-      "Swift 6 compiles your interface into a single fast executable with checked concurrency. Layout and state are type-checked at build time, and tests render frames as integer-cell rasters — no TTY required.",
+      "Swift 6 compiles your interface into a single fast executable with checked concurrency. Layout and state are type-checked at build time, and tests render frames as integer-cell rasters without a TTY.",
     sym: "SwiftPM · Swift 6 · RasterSurface",
   },
 ];
@@ -116,8 +116,8 @@ const rows = [
       <p>
         Most TUI toolkits make you choose between a low-level draw loop and a
         widget set with its own ad-hoc state story. SwiftTUI instead borrows
-        the declarative model SwiftUI has proven at platform scale — the
-        interface is a function of state — and aims it at terminal cells. You
+        the declarative model SwiftUI has proven at platform scale (the
+        interface is a function of state) and aims it at terminal cells. You
         declare views; the framework owns layout, focus, redraw, and the
         terminal itself.
       </p>
@@ -167,7 +167,7 @@ const rows = [
     </div>
 
     <p class="compare-foot mono">
-      Verified August 2026 against current releases — Bubble Tea 2.0 ·
+      Verified August 2026 against current releases: Bubble Tea 2.0 ·
       Textual 8.2 · Ratatui 0.30 · Ink 7.1. <span class="lk">✓</span>&nbsp;first-party
       · <span class="lk">~</span>&nbsp;partial, separate package, or raw mouse events
       · <span class="lk">—</span>&nbsp;none. Ratzilla is a separate crate in the
@@ -177,9 +177,9 @@ const rows = [
     </p>
 
     <p class="why-hosts">
-      Terminal first, not terminal only. When you need it, the same views also
-      run in the browser, in native macOS and iOS windows, and on Android —
-      start with the{" "}
+      Terminal first: when you need it, the same views also run in the
+      browser, in native macOS and iOS windows, and on Android.
+      Start with the{" "}
       <a href={`${base}/docs/documentation/swifttui/choosing-modules-and-platforms`}>
         hosts &amp; platforms guide</a>, or go straight to{" "}
       <a href="https://github.com/SwiftTUI/swift-tui-web" rel="noreferrer noopener">

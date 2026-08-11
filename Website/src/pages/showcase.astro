@@ -66,7 +66,7 @@ const hosts: Host[] = [
     slug: "android",
     platform: "Android",
     host: "SwiftTUIAndroidHost",
-    body: "Swift cross-compiled to arm64, painting styled cells and images on a Jetpack Compose Canvas through a JNI shim.",
+    body: "Swift cross-compiled to arm64 paints styled cells and images on a Jetpack Compose Canvas through a JNI shim.",
     href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/AndroidGallery",
     img: `${base}/showcase/host-android.png`,
   },
@@ -74,7 +74,7 @@ const hosts: Host[] = [
     slug: "terminal",
     platform: "Terminal",
     host: "SwiftTUICLI",
-    body: "The native substrate. ANSI / Kitty / Sixel negotiated against the live terminal, mouse and signals by default.",
+    body: "The native substrate. ANSI / Kitty / Sixel are negotiated against the live terminal, with mouse and signals on by default.",
     href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gallery",
     img: `${base}/showcase/host-terminal.png`,
   },
@@ -93,9 +93,9 @@ const tiles: Tile[] = [
   {
     slug: "gifeditor",
     title: "GIF Editor",
-    subtitle: "Canvas, layers, timeline, undo/redo — in the terminal.",
+    subtitle: "Canvas, layers, timeline, and undo/redo in the terminal.",
     body:
-      "A full GIF editor written as ordinary SwiftTUI Views. Click tools, paint on a canvas, scrub a timeline, export an animated GIF. Proves that sophisticated desktop-class UX fits inside integer-cell rendering.",
+      "A full GIF editor written as ordinary SwiftTUI Views. Click tools, paint on a canvas, scrub a timeline, export an animated GIF. It proves that desktop-class UX fits inside integer-cell rendering.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
     img: `${base}/showcase/gifeditor.png`,
   },
@@ -113,7 +113,7 @@ const tiles: Tile[] = [
     title: "git-viz",
     subtitle: "Every SwiftTUICharts primitive against a real repo.",
     body:
-      "Seventeen subcommands rendering BarChart, ColumnChart, StackedBarChart, ComparisonChart, LineChart, Sparkline, Timeline, HeatStrip, CalendarHeatmap, BulletChart, ThresholdGauge, Meter, and Legend against the git history of whatever repo you point it at. Dashboards in a terminal.",
+      "Seventeen subcommands render BarChart, ColumnChart, StackedBarChart, ComparisonChart, LineChart, Sparkline, Timeline, HeatStrip, CalendarHeatmap, BulletChart, ThresholdGauge, Meter, and Legend against the git history of whatever repo you point it at. Dashboards in a terminal.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/git-viz",
     img: `${base}/showcase/git-viz.png`,
   },
@@ -122,7 +122,7 @@ const tiles: Tile[] = [
     title: "mrkdwn",
     subtitle: "Markdown as a responsive terminal document.",
     body:
-      "A terminal Markdown reader built on swift-markdown: navigation, bounded search, theming, live reload on file changes, and inline images — shown here reading the SwiftTUI README.",
+      "A terminal Markdown reader built on swift-markdown: navigation, bounded search, theming, live reload on file changes, and inline images, shown here reading the SwiftTUI README.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/mrkdwn",
     img: `${base}/showcase/mrkdwn.png`,
   },
@@ -131,7 +131,7 @@ const tiles: Tile[] = [
     title: "csvui",
     subtitle: "A viewer-first CSV/TSV workbench.",
     body:
-      "Indexes the source bytes once and decodes only the rows the viewport needs, so a 34,000-row GeoNames city table stays responsive. Sparse editing, search, filtering, sorting, file watching, and safe atomic saves.",
+      "It indexes the source bytes once and decodes only the rows the viewport needs, so a 34,000-row GeoNames city table stays responsive. Sparse editing, search, filtering, sorting, file watching, and safe atomic saves.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
     img: `${base}/showcase/csvui.png`,
   },
@@ -140,7 +140,7 @@ const tiles: Tile[] = [
     title: "Sextant",
     subtitle: "Miller-column file browsing with inline previews.",
     body:
-      "Navigate directory columns with bounded text, binary, metadata, and directory previews, then open or edit the file when you have your bearing — here pointed at the swift-tui-examples checkout.",
+      "Navigate directory columns with bounded text, binary, metadata, and directory previews, then open or edit the file when you have your bearing, here pointed at the swift-tui-examples checkout.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/sextant",
     img: `${base}/showcase/sextant-browse.png`,
   },
@@ -185,7 +185,7 @@ const tiles: Tile[] = [
             <span class="eyebrow mono"><span class="num">/00</span>Showcase</span>
             <h1>Built with SwiftTUI.</h1>
             <p class="lede">
-              The framework already runs real, non-trivial apps — and runs the
+              The framework already runs real, non-trivial apps, and runs the
               same one on every host. Below: one component gallery rendered five
               ways, then every maintained example app in{" "}
               <span class="mono">swift-tui-examples</span> you can clone and run
@@ -276,7 +276,7 @@ const tiles: Tile[] = [
                 <p class="device-body">
                   The shared counter <span class="mono">View</span>, built to
                   <span class="mono"> wasm32-wasi</span> and mounted on a canvas
-                  through <span class="mono">@swifttui/web</span>. No xterm.js.
+                  through <span class="mono">@swifttui/web</span>, without xterm.js.
                 </p>
                 <div class="web-actions mono">
                   <a class="solid" href={webDemoHref}>open full demo →</a>

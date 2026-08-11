@@ -1,6 +1,6 @@
 # SwiftTUI Website
 
-Source for **[swifttui.sh](https://swifttui.sh)** — the public SwiftTUI site, the
+Source for **[swifttui.sh](https://swifttui.sh)**: the public SwiftTUI site, the
 combined DocC archive, and the in-browser WebExample demo, composed into one
 deployable artifact. See it live: <https://swifttui.sh>
 
@@ -59,6 +59,6 @@ as part of an organization release.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The build creates the DocC archive under `/docs/`
+MIT. See [LICENSE](LICENSE). The build creates the DocC archive under `/docs/`
 from the separate [`swift-tui`](https://github.com/SwiftTUI/swift-tui)
 repository. That repository also uses the MIT license.

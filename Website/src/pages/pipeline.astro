@@ -68,8 +68,8 @@ const description =
             <p class="lede-copy">
               A SwiftTUI frame is not "draw the view." It is a compiler-style
               pipeline: the value you author is <em>lowered</em>, step by step,
-              through a chain of typed, immutable representations — each one closer
-              to the terminal, each one able to answer a question the one before it
+              through a chain of typed, immutable representations, each one closer
+              to the terminal and able to answer a question the one before it
               could not. This page follows one small view down that ladder and links
               each step to its source. New framework developers can use it as an
               introduction. Renderer developers can use it as a reference.
@@ -77,7 +77,7 @@ const description =
             <dl class="lede-facts">
               <div>
                 <dt>One view, seven representations</dt>
-                <dd>From a <code>some View</code> value to styled cells and host bytes — every frame re-derives the chain.</dd>
+                <dd>From a <code>some View</code> value to styled cells and host bytes; every frame re-derives the chain.</dd>
               </div>
               <div>
                 <dt>Source-grounded</dt>
@@ -98,13 +98,13 @@ const description =
                 <h2>The mental model: lowering, and who schedules it</h2>
                 <p class="section-lead">
                   <em>Lowering</em> is a compiler idea: translate a program from one
-                  representation into a lower-level one — keep the meaning, change the
-                  vocabulary, discard whatever the next consumer does not need. A
+                  representation into a lower-level one. Keep the meaning, change the
+                  vocabulary, and discard whatever the next consumer does not need. A
                   compiler lowers source to an AST, the AST to an IR, the IR to machine
                   code. SwiftTUI treats your view the same way: the <code>View</code>{" "}
                   value is the source program, and the terminal cells are the machine
                   code. The framework's documentation describes this as <em>seven
-                  phases</em> scheduled across <em>five stages</em> — two views of one
+                  phases</em> scheduled across <em>five stages</em>: two views of one
                   frame, kept separate because they serve different purposes.
                 </p>
               </div>
@@ -112,9 +112,9 @@ const description =
 
             <div class="twocol">
               <article class="prose-card">
-                <h3>Phase products — the data model</h3>
+                <h3>Phase products: the data model</h3>
                 <p>
-                  Phase products are the values that the engine computes in order —
+                  Phase products are the values that the engine computes in order:
                   the rungs of the lowering ladder, plus its side products. Each
                   product is an immutable type from <code>SwiftTUICore</code>. The engine
                   derives later products from earlier products. It does not change the
@@ -127,7 +127,7 @@ const description =
                 </p>
               </article>
               <article class="prose-card">
-                <h3>Runtime stages — the scheduling model</h3>
+                <h3>Runtime stages: the scheduling model</h3>
                 <p>
                   Runtime stages are the boundaries across which an interactive session
                   schedules work. <code>SwiftTUIRuntime</code> owns these stages. They
@@ -173,8 +173,8 @@ const description =
               <div>
                 <h2>The lowering ladder: what "the view" is at each level</h2>
                 <p class="section-lead">
-                  Follow one authored line — <code>Text("Deploy Queue").bold()</code>{" "}
-                  from the example below — down every representation the framework
+                  Follow one authored line, <code>Text("Deploy Queue").bold()</code>{" "}
+                  from the example below, down every representation the framework
                   gives it during a frame. Each rung is a level: it gains the answers
                   the next consumer needs and gives up the vocabulary it no longer
                   needs. The arrows between rungs are the pipeline phases. Two
@@ -193,7 +193,7 @@ const description =
                 <p>
                   Every arrow is a pure derivation. You cannot reconstruct a{" "}
                   <code>View</code> from a <code>DrawNode</code>, or a draw tree from
-                  cells — each level has discarded exactly the information that made
+                  cells: each level has discarded exactly the information that made
                   the level above it expressive. That is why a new frame starts by
                   re-resolving the dirty part of the authored tree, and why reuse
                   works by <em>retaining</em> previous products, never by editing them.
@@ -205,7 +205,7 @@ const description =
                   One thing rides the ladder all the way down: identity. Resolved,
                   measured, placed, and draw nodes all carry it, and the rasterizer
                   collects the identities it actually paints. When a key press or
-                  pointer event arrives — or damage is diffed — that thread is what
+                  pointer event arrives, or damage is diffed, that thread is what
                   maps low-level artifacts back to your views.
                 </p>
               </aside>
@@ -343,7 +343,7 @@ const description =
                   Authored <code>View</code>, <code>Scene</code>, and <code>App</code> values
                   are main-actor APIs, so the first lowering must run on the main actor.
                   Every later lowering is a pure function over an already-derived,
-                  immutable product — which is exactly why the fused tail can leave the
+                  immutable product, which is exactly why the fused tail can leave the
                   main actor when the strategy permits. This boundary is the reason for
                   the scheduling model.
                 </p>
@@ -385,7 +385,7 @@ const description =
                 <h2>Crossing into the host: the last lowering</h2>
                 <p class="section-lead">
                   Commit produces data, not output. <code>RunLoop</code> performs the
-                  ladder's final step — lowering the committed, host-neutral surface into
+                  ladder's final step: it lowers the committed, host-neutral surface into
                   whatever the output mode and surface roles consume. Terminal bytes
                   exist only below this boundary.
                 </p>
