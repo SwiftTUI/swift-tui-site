@@ -1,0 +1,483 @@
+---
+import "../styles/site.css";
+import "../styles/marketing.css";
+import "../styles/from-swiftui.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
+const canonical = `${site}${base || ""}/differences-from-swiftui/`;
+const ogImage = `${site}${base || ""}/og.png`;
+const title = "Differences from SwiftUI — the SwiftTUI primer";
+const description =
+  "How SwiftTUI reads SwiftUI for the terminal: what transfers unchanged, the seven deliberate differences, what the framework adds, and the public register where every divergence is recorded.";
+
+// Deep links into the composed DocC (built at the release tag the site pins
+// in docs/docc-repos.yml). The Coming-From-SwiftUI article ships in the
+// swift-tui repo after 0.8.4, so this page links the register — the
+// authoritative list, live today — and should link the article
+// (`${base}/docs/documentation/swifttuiviews/coming-from-swiftui`) once the
+// next release tag moves the DocC pin.
+const registerHref = `${base}/docs/documentation/swifttuiviews/divergences-and-gaps`;
+const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="theme-color"
+      content="#f5f7f3"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#101512"
+      media="(prefers-color-scheme: dark)"
+    />
+    <ThemeScript />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="SwiftTUI: differences from SwiftUI" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content={ogImage} />
+    <SiteIcons />
+  </head>
+  <body class="marketing-subpage from-swiftui-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+
+    <main class="fsw" id="main">
+      <div class="doc-shell" id="top">
+        <aside class="toc" aria-label="On this page">
+          <p class="toc-kicker">On this page</p>
+          <nav class="toc-nav">
+            <a href="#promise">The promise</a>
+            <a href="#cells">Cells are the unit</a>
+            <a href="#state">State is the authority</a>
+            <a href="#data-flow">Modern data flow</a>
+            <a href="#keyboard">Keyboard first</a>
+            <a href="#chrome">Chrome from values</a>
+            <a href="#restraint">Restrained, fail-loud</a>
+            <a href="#accessibility">Accessible by default</a>
+            <a href="#adds">What SwiftTUI adds</a>
+            <a href="#register">Recorded in the open</a>
+          </nav>
+          <p class="toc-note">
+            Every stance on this page is an entry in the public{" "}
+            <a href={registerHref}>divergence register</a>.
+          </p>
+        </aside>
+
+        <div class="fsw-main">
+          <!-- ===================== INTRO ===================== -->
+          <section class="lede" id="intro">
+            <p class="eyebrow">For SwiftUI developers</p>
+            <h1>SwiftUI's shape. The terminal's rules.</h1>
+            <p class="lede-copy">
+              If you write SwiftUI, you already write SwiftTUI: <code>body</code>,
+              <code>@State</code>, stacks, modifiers, focus, and animation carry
+              over intact. What changes is deliberate — a small set of
+              terminal-native rereadings, applied consistently and recorded
+              publicly. This page is the tour of that boundary.
+            </p>
+            <dl class="lede-facts">
+              <div>
+                <dt>The reflexes transfer</dt>
+                <dd>Layout negotiation, state identity, modifier order, and lifecycle behave the way you expect.</dd>
+              </div>
+              <div>
+                <dt>Seven deliberate rereadings</dt>
+                <dd>Each difference is a considered terminal-native default behind a SwiftUI-shaped API.</dd>
+              </div>
+              <div>
+                <dt>Every divergence recorded</dt>
+                <dd>One public register, tagged and enforced by a repository check — not scattered folklore.</dd>
+              </div>
+            </dl>
+          </section>
+
+          <!-- ===================== 01 PROMISE ===================== -->
+          <section class="doc-section" id="promise">
+            <div class="section-head">
+              <span class="section-no">01</span>
+              <div>
+                <h2>The promise</h2>
+                <p class="section-lead">
+                  SwiftTUI mirrors SwiftUI's <em>shape</em>. Where a literal
+                  desktop behavior would degrade the terminal experience, the
+                  default is terminal-native while the API stays SwiftUI-shaped.
+                  The framework implements subsets of SwiftUI only where they
+                  map to high-value terminal use, skips deprecated surfaces, and
+                  preserves the important semantics of every API it does
+                  implement. Faithfulness is a constraint, not a veneer — and
+                  the rest of this page is what that constraint produces.
+                </p>
+              </div>
+            </div>
+            <aside class="callout">
+              <p class="callout-tag">Choosing a TUI framework from another ecosystem?</p>
+              <p>
+                This page assumes SwiftUI fluency. For the language-agnostic
+                case — what a declarative terminal UI buys you regardless of
+                where you come from — see{" "}
+                <a href={`${base}/#why`}>Why SwiftTUI</a> on the home page.
+              </p>
+            </aside>
+          </section>
+
+          <!-- ===================== 02 CELLS ===================== -->
+          <section class="doc-section" id="cells">
+            <div class="section-head">
+              <span class="section-no">02</span>
+              <div>
+                <h2>The cell is the unit of truth</h2>
+                <p class="section-lead">
+                  Geometry is integer terminal cells — <code>frame(width:height:)</code>{" "}
+                  takes <code>Int</code>, and there is no <code>CGFloat</code>.
+                  Two named coordinate domains keep the model honest: the{" "}
+                  <code>CellRect</code> grid for layout and rasterization, and
+                  continuous cell space for gestures, hover, and{" "}
+                  <code>Canvas</code>. <code>padding()</code> is literally one
+                  cell, and a border occupies real cells — so it defaults to{" "}
+                  <em>outset</em> placement and grows the frame instead of
+                  eating content.
+                </p>
+              </div>
+            </div>
+            <div class="code-pair">
+              <figure class="code-card">
+                <figcaption>SwiftUI habit</figcaption>
+                <pre class="code"><code is:raw>VStack(spacing: 12) {
+  Text("Deploys").font(.title2)
+  content
+}
+.padding()           // platform-adaptive points
+.border(.secondary)  // overlay; no layout effect</code></pre>
+              </figure>
+              <figure class="code-card code-card--tui">
+                <figcaption>SwiftTUI</figcaption>
+                <pre class="code"><code is:raw>VStack(spacing: 1) {
+  Text("Deploys").bold()
+  content
+}
+.padding()   // exactly one cell
+.border()    // real cells; grows the frame</code></pre>
+              </figure>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — a terminal
+              allocates whole cells; honest geometry is integer geometry, and a
+              border that pretended to be a zero-cost overlay would eat your
+              content.
+            </p>
+          </section>
+
+          <!-- ===================== 03 STATE ===================== -->
+          <section class="doc-section" id="state">
+            <div class="section-head">
+              <span class="section-no">03</span>
+              <div>
+                <h2>State is the only authority</h2>
+                <p class="section-lead">
+                  Navigation and presentation are strictly data-driven. There is
+                  deliberately no <code>NavigationLink</code> and no{" "}
+                  <code>@Environment(\.dismiss)</code>: a push mutates the bound
+                  path, and dismissal clears the binding that presents the
+                  surface. Every screen stays derivable from — and mutable
+                  through — your app's data, which is what makes a terminal UI
+                  scriptable, testable, and deep-linkable.
+                </p>
+              </div>
+            </div>
+            <div class="code-pair">
+              <figure class="code-card">
+                <figcaption>SwiftUI habit</figcaption>
+                <pre class="code"><code is:raw>NavigationLink("Build 42", value: Route.build(42))
+
+// inside the sheet:
+@Environment(\.dismiss) private var dismiss
+Button("Done") { dismiss() }</code></pre>
+              </figure>
+              <figure class="code-card code-card--tui">
+                <figcaption>SwiftTUI</figcaption>
+                <pre class="code"><code is:raw>Button("Build 42") { path.append(.build(42)) }
+
+// the presenter owns dismissal:
+Button("Done") { selectedBuild = nil }</code></pre>
+              </figure>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — a UI that can be
+              driven, replayed, and tested is one whose every state is data;
+              controls that carry hidden navigation side effects break that
+              contract.
+            </p>
+          </section>
+
+          <!-- ===================== 04 DATA FLOW ===================== -->
+          <section class="doc-section" id="data-flow">
+            <div class="section-head">
+              <span class="section-no">04</span>
+              <div>
+                <h2>Modern-only, portable data flow</h2>
+                <p class="section-lead">
+                  Models are <code>@Observable</code> classes; the Combine-era{" "}
+                  <code>ObservableObject</code> / <code>@Published</code> /{" "}
+                  <code>@StateObject</code> family does not exist. The authoring
+                  layers are Foundation-free by policy, and strict, unsuppressed
+                  concurrency is visible in the API — because frames finish on
+                  an off-main frame tail. One authoring shape satisfies all of
+                  it.
+                </p>
+              </div>
+            </div>
+            <div class="code-pair">
+              <figure class="code-card">
+                <figcaption>SwiftUI habit (Combine era)</figcaption>
+                <pre class="code"><code is:raw>final class DeployModel: ObservableObject {
+  @Published var builds: [Build] = []
+}
+
+struct Dashboard: View {
+  @StateObject private var model = DeployModel()
+  ...
+}</code></pre>
+              </figure>
+              <figure class="code-card code-card--tui">
+                <figcaption>SwiftTUI</figcaption>
+                <pre class="code"><code is:raw>@MainActor @Observable
+final class DeployModel {  // implicitly Sendable
+  var builds: [Build] = []
+}
+
+struct Dashboard: View {
+  @State private var model = DeployModel()
+  ...
+}</code></pre>
+              </figure>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — Foundation-free
+              layers and honest concurrency are what let one codebase reach
+              Linux, WASI, and Android, and let rendering leave the main actor
+              without undefined behavior.
+            </p>
+          </section>
+
+          <!-- ===================== 05 KEYBOARD ===================== -->
+          <section class="doc-section" id="keyboard">
+            <div class="section-head">
+              <span class="section-no">05</span>
+              <div>
+                <h2>Keyboard-first interaction</h2>
+                <p class="section-lead">
+                  Focus traversal is geometry-aware and <em>wraps</em> — there
+                  is no surrounding native UI for focus to escape to, so the
+                  chain cycles. Key bindings are authored with{" "}
+                  <code>keyCommand</code> and <code>paletteCommand</code> rather
+                  than <code>keyboardShortcut</code>, and{" "}
+                  <code>onKeyPress</code> is reshaped honestly for a terminal
+                  byte stream: complete key events, no down/up/repeat phases,
+                  because a terminal has none to observe. Collections are
+                  tree-forward and keyboard-first, and selection requires an
+                  explicit <code>.tag</code> — untagged rows fail loud instead
+                  of guessing which value you meant.
+                </p>
+              </div>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — the keyboard is
+              the terminal's native pointer; pretending otherwise produces
+              phase surfaces and shortcut systems that could never actually
+              fire.
+            </p>
+          </section>
+
+          <!-- ===================== 06 CHROME ===================== -->
+          <section class="doc-section" id="chrome">
+            <div class="section-head">
+              <span class="section-no">06</span>
+              <div>
+                <h2>Deterministic chrome from value metadata</h2>
+                <p class="section-lead">
+                  Tabs are declared as <code>Tab(...)</code> values,{" "}
+                  <code>Table</code> takes column metadata with positional row
+                  cells, toolbar items are <code>ToolbarItemConfig</code>{" "}
+                  values, and <code>Picker</code> options are scraped to labeled
+                  text. One stance, four surfaces: where SwiftUI resolves
+                  arbitrary label view trees into pixels, terminal chrome is
+                  deterministic text — so it is declared as structured values.
+                </p>
+              </div>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — a tab strip, a
+              column header, and a picker row are each a line of text; value
+              metadata renders them predictably where a label view tree cannot.
+            </p>
+          </section>
+
+          <!-- ===================== 07 RESTRAINT ===================== -->
+          <section class="doc-section" id="restraint">
+            <div class="section-head">
+              <span class="section-no">07</span>
+              <div>
+                <h2>Restrained chrome, fail-loud verbs</h2>
+                <p class="section-lead">
+                  <code>fullScreenCover</code> is chromeless.{" "}
+                  <code>background</code> fills the view's bounds without
+                  bleeding. The <code>List</code> focus highlight is row-shaped,
+                  not container-wide. Alerts and confirmation dialogs queue
+                  first-in, first-out — where SwiftUI leaves concurrent
+                  presentation undefined, SwiftTUI defines it. And where
+                  something can fail, it says so: environment verbs like{" "}
+                  <code>\.openLinkAction</code> and <code>\.resetFocus</code>{" "}
+                  return <code>Bool</code>, and the runtime reports issues
+                  instead of silently inferring intent.
+                </p>
+              </div>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — terminal output is
+              shared space, so chrome should earn its cells; and in a screen
+              made of text, silence is the most expensive way to hide a
+              mistake.
+            </p>
+          </section>
+
+          <!-- ===================== 08 ACCESSIBILITY ===================== -->
+          <section class="doc-section" id="accessibility">
+            <div class="section-head">
+              <span class="section-no">08</span>
+              <div>
+                <h2>Accessibility and capture as defaults</h2>
+                <p class="section-lead">
+                  Reduced motion changes <em>rendering</em>, not just timing:
+                  spinners go static and phase animations hold their first
+                  phase — and <code>CI=true</code> or a non-TTY stdout imply
+                  it. Semantic style roles resolve through a host-owned theme
+                  (there is deliberately no <code>ColorScheme</code>; the
+                  terminal reports colors, not a scheme). And every{" "}
+                  <code>App</code> is also a CLI command, shipping{" "}
+                  <code>--accessible</code>, <code>--no-color</code>,{" "}
+                  <code>--ascii</code>, <code>--reduce-motion</code>, and{" "}
+                  <code>--json</code> out of the box.
+                </p>
+              </div>
+            </div>
+            <p class="why">
+              <strong>Why the terminal wants this</strong> — terminal output is
+              captured, piped, diffed, and read aloud; degrading to stable
+              output is correctness, not a per-app opt-in.
+            </p>
+          </section>
+
+          <!-- ===================== 09 ADDS ===================== -->
+          <section class="doc-section" id="adds">
+            <div class="section-head">
+              <span class="section-no">09</span>
+              <div>
+                <h2>What SwiftTUI adds</h2>
+                <p class="section-lead">
+                  The differences run in both directions. Alongside the
+                  SwiftUI-shaped surface, SwiftTUI ships capabilities SwiftUI
+                  has no analog for — reach for these before porting a desktop
+                  habit.
+                </p>
+              </div>
+            </div>
+            <div class="adds">
+              <article class="add-card">
+                <h3>Terminal-program embedding</h3>
+                <p>
+                  A real child terminal program as authored content:{" "}
+                  <code>TerminalView</code>, pty-backed sessions, and a
+                  tabbed/split-pane workspace layer.
+                </p>
+              </article>
+              <article class="add-card">
+                <h3>Presentation extensions</h3>
+                <p>
+                  <code>toast</code> and <code>popoverTip</code> presentation
+                  families, plus FIFO-defined prompt queueing.
+                </p>
+              </article>
+              <article class="add-card">
+                <h3>Banner text</h3>
+                <p>
+                  <code>TextFigure</code> renders FIGlet banners with embedded
+                  fonts under normal layout proposals.
+                </p>
+              </article>
+              <article class="add-card">
+                <h3>Border styling</h3>
+                <p>
+                  Per-side border styles and animatable perimeter gradients
+                  (<code>BorderBlend</code>) on the cell grid.
+                </p>
+              </article>
+              <article class="add-card">
+                <h3>Open style protocols</h3>
+                <p>
+                  <code>ButtonStyle</code>, <code>ListStyle</code>,{" "}
+                  <code>PickerStyle</code>, and peers are public, extensible
+                  protocols — including families SwiftUI keeps closed.
+                </p>
+              </article>
+              <article class="add-card">
+                <h3>One codebase, four hosts</h3>
+                <p>
+                  The same views run on the terminal, inside SwiftUI on macOS
+                  and iOS, in the browser via WASI, and on Android.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <!-- ===================== 10 REGISTER ===================== -->
+          <section class="doc-section" id="register">
+            <div class="section-head">
+              <span class="section-no">10</span>
+              <div>
+                <h2>Recorded in the open</h2>
+                <p class="section-lead">
+                  Every departure from SwiftUI on this page — and every one it
+                  omits — lives in a single public register in the framework's
+                  documentation, tagged by stance. A repository check fails if
+                  a SwiftUI-named symbol diverges without a register entry, so
+                  the list cannot silently drift from the code. If you are
+                  evaluating SwiftTUI, that register is the honest ledger to
+                  read; if you adopt it, it is the contract you can hold the
+                  project to.
+                </p>
+              </div>
+            </div>
+            <div class="register-tags" aria-label="Register entry statuses">
+              <span class="register-tag"><strong>Ratified</strong> — a deliberate, recorded stance</span>
+              <span class="register-tag"><strong>Provisional</strong> — deliberate today, held loosely</span>
+              <span class="register-tag"><strong>Gap</strong> — a recorded shortfall, not a roadmap</span>
+            </div>
+            <div class="cta-row">
+              <a class="cta cta--primary" href={`${base}/#get-started`}>Get started</a>
+              <a class="cta" href={registerHref}>Read the divergence register</a>
+              <a class="cta" href={visionHref}>About SwiftTUI</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <SiteFooter />
+  </body>
+</html>
