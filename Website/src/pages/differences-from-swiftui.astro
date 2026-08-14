@@ -365,14 +365,15 @@ struct Dashboard: View {
                 <p class="section-lead">
                   Reduced motion changes the <em>rendering</em> itself:
                   spinners go static and phase animations hold their first
-                  phase, and <code>CI=true</code> or a non-TTY stdout imply
-                  it. Semantic style roles resolve through a host-owned theme
+                  phase. <code>CI=true</code> or a non-TTY stdout selects the
+                  same stable built-in output without changing the app-visible
+                  accessibility preference. Semantic style roles resolve through a host-owned theme
                   (there is deliberately no <code>ColorScheme</code>; the
                   terminal reports colors, not a scheme). And every{" "}
                   <code>App</code> is also a CLI command that ships{" "}
                   <code>--accessible</code>, <code>--no-color</code>,{" "}
-                  <code>--ascii</code>, <code>--reduce-motion</code>, and{" "}
-                  <code>--json</code> out of the box.
+                  <code>--ascii</code>, <code>--reduce-motion</code>,{" "}
+                  <code>--stable-output</code>, and <code>--json</code> out of the box.
                 </p>
               </div>
             </div>

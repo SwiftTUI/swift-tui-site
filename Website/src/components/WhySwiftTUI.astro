@@ -56,7 +56,7 @@ const rows = [
       { s: "yes", t: "✓" },
       { s: "yes", t: "✓ SwiftUI-shaped" },
       { s: "yes", t: "✓ tap·drag·hover" },
-      { s: "yes", t: "✓ SwiftUIHost · Android" },
+      { s: "yes", t: "✓ SwiftUIHost · Android arm64 preview" },
       { s: "yes", t: "✓ WebHost · DOM" },
       { s: "yes", t: "✓ WASI · DOM" },
     ],
@@ -173,12 +173,18 @@ const rows = [
       · <span class="lk">—</span>&nbsp;none. Ratzilla is a separate crate in the
       Ratatui org; Textual's browser host streams a server-side process through
       xterm.js. SwiftTUI's browser paths render to the DOM with a real
-      accessibility tree.
+      accessibility tree for one-way semantic presentation; assistive-origin
+      control actions are not part of the 0.9 preview.
     </p>
 
     <p class="why-hosts">
       Terminal first: when you need it, the same views also run in the
-      browser, in native macOS and iOS windows, and on Android.
+      browser, in native macOS and iOS windows, and in an Android arm64
+      preview. Android packaging is limited to <span class="mono">arm64-v8a</span>,
+      API 28+, and NDK 27.3.13750724 through the AAR/Gradle-plugin path. Full IME
+      marked/pre-edit composition is incomplete and semantics are one-way; a
+      connected journey exists, but current candidate device acceptance remains
+      pending.
       Start with the{" "}
       <a href={`${base}/docs/documentation/swifttui/choosing-modules-and-platforms`}>
         hosts &amp; platforms guide</a>, or go straight to{" "}

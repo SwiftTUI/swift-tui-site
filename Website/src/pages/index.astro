@@ -17,7 +17,7 @@ const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
 const canonical = `${site}${base || ""}/`;
 const title = "SwiftTUI · Build terminal interfaces in Swift";
 const description =
-  "SwiftTUI brings familiar views, state, focus, and layout to terminal interfaces, with browser and native hosts for the same authored scene.";
+  "SwiftTUI brings familiar views, state, focus, and layout to terminal interfaces, with browser and native hosts for the same authored scene. Android is an arm64 preview: API 28+ / NDK 27.3.13750724 packaging, incomplete IME pre-edit, and one-way semantics.";
 const ogImage = `${canonical}og.png`;
 
 const softwareSourceCodeJsonLd = {
@@ -27,7 +27,7 @@ const softwareSourceCodeJsonLd = {
   description,
   programmingLanguage: "Swift",
   runtimePlatform:
-    "Swift 6.3, macOS 15+, iOS 18+, Linux, WASI, Android arm64 host",
+    "Swift 6.3, macOS 15+, iOS 18+, Linux, WASI, Android arm64 preview (API 28+, NDK 27.3.13750724 packaging)",
   codeRepository: "https://github.com/SwiftTUI/swift-tui",
   url: canonical,
   license: "https://github.com/SwiftTUI/swift-tui/blob/0.8.9/LICENSE",
