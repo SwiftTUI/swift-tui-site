@@ -85,26 +85,11 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
             <p class="eyebrow">For SwiftUI developers</p>
             <h1>SwiftUI's shape. The terminal's rules.</h1>
             <p class="lede-copy">
-              If you write SwiftUI, you already write SwiftTUI: <code>body</code>,
-              <code>@State</code>, stacks, modifiers, focus, and animation carry
+              If you write SwiftUI, you already write SwiftTUI: <code>var body: some View</code>,
+              <code>@State</code>, <code>@Binding</code>, stacks, modifiers, focus, and animation carry
               over intact. What changes is deliberate: a small set of
-              terminal-native rereadings, applied consistently and recorded
-              publicly. This page is the tour of that boundary.
+              terminal-native rereadings, applied consistently, and explicitly recorded.
             </p>
-            <dl class="lede-facts">
-              <div>
-                <dt>The reflexes transfer</dt>
-                <dd>Layout negotiation, state identity, modifier order, and lifecycle behave the way you expect.</dd>
-              </div>
-              <div>
-                <dt>Seven deliberate rereadings</dt>
-                <dd>Each difference is a considered terminal-native default behind a SwiftUI-shaped API.</dd>
-              </div>
-              <div>
-                <dt>Every divergence recorded</dt>
-                <dd>One public register, tagged and enforced by a repository check rather than scattered folklore.</dd>
-              </div>
-            </dl>
           </section>
 
           <!-- ===================== 01 PROMISE ===================== -->
@@ -114,24 +99,22 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
               <div>
                 <h2>The promise</h2>
                 <p class="section-lead">
-                  SwiftTUI mirrors SwiftUI's <em>shape</em>. Where a literal
-                  desktop behavior would degrade the terminal experience, the
-                  default is terminal-native while the API stays SwiftUI-shaped.
-                  The framework implements subsets of SwiftUI only where they
-                  map to high-value terminal use, skips deprecated surfaces, and
-                  preserves the important semantics of every API it does
-                  implement. Faithfulness is a constraint, and the rest of
-                  this page is what that constraint produces.
+                  SwiftTUI mirrors SwiftUI's <em>shape</em>. Where an identical
+                  behavior does not fit a terminal experience, the
+                  default is terminal-native. The API stays SwiftUI-shaped.
+                  The framework implements the subsets of SwiftUI which
+                  map to high-value terminal use, and skips deprecated surfaces.
+                  For the APIs it does implement, semantic consistency is a hard constraint.
                 </p>
               </div>
             </div>
             <aside class="callout">
               <p class="callout-tag">Choosing a TUI framework from another ecosystem?</p>
               <p>
-                This page assumes SwiftUI fluency. For the language-agnostic
-                case (what a declarative terminal UI buys you regardless of
-                where you come from), see{" "}
-                <a href={`${base}/#why`}>Why SwiftTUI</a> on the home page.
+                This page assumes SwiftUI fluency. For language-agnostic
+                information — what the framework gets you regardless of
+                where you come from — see{" "}
+                <a href={`${base}/#why`}>Why SwiftTUI</a>.
               </p>
             </aside>
           </section>
@@ -148,9 +131,9 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
                   Two named coordinate domains keep the model honest: the{" "}
                   <code>CellRect</code> grid for layout and rasterization, and
                   continuous cell space for gestures, hover, and{" "}
-                  <code>Canvas</code>. <code>padding()</code> is literally one
-                  cell, and a border occupies real cells, so it defaults to{" "}
-                  <em>outset</em> placement and grows the frame instead of
+                  <code>Canvas</code>. <code>padding()</code>'s default is one
+                  cell. A border occupies a cell too and defaults to <em>inset</em>placement.
+                  Use <em>outset</em> placement to grow the frame instead of
                   eating content.
                 </p>
               </div>
@@ -171,13 +154,15 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
   Text("Deploys").bold()
   content
 }
-.padding()   // exactly one cell
-.border()    // real cells; grows the frame</code></pre>
+.padding()                  // one cell default.
+.border()                   // default inset, border occupies a content cell
+.border(placement: .outset) // convenience: border grows the frame
+</code></pre>
               </figure>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: a terminal
-              allocates whole cells; honest geometry is integer geometry, and a
+              <strong>Why?</strong>: a terminal
+              allocates whole cells; the geometry is inherently integer based., and a
               border that pretended to be a zero-cost overlay would eat your
               content.
             </p>
@@ -188,13 +173,11 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
             <div class="section-head">
               <span class="section-no">03</span>
               <div>
-                <h2>State is the only authority</h2>
+                <h2>State the authority</h2>
                 <p class="section-lead">
                   Navigation and presentation are strictly data-driven. There is
-                  deliberately no <code>NavigationLink</code> and no{" "}
-                  <code>@Environment(\.dismiss)</code>: a push mutates the bound
-                  path, and dismissal clears the binding that presents the
-                  surface. Every screen stays derivable from, and mutable
+                  deliberately no <code>NavigationLink&lt;Label, Destination&gt; where Destination: View</code>.
+                  Every screen stays derivable from, and mutable
                   through, your app's data, which is what makes a terminal UI
                   scriptable, testable, and deep-linkable.
                 </p>
@@ -202,23 +185,16 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
             </div>
             <div class="code-pair">
               <figure class="code-card">
-                <figcaption>SwiftUI habit</figcaption>
-                <pre class="code"><code is:raw>NavigationLink("Build 42", value: Route.build(42))
-
-// inside the sheet:
-@Environment(\.dismiss) private var dismiss
-Button("Done") { dismiss() }</code></pre>
+                <figcaption>SwiftUI habit (iOS 13 era API)</figcaption>
+                <pre class="code"><code is:raw>NavigationLink("Build 9") { BuildView(id: 9) }</code></pre>
               </figure>
               <figure class="code-card code-card--tui">
                 <figcaption>SwiftTUI</figcaption>
-                <pre class="code"><code is:raw>Button("Build 42") { path.append(.build(42)) }
-
-// the presenter owns dismissal:
-Button("Done") { selectedBuild = nil }</code></pre>
+                <pre class="code"><code is:raw>Button("Build 9") { selectedBuild = .build(9) }</code></pre>
               </figure>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: a UI that can be
+              <strong>Why?</strong>: a UI that can be
               driven, replayed, and tested is one whose every state is data;
               controls that carry hidden navigation side effects break that
               contract.
@@ -234,11 +210,9 @@ Button("Done") { selectedBuild = nil }</code></pre>
                 <p class="section-lead">
                   Models are <code>@Observable</code> classes; the Combine-era{" "}
                   <code>ObservableObject</code> / <code>@Published</code> /{" "}
-                  <code>@StateObject</code> family does not exist. The authoring
-                  layers are Foundation-free by policy, and strict, unsuppressed
-                  concurrency is visible in the API, because frames finish on
-                  an off-main frame tail. One authoring shape satisfies all of
-                  it.
+                  <code>@StateObject</code> family does not exist. Strict concurrency <code>@MainActor</code>{" "}
+                  annotations are visible in the API to allow the framework to safely run other parts of the view
+                  lifecycle in the background.
                 </p>
               </div>
             </div>
@@ -257,7 +231,7 @@ struct Dashboard: View {
               <figure class="code-card code-card--tui">
                 <figcaption>SwiftTUI</figcaption>
                 <pre class="code"><code is:raw>@MainActor @Observable
-final class DeployModel {  // implicitly Sendable
+final class DeployModel {
   var builds: [Build] = []
 }
 
@@ -268,9 +242,7 @@ struct Dashboard: View {
               </figure>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: Foundation-free
-              layers and honest concurrency are what let one codebase reach
-              Linux, WASI, and Android, and let rendering leave the main actor
+              <strong>Why?</strong>: Strict concurrency enforced for views lets rendering leave the main actor
               without undefined behavior.
             </p>
           </section>
@@ -285,22 +257,16 @@ struct Dashboard: View {
                   Focus traversal is geometry-aware and <em>wraps</em>: there
                   is no surrounding native UI for focus to escape to, so the
                   chain cycles. Key bindings are authored with{" "}
-                  <code>keyCommand</code> and <code>paletteCommand</code> rather
-                  than <code>keyboardShortcut</code>, and{" "}
-                  <code>onKeyPress</code> is reshaped honestly for a terminal
+                  <code>keyCommand</code> rather than <code>keyboardShortcut</code>, and{" "}
+                  <code>onKeyPress</code> is reshaped for a terminal
                   byte stream: complete key events, no down/up/repeat phases,
-                  because a terminal has none to observe. Collections are
-                  tree-forward and keyboard-first, and selection requires an
-                  explicit <code>.tag</code>: untagged rows fail loud instead
-                  of guessing which value you meant.
+                  because a terminal has none to observe.
                 </p>
               </div>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: the keyboard is
-              the terminal's native pointer; pretending otherwise produces
-              phase surfaces and shortcut systems that could never actually
-              fire.
+              <strong>Why?</strong>: the keyboard is
+              the terminal's native input; the APIs are fit to it.
             </p>
           </section>
 
@@ -311,19 +277,19 @@ struct Dashboard: View {
               <div>
                 <h2>Deterministic chrome from value metadata</h2>
                 <p class="section-lead">
-                  Tabs are declared as <code>Tab(...)</code> values,{" "}
+                  Tabs are declared as <code>Tab("My Label", value: .myValue)</code>,{" "}
                   <code>Table</code> takes column metadata with positional row
                   cells, toolbar items are <code>ToolbarItemConfig</code>{" "}
-                  values, and <code>Picker</code> options are scraped to labeled
-                  text. One stance, four surfaces: where SwiftUI resolves
+                  values, and <code>Picker</code> displays only label text.
+                  One stance, four surfaces: where SwiftUI resolves
                   arbitrary label view trees into pixels, terminal chrome is
-                  deterministic text, so it is declared as structured values.
+                  most often text - so the APIs emphasize those overloads.
                 </p>
               </div>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: a tab strip, a
-              column header, and a picker row are each a line of text; value
+              <strong>Why?</strong>: a tab strip, a
+              column header, and a picker row are usually a line of text; value
               metadata renders them predictably where a label view tree cannot.
             </p>
           </section>
@@ -333,26 +299,24 @@ struct Dashboard: View {
             <div class="section-head">
               <span class="section-no">07</span>
               <div>
-                <h2>Restrained chrome, fail-loud verbs</h2>
+                <h2>Terminal-native chrome, defined behavior</h2>
                 <p class="section-lead">
                   <code>fullScreenCover</code> is chromeless.{" "}
                   <code>background</code> fills the view's bounds without
-                  bleeding. The <code>List</code> focus highlight is row-shaped,
-                  not container-wide. Alerts and confirmation dialogs queue
-                  first-in, first-out: where SwiftUI leaves concurrent
-                  presentation undefined, SwiftTUI defines it. And where
-                  something can fail, it says so: environment verbs like{" "}
+                  bleeding. Borders occupy an explicit cell.
+                  The <code>List</code> focus highlight is row-shaped,
+                  not container-wide. Alerts and confirmation have a defined FIFO queue.
+                  Where something can fail, the API says so: environment verbs like{" "}
                   <code>\.openLinkAction</code> and <code>\.resetFocus</code>{" "}
-                  return <code>Bool</code>, and the runtime reports issues
-                  instead of silently inferring intent.
+                  return <code>Bool</code>, and the runtime reports issues.
                 </p>
               </div>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: terminal output is
-              shared space, so chrome should earn its cells; and in a screen
-              made of text, silence is the most expensive way to hide a
-              mistake.
+              <strong>Why?</strong>
+              Cells are finite and restrictive so defaults are tuned to match.
+              And to help a bit further, SwiftTUI polishes some behavior SwiftUI leaves undefined — because it
+              doesn't have to support heterogeneous AppKit and UIKit rendering under the hood.
             </p>
           </section>
 
@@ -366,21 +330,19 @@ struct Dashboard: View {
                   Reduced motion changes the <em>rendering</em> itself:
                   spinners go static and phase animations hold their first
                   phase. <code>CI=true</code> or a non-TTY stdout selects the
-                  same stable built-in output without changing the app-visible
-                  accessibility preference. Semantic style roles resolve through a host-owned theme
-                  (there is deliberately no <code>ColorScheme</code>; the
-                  terminal reports colors, not a scheme). And every{" "}
+                  same stable built-in. By default, every{" "}
                   <code>App</code> is also a CLI command that ships{" "}
-                  <code>--accessible</code>, <code>--no-color</code>,{" "}
-                  <code>--ascii</code>, <code>--reduce-motion</code>,{" "}
-                  <code>--stable-output</code>, and <code>--json</code> out of the box.
+                  <code>--accessible</code> (<code>--no-color</code>{" "}
+                  and <code>--reduce-motion</code>), and <code>--ascii</code> configs,{" "}
+                  <em>and an in-browser view</em> triggered with <code>--web</code> and served
+                  via an in-binary http server — all out of the box.
                 </p>
               </div>
             </div>
             <p class="why">
-              <strong>Why the terminal wants this</strong>: terminal output is
-              captured, piped, diffed, and read aloud; degrading to stable
-              output is correctness, not a per-app opt-in.
+              <strong>Why?</strong>: Many TUIs are have <a href="https://xogium.me/the-text-mode-lie-why-modern-tuis-are-a-nightmare-for-accessibility">serious accessibility issues</a>.
+              SwiftTUI's declarative API allows it to provide alternative behaviors
+              for screen readers without putting more burden on the developer.
             </p>
           </section>
 
@@ -393,8 +355,7 @@ struct Dashboard: View {
                 <p class="section-lead">
                   The differences run in both directions. Alongside the
                   SwiftUI-shaped surface, SwiftTUI ships capabilities SwiftUI
-                  has no analog for. Reach for these before porting a desktop
-                  habit.
+                  has no analog for.
                 </p>
               </div>
             </div>
@@ -411,35 +372,35 @@ struct Dashboard: View {
                 <h3>Presentation extensions</h3>
                 <p>
                   <code>toast</code> and <code>popoverTip</code> presentation
-                  families, plus FIFO-defined prompt queueing.
+                  families, with FIFO-defined prompt queueing.
                 </p>
               </article>
               <article class="add-card">
-                <h3>Banner text</h3>
+                <h3>FIGlet banner text</h3>
                 <p>
-                  <code>TextFigure</code> renders FIGlet banners with embedded
-                  fonts under normal layout proposals.
+                  <code>TextFigure</code> renders FIGlet text and integrates it fully
+                  with the layout system so the banner text wraps if needed.
                 </p>
               </article>
               <article class="add-card">
                 <h3>Border styling</h3>
                 <p>
-                  Per-side border styles and animatable perimeter gradients
-                  (<code>BorderBlend</code>) on the cell grid.
+                  Terminal borders take a cell. They're chonky. SwiftTUI makes this
+                  regrettable truth a little nice by adding an API overload for per-side
+                  border styles... And even animatable perimeter gradients with <code>BorderBlend</code>.
                 </p>
               </article>
               <article class="add-card">
                 <h3>Open style protocols</h3>
-                <p>
-                  <code>ButtonStyle</code>, <code>ListStyle</code>,{" "}
-                  <code>PickerStyle</code>, and peers are public, extensible
-                  protocols, including families SwiftUI keeps closed.
+                <p>SwiftTUI's style API protocols (<code>ButtonStyle</code>, <code>ListStyle</code>,{" "}
+                  <code>PickerStyle</code>, etc.) are public and extensible or will be soon.
+                   Even the families SwiftUI keeps closed.
                 </p>
               </article>
               <article class="add-card">
                 <h3>One codebase, four hosts</h3>
                 <p>
-                  The same views run on the terminal, inside SwiftUI on macOS
+                  Your SwiftTUI views run not only on the terminal, but also inside SwiftUI on macOS
                   and iOS, in the browser via WASI, and on Android.
                 </p>
               </article>
@@ -453,14 +414,9 @@ struct Dashboard: View {
               <div>
                 <h2>Recorded in the open</h2>
                 <p class="section-lead">
-                  Every departure from SwiftUI on this page, and every one it
-                  omits, lives in a single public register in the framework's
-                  documentation, tagged by stance. A repository check fails if
-                  a SwiftUI-named symbol diverges without a register entry, so
-                  the list cannot silently drift from the code. If you are
-                  evaluating SwiftTUI, that register is the honest ledger to
-                  read; if you adopt it, it is the contract you can hold the
-                  project to.
+                  Departures from SwiftUI are listed in the framework's documentation.
+                  Some are intentional and some are known gaps to fix. Many are awaiting a good terminal usecase.
+                  If you find a surprising hole, <a href="https://github.com/SwiftTUI/swift-tui/issues/new/choose">open an issue</a>.
                 </p>
               </div>
             </div>
