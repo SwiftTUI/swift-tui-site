@@ -15,7 +15,7 @@ on:
       counter_demo_ref:
         description: Public swift-tui-counter-demo branch or tag to build
         required: true
-        default: "0.9.2"
+        default: "0.9.3"
         type: string
 
 permissions:
