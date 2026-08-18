@@ -10,9 +10,10 @@ const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
       <h2 id="start-title">A terminal and a toolchain. That's it.</h2>
       <p>
         SwiftTUI apps are plain SwiftPM packages: any Swift 6.3+ toolchain
-        builds and runs them from the command line, on macOS or Linux. You do
-        not need an Xcode project, a simulator, or an app store. If you already
-        run a current Xcode, its bundled toolchain is all you need.
+        builds and runs them from the command line, on macOS, Linux, or
+        Windows. You do not need an Xcode project, a simulator, or an app
+        store. If you already run a current Xcode, its bundled toolchain is
+        all you need.
       </p>
     </header>
 
@@ -25,7 +26,7 @@ const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
           </div>
           <a href={demoRepo} rel="noreferrer noopener">Open repo</a>
         </header>
-        <pre tabindex="0"><code><span class="cm"># macOS or Linux — any Swift 6.3+ toolchain</span>
+        <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows — any Swift 6.3+ toolchain</span>
 git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
 cd swift-tui-counter-demo
 swift run --package-path counter counter</code></pre>
@@ -44,7 +45,9 @@ swift run --package-path counter counter</code></pre>
             Swift's official toolchain installer for macOS and Linux,
             puts <span class="mono">swift</span> on your path in one step,
             without Xcode. On a Mac with a current Xcode, skip it: the
-            toolchain is already installed.
+            toolchain is already installed. On Windows, use the{" "}
+            <a href="https://www.swift.org/install/windows/" rel="noreferrer noopener">
+              swift.org installer</a> instead.
           </p>
         </article>
 
@@ -53,7 +56,7 @@ swift run --package-path counter counter</code></pre>
           <pre tabindex="0"><code><span class="cm">// Package.swift</span>
 .package(
   url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
-  .upToNextMinor(from: <span class="str">"0.9.1"</span>)
+  .upToNextMinor(from: <span class="str">"0.9.2"</span>)
 ),
 <span class="cm">// in your executable target:</span>
 .product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>

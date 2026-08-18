@@ -16,11 +16,10 @@ const description =
   "How SwiftTUI reads SwiftUI for the terminal: what transfers unchanged, the seven deliberate differences, what the framework adds, and the public register where every divergence is recorded.";
 
 // Deep links into the composed DocC (built at the release tag the site pins
-// in docs/docc-repos.yml). The Coming-From-SwiftUI article ships in the
-// swift-tui repo after 0.9.0, so this page links the register — the
-// authoritative list, live today — and should link the article
-// (`${base}/docs/documentation/swifttuiviews/coming-from-swiftui`) once the
-// next release tag moves the DocC pin.
+// in docs/docc-repos.yml). The DocC pin serves the Coming-From-SwiftUI
+// article since 0.9.1, so the page links both the article (the guide) and
+// the register (the authoritative divergence list).
+const comingFromSwiftUIHref = `${base}/docs/documentation/swifttuiviews/coming-from-swiftui`;
 const registerHref = `${base}/docs/documentation/swifttuiviews/divergences-and-gaps`;
 const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
 ---
@@ -335,7 +334,9 @@ struct Dashboard: View {
                   <code>--accessible</code> (<code>--no-color</code>{" "}
                   and <code>--reduce-motion</code>), and <code>--ascii</code> configs,{" "}
                   <em>and an in-browser view</em> triggered with <code>--web</code> and served
-                  via an in-binary http server — all out of the box.
+                  via an in-binary http server (macOS, Linux, and iOS; on
+                  Windows the umbrella ships the terminal surface only) — all
+                  out of the box.
                 </p>
               </div>
             </div>
@@ -427,6 +428,7 @@ struct Dashboard: View {
             </div>
             <div class="cta-row">
               <a class="cta cta--primary" href={`${base}/#get-started`}>Get started</a>
+              <a class="cta" href={comingFromSwiftUIHref}>Read the Coming-From-SwiftUI guide</a>
               <a class="cta" href={registerHref}>Read the divergence register</a>
               <a class="cta" href={visionHref}>About SwiftTUI</a>
             </div>
