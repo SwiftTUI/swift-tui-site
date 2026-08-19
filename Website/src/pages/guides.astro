@@ -1,0 +1,583 @@
+---
+import "../styles/site.css";
+import "../styles/marketing.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
+const canonical = `${site}${base || ""}/guides/`;
+const ogImage = `${site}${base || ""}/og.png`;
+const title = "SwiftTUI documentation";
+const description =
+  "SwiftTUI's documentation, organized by task: getting started, building your interface, charts, running on every host, and the module-by-module API reference.";
+
+// Deep links into the composed DocC archives (built at the release tags the
+// site pins in docs/docc-repos.yml). Guides are organized here by task; the
+// archive itself is organized by module.
+const docs = `${base}/docs/documentation`;
+const charts = `${base}/docs/charts/documentation/swifttuicharts`;
+
+const startCards = [
+  {
+    href: `${docs}/swifttui/choosing-modules-and-platforms`,
+    title: "Choosing modules and platforms",
+    copy: "One dependency and one import for most apps — plus the product matrix when you need a narrower build.",
+  },
+  {
+    href: `${docs}/swifttuiviews/coming-from-swiftui`,
+    title: "Coming from SwiftUI",
+    copy: "What transfers unchanged, which reflexes need retraining, and what is not here yet.",
+  },
+  {
+    href: `${base}/#get-started`,
+    title: "Add it to your app",
+    copy: "Pick a toolchain, add the package, and write your first App declaration.",
+  },
+];
+
+const buildGuides = [
+  {
+    href: `${docs}/swifttuiviews/authoring-views`,
+    title: "Authoring Views",
+    copy: "Compose containers, local state, focused controls, and modifiers around a body-driven tree.",
+  },
+  {
+    href: `${docs}/swifttuiviews/state-environment-and-focus`,
+    title: "State, Environment, and Focus",
+    copy: "State, observation, environment, and focus share one runtime invalidation path.",
+  },
+  {
+    href: `${docs}/swifttuiviews/focus`,
+    title: "Understanding Focus",
+    copy: "The runtime focus model for input routing, state control, and context export.",
+  },
+  {
+    href: `${docs}/swifttuiviews/collections`,
+    title: "Lists and Tables",
+    copy: "Collections with authored row content, selection, and viewport-backed data sources.",
+  },
+  {
+    href: `${docs}/swifttuiviews/geometry-and-preferences`,
+    title: "Geometry and Preferences",
+    copy: "Anchor preferences let a subtree publish geometry that other views resolve after layout.",
+  },
+  {
+    href: `${docs}/swifttuiviews/shapes`,
+    title: "Shapes",
+    copy: "Fill, stroke, and inset built-in and custom Path shapes, rasterized to Braille subpixels.",
+  },
+  {
+    href: `${docs}/swifttuiviews/aspectcorrectshapes`,
+    title: "Aspect-correct shapes",
+    copy: "Cell pixel metrics keep circles circular across terminal fonts and hosts.",
+  },
+  {
+    href: `${docs}/swifttuiviews/pointer-and-canvas`,
+    title: "Pointer and Canvas",
+    copy: "One continuous cell coordinate space for gestures, hover, and drawing.",
+  },
+  {
+    href: `${docs}/swifttuiviews/accessibility`,
+    title: "Accessibility",
+    copy: "Semantic metadata for terminal screen readers, browser ARIA trees, VoiceOver, and TalkBack.",
+  },
+  {
+    href: `${docs}/swifttuiviews/custom-dynamic-properties`,
+    title: "Custom Dynamic Properties",
+    copy: "Build your own property wrappers on the DynamicProperty extension point.",
+  },
+  {
+    href: `${docs}/swifttuiviews/state-keying`,
+    title: "State Keying",
+    copy: "How @State storage is keyed across evaluations, and where owners survive lazy seams.",
+  },
+  {
+    href: `${docs}/swifttuiviews/dormant-tab-state`,
+    title: "Dormant Tab State",
+    copy: "What happens to a tab's persistent state while the tab is not selected.",
+  },
+  {
+    href: `${docs}/swifttuiviews/dismissal-is-data`,
+    title: "Dismissal Is Data",
+    copy: "Presentations are driven by Boolean bindings and identifiable items, not hidden stacks.",
+  },
+];
+
+const runGuides = [
+  {
+    href: `${docs}/swifttuiruntime/running-apps`,
+    title: "Running Apps",
+    copy: "Runtime entry points from the @main convenience down to hosted scene sessions.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/hosts-and-platforms`,
+    title: "Hosts and Platforms",
+    copy: "The host and distribution matrix: terminal, browser, Android, and native SwiftUI embedding.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/host-integration`,
+    title: "Runner and Host Integration",
+    copy: "How apps launch through runner products or live inside host products.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/terminalembedding`,
+    title: "Terminal Embedding",
+    copy: "Host external terminal programs inside SwiftTUI layout with SwiftTUITerminal.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/terminal-handoffs`,
+    title: "Terminal Handoffs",
+    copy: "Temporarily hand the interactive terminal back to the user's shell mid-run.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/environment-variables`,
+    title: "Environment Variables",
+    copy: "Every SWIFTTUI_* environment variable the framework reads, grouped by subsystem.",
+  },
+];
+
+const conceptLinks = [
+  {
+    href: `${base}/differences-from-swiftui/`,
+    title: "Differences from SwiftUI",
+    copy: "The primer: what transfers, and the deliberate terminal-native rereadings.",
+  },
+  {
+    href: `${base}/pipeline/`,
+    title: "How rendering works",
+    copy: "An interactive walkthrough of the frame pipeline, from body to terminal cells.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/runtime-render-pipeline`,
+    title: "Runtime Render Pipeline",
+    copy: "The developer-level reference for the same pipeline: phases, products, and commit policy.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/vision`,
+    title: "About SwiftTUI",
+    copy: "Why the framework exists and what it optimizes for.",
+  },
+  {
+    href: `${docs}/swifttuiviews/divergences-and-gaps`,
+    title: "Divergences and gaps",
+    copy: "The public register of API departures from SwiftUI and known gaps at HEAD.",
+  },
+];
+
+// Module tiers for the API reference. The everyday tier is what app code
+// imports; the hosts tier is per-deployment; the engine tier declares shared
+// vocabulary types but is rarely imported directly.
+const everydayModules = [
+  { href: `${docs}/swifttui`, name: "SwiftTUI", copy: "the batteries-included app product" },
+  { href: `${docs}/swifttuiviews`, name: "SwiftTUIViews", copy: "views, controls, layout, state, focus" },
+  { href: `${docs}/swifttuiruntime`, name: "SwiftTUIRuntime", copy: "scenes, run loop, host integration" },
+  { href: charts, name: "SwiftTUICharts", copy: "charts and compact metrics" },
+];
+
+const hostModules = [
+  { href: `${docs}/swifttuicli`, name: "SwiftTUICLI", copy: "terminal-only runner" },
+  { href: `${docs}/swifttuiwebhostcli`, name: "SwiftTUIWebHostCLI", copy: "terminal runner with --web" },
+  { href: `${docs}/swifttuiwebhost`, name: "SwiftTUIWebHost", copy: "localhost browser host" },
+  { href: `${docs}/swifttuiwasi`, name: "SwiftTUIWASI", copy: "WASI and browser builds" },
+  { href: `${docs}/swifttuiandroidhost`, name: "SwiftTUIAndroidHost", copy: "Android embedding" },
+  { href: `${docs}/swifttuiterminal`, name: "SwiftTUITerminal", copy: "embedded terminal panes" },
+  { href: `${docs}/swifttuianimatedimage`, name: "SwiftTUIAnimatedImage", copy: "animated GIF and image views" },
+  { href: `${docs}/swifttuiprofiling`, name: "SwiftTUIProfiling", copy: "opt-in profiling and diagnostics" },
+  {
+    href: "https://github.com/SwiftTUI/swift-tui-swiftui",
+    name: "SwiftUIHost",
+    copy: "native SwiftUI embedding (separate package)",
+    external: true,
+  },
+];
+
+const vocabularyModules = [
+  { href: `${docs}/swifttuiprimitives`, name: "SwiftTUIPrimitives", copy: "geometry, color, style, animation math" },
+  { href: `${docs}/swifttuigraph`, name: "SwiftTUIGraph", copy: "reconciliation engine; PreferenceKey, DynamicProperty" },
+  { href: `${docs}/swifttuicore`, name: "SwiftTUICore", copy: "the render engine's frame pipeline" },
+  { href: `${docs}/swifttuiarguments`, name: "SwiftTUIArguments", copy: "SwiftTUIOptions and command parsing" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="theme-color"
+      content="#f5f7f3"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#101512"
+      media="(prefers-color-scheme: dark)"
+    />
+    <ThemeScript />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="SwiftTUI documentation" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content={ogImage} />
+    <SiteIcons />
+  </head>
+  <body class="marketing-subpage guides-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+
+    <main class="guides" id="main">
+      <div class="shell">
+        <header class="lede">
+          <p class="eyebrow">Documentation</p>
+          <h1>SwiftTUI documentation</h1>
+          <p class="lede-copy">
+            Organized by what you're doing: getting started, building your
+            interface, charting data, and running the same app on every host.
+            The module-by-module API reference is at the end.
+          </p>
+          <div class="lede-ctas">
+            <a class="cta cta--primary" href={`${base}/#get-started`}>
+              Get started
+            </a>
+            <a class="cta" href={`${docs}/`}>Open the API reference</a>
+          </div>
+        </header>
+
+        <section class="guides-section" id="start" aria-labelledby="start-title">
+          <div class="section-head">
+            <h2 id="start-title">Start here</h2>
+          </div>
+          <div class="card-grid card-grid--three">
+            {
+              startCards.map((card) => (
+                <a class="doc-card" href={card.href}>
+                  <strong>{card.title}</strong>
+                  <span>{card.copy}</span>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="guides-section" id="build" aria-labelledby="build-title">
+          <div class="section-head">
+            <h2 id="build-title">Build your interface</h2>
+            <p>
+              The authoring surface is SwiftUI-shaped: views, state, focus, and
+              layout guides from the <code>SwiftTUIViews</code> catalog.
+            </p>
+          </div>
+          <div class="card-grid">
+            {
+              buildGuides.map((guide) => (
+                <a class="doc-card" href={guide.href}>
+                  <strong>{guide.title}</strong>
+                  <span>{guide.copy}</span>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="guides-section" id="charts" aria-labelledby="charts-title">
+          <div class="section-head">
+            <h2 id="charts-title">Charts</h2>
+            <p>
+              Sparklines, bar and line charts, heatmaps, meters, and calendar
+              views ship separately as{" "}
+              <a href="https://github.com/SwiftTUI/swift-tui-charts" rel="noreferrer noopener">
+                <code>swift-tui-charts</code></a>, composed on the same view surface.
+            </p>
+          </div>
+          <div class="card-grid card-grid--three">
+            <a class="doc-card" href={`${charts}/building-dashboards`}>
+              <strong>Building Dashboards</strong>
+              <span>The charts guide: layout, scales, live data, and thresholds.</span>
+            </a>
+            <a class="doc-card" href={charts}>
+              <strong>SwiftTUICharts reference</strong>
+              <span>Every chart view and support type, in its own DocC archive.</span>
+            </a>
+            <a class="doc-card" href={`${base}/showcase/`}>
+              <strong>Charts in the showcase</strong>
+              <span>Every charting primitive exercised against a real repository.</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="guides-section" id="run" aria-labelledby="run-title">
+          <div class="section-head">
+            <h2 id="run-title">Run it everywhere</h2>
+            <p>
+              One authored app; hosts for the terminal, the browser, Android,
+              and native SwiftUI. Guides from the <code>SwiftTUIRuntime</code>{" "}
+              catalog.
+            </p>
+          </div>
+          <div class="card-grid">
+            {
+              runGuides.map((guide) => (
+                <a class="doc-card" href={guide.href}>
+                  <strong>{guide.title}</strong>
+                  <span>{guide.copy}</span>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section
+          class="guides-section"
+          id="concepts"
+          aria-labelledby="concepts-title"
+        >
+          <div class="section-head">
+            <h2 id="concepts-title">Concepts and background</h2>
+          </div>
+          <div class="card-grid">
+            {
+              conceptLinks.map((link) => (
+                <a class="doc-card" href={link.href}>
+                  <strong>{link.title}</strong>
+                  <span>{link.copy}</span>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section
+          class="guides-section"
+          id="reference"
+          aria-labelledby="reference-title"
+        >
+          <div class="section-head">
+            <h2 id="reference-title">API reference by module</h2>
+            <p>
+              The <a href={`${docs}/`}>combined DocC archive</a> documents each
+              module. Most app code touches only the first row.
+            </p>
+          </div>
+          <div class="module-tiers">
+            <div class="module-tier">
+              <h3>What you import</h3>
+              <ul>
+                {
+                  everydayModules.map((m) => (
+                    <li>
+                      <a href={m.href} class="mono">{m.name}</a>
+                      <span> — {m.copy}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <div class="module-tier">
+              <h3>Hosts and opt-in products</h3>
+              <ul>
+                {
+                  hostModules.map((m) => (
+                    <li>
+                      <a
+                        href={m.href}
+                        class="mono"
+                        rel={m.external ? "noreferrer noopener" : undefined}
+                      >{m.name}</a>
+                      <span> — {m.copy}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <div class="module-tier">
+              <h3>Vocabulary you use, modules you don't import</h3>
+              <ul>
+                {
+                  vocabularyModules.map((m) => (
+                    <li>
+                      <a href={m.href} class="mono">{m.name}</a>
+                      <span> — {m.copy}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+          <p class="reference-note">
+            The last group declares types that reach app code through
+            re-export — <code>CellSize</code>, <code>Alignment</code>,
+            <code>PreferenceKey</code>, <code>SwiftTUIOptions</code> — so
+            their pages document symbols you use, behind imports you never
+            write.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .guides {
+    padding: clamp(48px, 7vw, 96px) 0 clamp(64px, 8vw, 110px);
+  }
+
+  .lede {
+    display: grid;
+    gap: 18px;
+    max-width: 760px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+
+  .lede-copy {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 62ch;
+  }
+
+  .lede-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .guides-section {
+    margin-top: clamp(44px, 6vw, 76px);
+    padding-top: clamp(28px, 4vw, 44px);
+    border-top: 1px solid var(--line);
+  }
+
+  .section-head {
+    display: grid;
+    gap: 10px;
+    max-width: 720px;
+    margin-bottom: 26px;
+  }
+
+  .section-head p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  .section-head a {
+    color: var(--accent-ink, var(--accent));
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .section-head code,
+  .reference-note code {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .card-grid--three {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .doc-card {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 18px 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+
+  .doc-card:hover {
+    border-color: var(--line-strong);
+    background: var(--panel-2);
+  }
+
+  .doc-card strong {
+    color: var(--text);
+    font-size: 14.5px;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+  }
+
+  .doc-card span {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .module-tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 26px;
+  }
+
+  .module-tier h3 {
+    margin-bottom: 12px;
+    color: var(--quiet);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .module-tier ul {
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .module-tier li {
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .module-tier a {
+    color: var(--text);
+    font-size: 13px;
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+
+  .module-tier a:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .reference-note {
+    max-width: 68ch;
+    margin-top: 26px;
+    color: var(--quiet);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid,
+    .card-grid--three {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
