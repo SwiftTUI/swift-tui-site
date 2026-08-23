@@ -32,8 +32,8 @@ const { id = "demo" } = Astro.props;
 <section class="demo" id={id} aria-label="Live SwiftTUI counter">
   <header class="demo-header">
     <div>
-      <strong>SwiftTUI app</strong>
-      <span>Compiled for browser with SwiftTUIWASI</span>
+      <strong>Live demo</strong>
+      <span>The counter, compiled to WebAssembly</span>
     </div>
     <a href={webExampleHref}>Open separately</a>
   </header>
@@ -60,7 +60,7 @@ const { id = "demo" } = Astro.props;
         />
 
         <div class="demo-state demo-state--idle" data-state-view="idle">
-          <p>Run the exact source shown beside this frame.</p>
+          <p>A real SwiftTUI app, running live in your browser.</p>
           <button type="button" data-load-demo>Load live counter</button>
         </div>
 

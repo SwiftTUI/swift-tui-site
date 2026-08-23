@@ -11,6 +11,10 @@ const repo = "https://github.com/SwiftTUI/swift-tui";
 // panel. Nothing is ever dropped: every destination is reachable at every width.
 // Each label names the destination the way that page names itself: the homepage
 // showcase section is a preview of /showcase/, so only the page gets a nav item.
+// The render-pipeline walkthrough is deliberately NOT in the primary row: it is
+// internals ("under the hood"), reached from Further reading, the docs hub's
+// Concepts group, and the footer — the primary row stays core (try · start ·
+// why · proof · from-SwiftUI · docs).
 const navGroups = [
   [
     { href: `${home}#demo`, label: "Demo" },
@@ -19,7 +23,6 @@ const navGroups = [
   ],
   [
     { href: `${base}/showcase/`, label: "Showcase" },
-    { href: `${base}/pipeline/`, label: "How it works" },
     { href: `${base}/differences-from-swiftui/`, label: "From SwiftUI" },
     { href: `${base}/guides/`, label: "Docs" },
   ],

@@ -1,11 +1,12 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// The homepage keeps only two flagship examples — one interaction-heavy
-// (gifeditor), one data-heavy (csvui). The full roster lives on /showcase/,
-// linked below. Each caption describes what its screenshot actually shows —
-// this pane's whole job is credibility, so an image that undersells or
-// overshoots its caption costs more than the tile is worth.
+// The homepage shows four flagship terminal apps — the same 2×2 the swift-tui
+// README carries — two interaction-heavy (gifeditor, terminal-workspace), two
+// data-heavy (csvui, mrkdwn). The full roster lives on /showcase/, linked
+// below. Each caption describes what its screenshot actually shows — this
+// pane's whole job is credibility, so an image that undersells or overshoots
+// its caption costs more than the tile is worth.
 type ProofItem = {
   slug: string;
   title: string;
@@ -18,18 +19,30 @@ const items: ProofItem[] = [
   {
     slug: "gifeditor",
     title: "GIF Editor",
-    body:
-      "A canvas, layers, a scrubbable timeline, pointer tools, undo, and animated GIF export.",
+    body: "Canvas, layers, a scrubbable timeline, pointer tools, undo, export.",
     alt: "SwiftTUI GIF Editor with canvas, layers, tools, and a timeline",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
   },
   {
     slug: "csvui",
     title: "csvui",
-    body:
-      "A 34,000-row GeoNames city table, browsed and edited safely in place.",
+    body: "A 34,000-row table browsed and edited in place.",
     alt: "csvui displaying a large tab-separated table of world cities",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
+  },
+  {
+    slug: "terminal-workspace",
+    title: "Terminal Workspace",
+    body: "Tabs, splits, and a command palette over embedded terminals.",
+    alt: "Terminal Workspace showing tabs and split panes of live shells",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace",
+  },
+  {
+    slug: "mrkdwn",
+    title: "mrkdwn",
+    body: "A responsive Markdown reader, shown reading the SwiftTUI README.",
+    alt: "mrkdwn rendering the SwiftTUI README as a navigable document",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/mrkdwn",
   },
 ];
 ---
@@ -40,9 +53,9 @@ const items: ProofItem[] = [
       <p class="home-kicker">Showcase</p>
       <h2 id="proof-title">Built with SwiftTUI.</h2>
       <p>
-        The counter above fits on one screen. These do not. Both are maintained
-        examples in <code>swift-tui-examples</code>: clone the repo and every
-        example builds and runs with one command.
+        The counter above fits on one screen. These do not. All four are
+        maintained examples in <code>swift-tui-examples</code>: clone the repo
+        and each one builds and runs with one command.
       </p>
     </header>
 
@@ -70,7 +83,7 @@ const items: ProofItem[] = [
     </div>
 
     <a class="proof-link" href={`${base}/showcase/`}>
-      Browse every example and host
+      Browse every example
     </a>
   </div>
 </section>

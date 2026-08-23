@@ -16,8 +16,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
 const canonical = `${site}${base || ""}/`;
 const title = "SwiftTUI · Build terminal interfaces in Swift";
+// This string is what search results and link unfurls show (it is reused as
+// og:description, twitter:description, and the JSON-LD description), so it
+// carries the core pitch only: terminal UIs, SwiftUI semantics, one binary,
+// try the demo. Host caveats live on the host repos, not here.
 const description =
-  "SwiftTUI brings familiar views, state, focus, and layout to terminal interfaces, with browser and native hosts for the same authored scene. Android is an arm64 preview: API 28+ / NDK 27.3.13750724 packaging, incomplete IME pre-edit, and one-way semantics.";
+  "Build terminal user interfaces in Swift with SwiftUI semantics: views, state, focus, gestures, and animation, compiled to one native binary for macOS, Linux, and Windows. Try the live demo, then run the same app in your own terminal.";
 const ogImage = `${canonical}og.png`;
 
 const softwareSourceCodeJsonLd = {
@@ -27,7 +31,7 @@ const softwareSourceCodeJsonLd = {
   description,
   programmingLanguage: "Swift",
   runtimePlatform:
-    "Swift 6.3, macOS 15+, iOS 18+, Linux, Windows 10 1809+ / Server 2019+, WASI, Android arm64 preview (API 28+, NDK 27.3.13750724 packaging)",
+    "Swift 6.3, macOS 15+, Linux, Windows 10 1809+ / Server 2019+; also WASI (browser), iOS 18+ (SwiftUI host), Android arm64 preview",
   codeRepository: "https://github.com/SwiftTUI/swift-tui",
   url: canonical,
   license: "https://github.com/SwiftTUI/swift-tui/blob/0.9.7/LICENSE",
@@ -41,12 +45,14 @@ const softwareSourceCodeJsonLd = {
     "SwiftUI",
     "TUI",
     "Terminal UI",
-    "WASI",
-    "Android",
-    "Windows",
-    "Cross platform",
+    "Terminal framework",
+    "Declarative TUI",
     "Swift Package",
     "Swift 6",
+    "macOS",
+    "Linux",
+    "Windows",
+    "WASI",
   ],
 };
 ---
@@ -60,7 +66,7 @@ const softwareSourceCodeJsonLd = {
     <meta name="description" content={description} />
     <meta
       name="keywords"
-      content="Swift, SwiftUI, TUI, Terminal UI, WASI, Android, Swift 6, Swift package, terminal framework, declarative TUI, OPTIONAL.DEV"
+      content="Swift, SwiftUI, TUI, Terminal UI, terminal framework, declarative TUI, Swift 6, Swift package, macOS, Linux, Windows, WASI, OPTIONAL.DEV"
     />
     <meta name="author" content="OPTIONAL.DEV" />
     <meta

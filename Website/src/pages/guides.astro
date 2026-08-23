@@ -12,7 +12,7 @@ const canonical = `${site}${base || ""}/guides/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI documentation";
 const description =
-  "SwiftTUI's documentation, organized by task: getting started, building your interface, charts, running on every host, and the module-by-module API reference.";
+  "SwiftTUI's documentation, organized by task: the first-hour path, the reference guides for views, state, and focus, charts, what lies beyond the terminal, and the module-by-module API reference.";
 
 // Deep links into the composed DocC archives (built at the release tags the
 // site pins in docs/docc-repos.yml). Guides are organized here by task; the
@@ -20,25 +20,15 @@ const description =
 const docs = `${base}/docs/documentation`;
 const charts = `${base}/docs/charts/documentation/swifttuicharts`;
 
-const startCards = [
-  {
-    href: `${docs}/swifttui/choosing-modules-and-platforms`,
-    title: "Choosing modules and platforms",
-    copy: "One dependency and one import for most apps — plus the product matrix when you need a narrower build.",
-  },
-  {
-    href: `${docs}/swifttuiviews/coming-from-swiftui`,
-    title: "Coming from SwiftUI",
-    copy: "What transfers unchanged, which reflexes need retraining, and what is not here yet.",
-  },
+// The first hour, in reading order: the page-one sequence a new user should
+// not have to guess. "Add it to your app" lands on the home page's Get started
+// block, which sits directly under the counter's source.
+const firstHour = [
   {
     href: `${base}/#get-started`,
     title: "Add it to your app",
-    copy: "Pick a toolchain, add the package, and write your first App declaration.",
+    copy: "Pick a toolchain, add the package, paste the counter, swift run.",
   },
-];
-
-const buildGuides = [
   {
     href: `${docs}/swifttuiviews/authoring-views`,
     title: "Authoring Views",
@@ -49,6 +39,19 @@ const buildGuides = [
     title: "State, Environment, and Focus",
     copy: "State, observation, environment, and focus share one runtime invalidation path.",
   },
+  {
+    href: `${docs}/swifttuiruntime/running-apps`,
+    title: "Running Apps",
+    copy: "The @main entry point, the standard flags, exit keys, and rendering one frame without a TTY.",
+  },
+  {
+    href: `${docs}/swifttuiviews/coming-from-swiftui`,
+    title: "Coming from SwiftUI",
+    copy: "What transfers unchanged, which reflexes need retraining, and what is not here yet.",
+  },
+];
+
+const buildGuides = [
   {
     href: `${docs}/swifttuiviews/focus`,
     title: "Understanding Focus",
@@ -106,26 +109,14 @@ const buildGuides = [
   },
 ];
 
-const runGuides = [
+// Terminal-side runtime reference: what an app reads and does once it is
+// running. Kept separate from the host guides so "beyond the terminal" stays
+// one clearly labeled group.
+const runtimeGuides = [
   {
-    href: `${docs}/swifttuiruntime/running-apps`,
-    title: "Running Apps",
-    copy: "Runtime entry points from the @main convenience down to hosted scene sessions.",
-  },
-  {
-    href: `${docs}/swifttuiruntime/hosts-and-platforms`,
-    title: "Hosts and Platforms",
-    copy: "The host and distribution matrix: terminal, browser, Android, and native SwiftUI embedding.",
-  },
-  {
-    href: `${docs}/swifttuiruntime/host-integration`,
-    title: "Runner and Host Integration",
-    copy: "How apps launch through runner products or live inside host products.",
-  },
-  {
-    href: `${docs}/swifttuiruntime/terminalembedding`,
-    title: "Terminal Embedding",
-    copy: "Host external terminal programs inside SwiftTUI layout with SwiftTUITerminal.",
+    href: `${docs}/swifttuiruntime/environment-variables`,
+    title: "Environment Variables",
+    copy: "Every SWIFTTUI_* environment variable the framework reads, grouped by subsystem.",
   },
   {
     href: `${docs}/swifttuiruntime/terminal-handoffs`,
@@ -133,9 +124,30 @@ const runGuides = [
     copy: "Temporarily hand the interactive terminal back to the user's shell mid-run.",
   },
   {
-    href: `${docs}/swifttuiruntime/environment-variables`,
-    title: "Environment Variables",
-    copy: "Every SWIFTTUI_* environment variable the framework reads, grouped by subsystem.",
+    href: `${docs}/swifttuiruntime/terminalembedding`,
+    title: "Terminal Embedding",
+    copy: "Host external terminal programs inside SwiftTUI layout with SwiftTUITerminal.",
+  },
+];
+
+// Beyond the terminal, WASI → web first, then native hosts, then the product
+// matrix for narrower builds. Host caveats live in these articles and on the
+// host repos, not on this hub.
+const hostGuides = [
+  {
+    href: `${docs}/swifttuiruntime/hosts-and-platforms`,
+    title: "Hosts and Platforms",
+    copy: "The browser (--web and static WASI bundles), native SwiftUI windows, and Android, with the support matrix.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/host-integration`,
+    title: "Runner and Host Integration",
+    copy: "How apps launch through runner products or live inside host products.",
+  },
+  {
+    href: `${docs}/swifttui/choosing-modules-and-platforms`,
+    title: "Choosing Modules and Platforms",
+    copy: "One dependency and one import for most apps, plus the product matrix when you need a narrower build.",
   },
 ];
 
@@ -147,7 +159,7 @@ const conceptLinks = [
   },
   {
     href: `${base}/pipeline/`,
-    title: "How rendering works",
+    title: "Under the hood",
     copy: "An interactive walkthrough of the frame pipeline, from body to terminal cells.",
   },
   {
@@ -241,9 +253,9 @@ const vocabularyModules = [
           <p class="eyebrow">Documentation</p>
           <h1>SwiftTUI documentation</h1>
           <p class="lede-copy">
-            Organized by what you're doing: getting started, building your
-            interface, charting data, and running the same app on every host.
-            The module-by-module API reference is at the end.
+            Organized by what you're doing: your first hour, then the reference
+            guides for views, state, and focus, charts, and what lies beyond the
+            terminal. The module-by-module API reference is at the end.
           </p>
           <div class="lede-ctas">
             <a class="cta cta--primary" href={`${base}/#get-started`}>
@@ -253,28 +265,36 @@ const vocabularyModules = [
           </div>
         </header>
 
-        <section class="guides-section" id="start" aria-labelledby="start-title">
+        <section class="guides-section" id="first-hour" aria-labelledby="first-hour-title">
           <div class="section-head">
-            <h2 id="start-title">Start here</h2>
+            <h2 id="first-hour-title">Your first hour</h2>
+            <p>
+              Read these in order. Each one picks up where the last left off,
+              from an empty package to an app that handles state, focus, and
+              the terminal's own rules.
+            </p>
           </div>
-          <div class="card-grid card-grid--three">
+          <ol class="step-grid">
             {
-              startCards.map((card) => (
-                <a class="doc-card" href={card.href}>
-                  <strong>{card.title}</strong>
-                  <span>{card.copy}</span>
-                </a>
+              firstHour.map((card, index) => (
+                <li>
+                  <a class="doc-card doc-card--step" href={card.href}>
+                    <span class="step-index mono">{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{card.title}</strong>
+                    <span>{card.copy}</span>
+                  </a>
+                </li>
               ))
             }
-          </div>
+          </ol>
         </section>
 
         <section class="guides-section" id="build" aria-labelledby="build-title">
           <div class="section-head">
             <h2 id="build-title">Build your interface</h2>
             <p>
-              The authoring surface is SwiftUI-shaped: views, state, focus, and
-              layout guides from the <code>SwiftTUIViews</code> catalog.
+              The reference guides, one per subsystem, from the{" "}
+              <code>SwiftTUIViews</code> catalog. Read them as you need them.
             </p>
           </div>
           <div class="card-grid">
@@ -317,16 +337,36 @@ const vocabularyModules = [
 
         <section class="guides-section" id="run" aria-labelledby="run-title">
           <div class="section-head">
-            <h2 id="run-title">Run it everywhere</h2>
+            <h2 id="run-title">At run time</h2>
             <p>
-              One authored app; hosts for the terminal, the browser, Android,
-              and native SwiftUI. Guides from the <code>SwiftTUIRuntime</code>{" "}
-              catalog.
+              What a running terminal app reads and can do, from the{" "}
+              <code>SwiftTUIRuntime</code> catalog.
             </p>
           </div>
-          <div class="card-grid">
+          <div class="card-grid card-grid--three">
             {
-              runGuides.map((guide) => (
+              runtimeGuides.map((guide) => (
+                <a class="doc-card" href={guide.href}>
+                  <strong>{guide.title}</strong>
+                  <span>{guide.copy}</span>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="guides-section" id="beyond" aria-labelledby="beyond-title">
+          <div class="section-head">
+            <h2 id="beyond-title">Beyond the terminal</h2>
+            <p>
+              Terminal first, not terminal only. The same app runs in a
+              browser, inside native SwiftUI windows, and on Android; these
+              guides own that path and its platform notes.
+            </p>
+          </div>
+          <div class="card-grid card-grid--three">
+            {
+              hostGuides.map((guide) => (
                 <a class="doc-card" href={guide.href}>
                   <strong>{guide.title}</strong>
                   <span>{guide.copy}</span>
@@ -493,6 +533,32 @@ const vocabularyModules = [
 
   .card-grid--three {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .step-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .step-grid li {
+    min-width: 0;
+  }
+
+  .doc-card--step {
+    height: 100%;
+    border-color: var(--line-strong);
+  }
+
+  .step-index {
+    color: var(--accent-ink, var(--accent));
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
   }
 
   .doc-card {

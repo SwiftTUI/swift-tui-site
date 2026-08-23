@@ -3,35 +3,37 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // Audience: people choosing a TUI framework, in any language. The pitch is
 // the track record and shape of the declarative model itself — never "you
-// already know SwiftUI".
+// already know SwiftUI". Four cards, each one concrete claim; the same four
+// (state in / screen out · components + focus · terminal negotiated · one
+// binary) anchor the swift-tui README and the org profile.
 const cards = [
   {
     n: "01",
     title: "State in, screen out",
     body:
-      "There is no draw loop, no buffer diffing, and no repaint bookkeeping. Views are a pure function of your app's state: change a value and the runtime recomputes layout and rewrites exactly the cells that changed. SwiftUI has spent seven years hardening that model in production; here it is the entire programming model.",
+      "Change a value and the runtime recomputes layout and rewrites exactly the cells that changed. No draw loop, no buffer diffing, no repaint bookkeeping.",
     sym: "View · @State · @Observable · body",
   },
   {
     n: "02",
     title: "Real components, real focus",
     body:
-      "Buttons, text fields, pickers, sliders, scroll views, and charts, with a focus engine, tab traversal, keyboard chords, tap · drag · hover gestures, and animation built in. You compose behavior instead of hand-routing key events to widgets.",
-    sym: "@FocusState · TapGesture · withAnimation · SwiftTUICharts",
+      "Buttons, text fields, pickers, sliders, lists, tables, and scroll views, with focus traversal, keyboard chords, tap · drag · hover gestures, and animation built in.",
+    sym: "@FocusState · TapGesture · withAnimation · List",
   },
   {
     n: "03",
     title: "The terminal, negotiated for you",
     body:
-      "Truecolor, Kitty and Sixel images, OSC 8 hyperlinks, and mouse reporting are probed per session and degrade gracefully: one binary is correct in kitty, a bare SSH session, or CI. You write views, never escape codes.",
+      "Truecolor, Kitty and Sixel images, OSC 8 links, and mouse reporting are probed per session and degrade gracefully, so one binary is right in kitty, over SSH, or in CI. --accessible, --reduce-motion, --no-color, and --ascii come free.",
     sym: "TerminalCapabilityProfile · Kitty · Sixel · OSC 8",
   },
   {
     n: "04",
-    title: "One compiled binary",
+    title: "One binary, testable without a TTY",
     body:
-      "Swift 6 compiles your interface into a single fast executable with checked concurrency. Layout and state are type-checked at build time, and tests render frames as integer-cell rasters without a TTY.",
-    sym: "SwiftPM · Swift 6 · RasterSurface",
+      "Swift 6 compiles your interface into a single executable with checked concurrency. A frame is a pure function of the view tree and a size, so tests compare integer-cell frames with no terminal attached.",
+    sym: "SwiftPM · Swift 6 · RenderOnce",
   },
 ];
 
@@ -114,12 +116,10 @@ const rows = [
       <p class="home-kicker">Why SwiftTUI</p>
       <h2 id="why-title">A proven UI model, pointed at the terminal.</h2>
       <p>
-        Most TUI toolkits make you choose between a low-level draw loop and a
-        widget set with its own ad-hoc state story. SwiftTUI instead borrows
-        the declarative model SwiftUI has proven at platform scale (the
-        interface is a function of state) and aims it at terminal cells. You
-        declare views; the framework owns layout, focus, redraw, and the
-        terminal itself.
+        Most TUI toolkits offer a low-level draw loop or a widget set with its
+        own state story. SwiftTUI takes the declarative model SwiftUI has
+        proven at platform scale and aims it at terminal cells: you declare
+        views; the framework owns layout, focus, redraw, and the terminal.
       </p>
     </header>
 
@@ -141,9 +141,8 @@ const rows = [
     <div class="compare-head">
       <h3>How it compares</h3>
       <p>
-        Capability axes against the other major TUI frameworks. The first
-        three are the day-one terminal experience; the last three are where
-        the same source can travel later.
+        The first three columns are the day-one terminal experience; the last
+        three are where the same source can go later.
       </p>
     </div>
 
@@ -170,30 +169,14 @@ const rows = [
       Verified August 2026 against current releases: Bubble Tea 2.0 ·
       Textual 8.2 · Ratatui 0.30 · Ink 7.1. <span class="lk">✓</span>&nbsp;first-party
       · <span class="lk">~</span>&nbsp;partial, separate package, or raw mouse events
-      · <span class="lk">—</span>&nbsp;none. Ratzilla is a separate crate in the
-      Ratatui org; Textual's browser host streams a server-side process through
-      xterm.js. SwiftTUI's browser paths render to the DOM with a real
-      accessibility tree for one-way semantic presentation; assistive-origin
-      control actions are not part of the 0.9 preview.
+      · <span class="lk">—</span>&nbsp;none. SwiftTUI's browser paths render
+      to the DOM with a real accessibility tree, not through a terminal emulator.
     </p>
 
-    <p class="why-hosts">
-      Terminal first: when you need it, the same views also run in the
-      browser, in native macOS and iOS windows, and in an Android arm64
-      preview. Android packaging is limited to <span class="mono">arm64-v8a</span>,
-      API 28+, and NDK 27.3.13750724 through the AAR/Gradle-plugin path. Full IME
-      marked/pre-edit composition is incomplete and semantics are one-way; a
-      connected journey exists, but current candidate device acceptance remains
-      pending.
-      Start with the{" "}
-      <a href={`${base}/docs/documentation/swifttui/choosing-modules-and-platforms`}>
-        hosts &amp; platforms guide</a>, or go straight to{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-web" rel="noreferrer noopener">
-        swift-tui-web</a>,{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-swiftui" rel="noreferrer noopener">
-        swift-tui-swiftui</a>, or{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-android" rel="noreferrer noopener">
-        swift-tui-android</a>.
+    <p class="why-from-swiftui">
+      Coming from SwiftUI? The shape is the same; the terminal-native
+      differences are deliberate and recorded in the open.{" "}
+      <a href={`${base}/differences-from-swiftui/`}>Read the primer</a>.
     </p>
   </div>
 </section>
@@ -385,7 +368,7 @@ const rows = [
     color: var(--home-ink);
   }
 
-  .why-hosts {
+  .why-from-swiftui {
     margin-top: 34px;
     max-width: 74ch;
     color: var(--home-muted);
@@ -394,14 +377,14 @@ const rows = [
     text-wrap: pretty;
   }
 
-  .why-hosts a {
+  .why-from-swiftui a {
     padding-bottom: 1px;
     border-bottom: 1px solid var(--home-line-strong);
     color: var(--home-ink);
     white-space: nowrap;
   }
 
-  .why-hosts a:hover {
+  .why-from-swiftui a:hover {
     border-color: var(--home-accent);
   }
 

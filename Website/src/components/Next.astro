@@ -1,43 +1,76 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Four reading paths, ordered by tier: the first-hour docs, the SwiftUI
+// primer, the example roster, then the internals walkthrough ("under the
+// hood" is a credibility asset for evaluators, not lead copy). Below the
+// paths, the home page's ONE host block — browser deployment first, native
+// hosts in a clause. Host caveats live on the host repos, not here.
+const paths = [
+  {
+    kicker: "Documentation",
+    title: "The first-hour guides: views, state and focus, running apps",
+    cta: "Browse the docs",
+    href: `${base}/guides/`,
+  },
+  {
+    kicker: "From SwiftUI",
+    title: "What transfers, what is deliberately different, and why",
+    cta: "Read the primer",
+    href: `${base}/differences-from-swiftui/`,
+  },
+  {
+    kicker: "Examples",
+    title: "Every maintained terminal app, and the demo on every host",
+    cta: "Browse examples",
+    href: `${base}/showcase/`,
+  },
+  {
+    kicker: "Under the hood",
+    title: "resolve → measure → place → semantics → draw → raster → commit",
+    cta: "Read about the pipeline",
+    href: `${base}/pipeline/`,
+  },
+];
 ---
 
-<section class="hosts" id="next" aria-labelledby="next-title">
+<section class="next" id="next" aria-labelledby="next-title">
   <div class="shell">
-    <header class="hosts-head">
+    <header class="next-head">
       <h2 id="next-title">Further reading</h2>
     </header>
     <nav class="audience-paths" aria-label="Choose a SwiftTUI guide">
-      <a href={`${base}/guides/`}>
-        <span>Documentation</span>
-        <strong>Guides for views, state, focus, hosting, and charts</strong>
-        <i>Browse the docs</i>
-      </a>
-      <a href={`${base}/showcase/`}>
-        <span>Examples</span>
-        <strong>Maintained applications across the host family</strong>
-        <i>Browse examples</i>
-      </a>
-      <a
-        href={`${base}/pipeline/`}
-      >
-        <span>Concepts</span>
-        <strong>resolve → measure → place → semantics → draw → raster → commit</strong>
-        <i>Read about the pipeline</i>
-      </a>
-      <a href={`${base}/differences-from-swiftui/`}>
-        <span>From SwiftUI</span>
-        <strong>What transfers, what is deliberately different, and why</strong>
-        <i>Read the primer</i>
-      </a>
-      <a
-        href={`${base}/docs/documentation/swifttui/choosing-modules-and-platforms`}
-      >
-        <span>Capabilities &amp; platforms</span>
-        <strong>Cell-based UI on terminal, Web, Native iOS and macOS, Android.</strong>
-        <i>Open the host guide</i>
-      </a>
+      {
+        paths.map((p) => (
+          <a href={p.href}>
+            <span>{p.kicker}</span>
+            <strong>{p.title}</strong>
+            <i>{p.cta}</i>
+          </a>
+        ))
+      }
     </nav>
+
+    <div class="beyond" id="beyond">
+      <p class="home-kicker">Beyond the terminal</p>
+      <p>
+        Terminal first, not terminal only. The same <span class="mono">App</span>{" "}
+        runs in a browser: <span class="mono">--web</span> serves it on
+        localhost, or build it with <span class="mono">SwiftTUIWASI</span> and
+        ship a static bundle with{" "}
+        <a href="https://github.com/SwiftTUI/swift-tui-web" rel="noreferrer noopener">
+          @swifttui/web</a>, as the demo above is. It also embeds in native apps
+        through{" "}
+        <a href="https://github.com/SwiftTUI/swift-tui-swiftui" rel="noreferrer noopener">
+          swift-tui-swiftui</a>{" "}
+        (macOS, iOS) and{" "}
+        <a href="https://github.com/SwiftTUI/swift-tui-android" rel="noreferrer noopener">
+          swift-tui-android</a>{" "}
+        (arm64 preview). No terminal emulators. Start from{" "}
+        <a href={`${base}/docs/documentation/swifttuiruntime/hosts-and-platforms`}>
+          Hosts and Platforms</a>.
+      </p>
+    </div>
 
     <div class="closing">
       <div class="closing-copy">
@@ -70,95 +103,25 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 </section>
 
 <style>
-  .hosts {
+  .next {
     padding: clamp(58.667px, 7.333vw, 100px) 0
       clamp(88px, 11vw, 150px);
     border-bottom: 1px solid var(--home-ink);
   }
 
-  .hosts-head {
+  .next-head {
     display: grid;
     gap: 20px;
     max-width: 860px;
     margin-bottom: 52px;
   }
 
-  .hosts-head h2 {
+  .next-head h2 {
     font-size: clamp(44px, 6.5vw, 82px);
     font-weight: 520;
     line-height: 0.95;
     letter-spacing: -0.062em;
     text-wrap: balance;
-  }
-
-  .hosts-head p {
-    max-width: 58ch;
-    color: var(--home-muted);
-    font-size: 17px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .host-map {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
-    border-top: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-  }
-
-  .engine {
-    display: flex;
-    min-height: 320px;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 28px;
-    border-right: 1px solid var(--home-ink);
-    background: var(--home-accent);
-    color: var(--home-accent-on);
-  }
-
-  .engine span {
-    font-weight: 700;
-  }
-
-  .engine strong {
-    max-width: 14ch;
-    font-size: clamp(28px, 3vw, 38px);
-    line-height: 1.03;
-    letter-spacing: -0.045em;
-  }
-
-  .host-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .host-list span {
-    display: flex;
-    min-height: 104px;
-    align-items: flex-end;
-    padding: 20px;
-    border-right: 1px solid var(--home-line);
-    border-bottom: 1px solid var(--home-line);
-    color: var(--home-muted);
-  }
-
-  .host-list span:nth-child(2n) {
-    border-right: 0;
-  }
-
-  .host-list span:last-child {
-    grid-column: 1 / -1;
-    border-bottom: 0;
-  }
-
-  .host-caveat {
-    max-width: 86ch;
-    margin: 15px 0 60px;
-    color: var(--home-quiet);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    line-height: 1.6;
   }
 
   .audience-paths {
@@ -194,6 +157,36 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     border-bottom: 1px solid var(--home-accent);
     font-size: 13px;
     font-style: normal;
+  }
+
+  .beyond {
+    display: grid;
+    gap: 12px;
+    max-width: 78ch;
+    margin-top: 44px;
+  }
+
+  .beyond > p:last-child {
+    color: var(--home-muted);
+    font-size: 14.5px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .beyond .mono {
+    color: var(--home-ink);
+    font-size: 0.92em;
+  }
+
+  .beyond a {
+    padding-bottom: 1px;
+    border-bottom: 1px solid var(--home-line-strong);
+    color: var(--home-ink);
+    white-space: nowrap;
+  }
+
+  .beyond a:hover {
+    border-color: var(--home-accent);
   }
 
   .closing {
@@ -234,6 +227,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   }
 
   @media (max-width: 900px) {
+    .audience-paths a {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 22px 0;
+    }
+
+    .audience-paths i {
+      justify-self: start;
+      margin-top: 8px;
+    }
+
     .closing {
       grid-template-columns: 1fr;
       gap: 32px;
@@ -248,44 +252,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
     .closing-action .home-button {
       width: 100%;
-    }
-  }
-
-  @media (max-width: 900px) {
-    .host-map {
-      grid-template-columns: 1fr;
-    }
-
-    .engine {
-      min-height: 230px;
-      border-right: 0;
-      border-bottom: 1px solid var(--home-ink);
-    }
-
-    .audience-paths a {
-      grid-template-columns: 1fr;
-      gap: 8px;
-      padding: 22px 0;
-    }
-
-    .audience-paths i {
-      justify-self: start;
-      margin-top: 8px;
-    }
-  }
-
-  @media (max-width: 620px) {
-    .host-list {
-      grid-template-columns: 1fr;
-    }
-
-    .host-list span,
-    .host-list span:nth-child(2n) {
-      border-right: 0;
-    }
-
-    .host-list span:last-child {
-      grid-column: auto;
     }
   }
 </style>

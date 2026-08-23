@@ -9,11 +9,9 @@ const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
       <p class="home-kicker">Get started</p>
       <h2 id="start-title">A terminal and a toolchain. That's it.</h2>
       <p>
-        SwiftTUI apps are plain SwiftPM packages: any Swift 6.3+ toolchain
-        builds and runs them from the command line, on macOS, Linux, or
-        Windows. You do not need an Xcode project, a simulator, or an app
-        store. If you already run a current Xcode, its bundled toolchain is
-        all you need.
+        SwiftTUI apps are plain SwiftPM packages. Any Swift 6.3+ toolchain
+        builds and runs them from the command line on macOS, Linux, or
+        Windows: no Xcode project, no simulator, no app store.
       </p>
     </header>
 
@@ -31,9 +29,9 @@ git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
 cd swift-tui-counter-demo
 swift run --package-path counter counter</code></pre>
         <p class="start-note">
-          The same counter as the live demo above, drawn in your own terminal.{" "}
-          <span class="mono">Space</span> increments;{" "}
-          <span class="mono">Ctrl-C</span> quits.
+          The counter from the demo above, drawn in your own terminal.{" "}
+          <span class="mono">Space</span> or a click increments;{" "}
+          <span class="mono">Ctrl-C</span> quits and restores your shell.
         </p>
       </article>
 
@@ -41,18 +39,15 @@ swift run --package-path counter counter</code></pre>
         <article aria-labelledby="start-toolchain-title">
           <h3 id="start-toolchain-title">Pick a toolchain</h3>
           <p>
-            <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a>,
-            Swift's official toolchain installer for macOS and Linux,
-            puts <span class="mono">swift</span> on your path in one step,
-            without Xcode. On a Mac with a current Xcode, skip it: the
-            toolchain is already installed. On Windows, use the{" "}
+            <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a>{" "}
+            on macOS and Linux, a current Xcode on a Mac, or the{" "}
             <a href="https://www.swift.org/install/windows/" rel="noreferrer noopener">
-              swift.org installer</a> instead.
+              swift.org installer</a> on Windows.
           </p>
         </article>
 
         <article aria-labelledby="start-package-title">
-          <h3 id="start-package-title">Add it to your app</h3>
+          <h3 id="start-package-title">Start your own app</h3>
           <pre tabindex="0"><code><span class="cm">// Package.swift</span>
 .package(
   url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
@@ -60,9 +55,11 @@ swift run --package-path counter counter</code></pre>
 ),
 <span class="cm">// in your executable target:</span>
 .product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>
-          <a class="start-docs-link" href={`${base}/guides/`}>
-            Read the documentation
-          </a>
+          <p class="start-next">
+            Paste the counter above into <span class="mono">main.swift</span> and{" "}
+            <span class="mono">swift run</span>. Then the{" "}
+            <a href={`${base}/guides/#first-hour`}>first-hour guides</a>.
+          </p>
         </article>
       </div>
     </div>
@@ -141,15 +138,13 @@ swift run --package-path counter counter</code></pre>
     color: var(--home-muted);
   }
 
-  .start-run > header a,
-  .start-docs-link {
+  .start-run > header a {
     padding-bottom: 2px;
     border-bottom: 1px solid var(--home-line-strong);
     color: var(--home-muted);
   }
 
-  .start-run > header a:hover,
-  .start-docs-link:hover {
+  .start-run > header a:hover {
     border-color: var(--home-accent);
     color: var(--home-ink);
   }
@@ -181,7 +176,8 @@ swift run --package-path counter counter</code></pre>
     line-height: 1.55;
   }
 
-  .start-note .mono {
+  .start-note .mono,
+  .start-next .mono {
     color: var(--home-ink);
     font-size: 0.92em;
   }
@@ -234,9 +230,8 @@ swift run --package-path counter counter</code></pre>
     padding: 14px 0 16px;
   }
 
-  .start-docs-link {
-    display: inline-block;
-    font-size: 13px;
+  .start-next {
+    margin-top: 4px;
   }
 
   @media (max-width: 900px) {

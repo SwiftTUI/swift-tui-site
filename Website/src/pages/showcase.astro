@@ -14,7 +14,7 @@ const canonical = `${site}${base || ""}/showcase/`;
 const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Showcase";
 const description =
-  "One SwiftTUI component gallery rendered by every host, and every maintained example app in swift-tui-examples you can clone and run.";
+  "Real terminal apps built with SwiftTUI, every one a maintained example in swift-tui-examples you can clone and run, plus the same component gallery rendered by every host.";
 
 // Live WebExample embed. The whole origin is cross-origin isolated (public/_headers
 // applies COOP/COEP to /*), so the iframe's SharedArrayBuffer-backed stdin works on
@@ -44,8 +44,20 @@ type Host = {
   preview?: boolean;
 };
 
-// The same gallery surface (GalleryDemoViews / gallery-demo), rendered by each host.
+// The same gallery surface (GalleryDemoViews / gallery-demo), rendered by each
+// host. Terminal first: it is the native substrate and the core experience;
+// the others are where the same view can travel. Host caveats (Android's
+// packaging, IME, and semantics limits) live on the host repos' READMEs and
+// in the Hosts-And-Platforms article, not in these captions.
 const hosts: Host[] = [
+  {
+    slug: "terminal",
+    platform: "Terminal",
+    host: "SwiftTUICLI",
+    body: "The native substrate. ANSI / Kitty / Sixel are negotiated against the live terminal, with mouse and signals on by default.",
+    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gallery",
+    img: `${base}/showcase/host-terminal.png`,
+  },
   {
     slug: "macos",
     platform: "macOS",
@@ -58,7 +70,7 @@ const hosts: Host[] = [
     slug: "ios",
     platform: "iOS",
     host: "SwiftUIHost",
-    body: "The same scenes in a native iOS app shell, with keyboard and pointer input plus a one-way VoiceOver-readable semantic overlay.",
+    body: "The same scenes in a native iOS app shell, with keyboard and pointer input and a VoiceOver-readable semantic overlay.",
     href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/SwiftUIExample",
     img: `${base}/showcase/host-ios.png`,
   },
@@ -66,18 +78,10 @@ const hosts: Host[] = [
     slug: "android",
     platform: "Android · arm64 preview",
     host: "SwiftTUIAndroidHost",
-    body: "Arm64 preview: Swift paints through Compose and JNI using the API 28+ / NDK 27.3.13750724 AAR/Gradle-plugin path. Full IME pre-edit is incomplete and semantics are one-way; current candidate device acceptance remains pending.",
+    body: "Swift paints through Compose and JNI. An arm64 preview; its current limits are recorded on swift-tui-android.",
     href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/AndroidGallery",
     img: `${base}/showcase/host-android.png`,
     preview: true,
-  },
-  {
-    slug: "terminal",
-    platform: "Terminal",
-    host: "SwiftTUICLI",
-    body: "The native substrate. ANSI / Kitty / Sixel are negotiated against the live terminal, with mouse and signals on by default.",
-    href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gallery",
-    img: `${base}/showcase/host-terminal.png`,
   },
 ];
 
@@ -90,6 +94,8 @@ type Tile = {
   img: string;
 };
 
+// Same order as the swift-tui README's 2×2 (gifeditor · csvui · terminal-
+// workspace · mrkdwn), then the two that only fit here.
 const tiles: Tile[] = [
   {
     slug: "gifeditor",
@@ -101,6 +107,15 @@ const tiles: Tile[] = [
     img: `${base}/showcase/gifeditor.png`,
   },
   {
+    slug: "csvui",
+    title: "csvui",
+    subtitle: "A viewer-first CSV/TSV workbench.",
+    body:
+      "It indexes the source bytes once and decodes only the rows the viewport needs, so a 34,000-row GeoNames city table stays responsive. Sparse editing, search, filtering, sorting, file watching, and safe atomic saves.",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
+    img: `${base}/showcase/csvui.png`,
+  },
+  {
     slug: "terminal-workspace",
     title: "Terminal Workspace",
     subtitle: "Zellij-style tabs, splits, and a command palette.",
@@ -108,15 +123,6 @@ const tiles: Tile[] = [
       "Multi-pane terminal workspace built on SwiftTUITerminal. Persisted layouts, focused chrome, command palette, embedded pty sessions. The framework is large enough to host its own multiplexer.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace",
     img: `${base}/showcase/terminal-workspace.png`,
-  },
-  {
-    slug: "git-viz",
-    title: "git-viz",
-    subtitle: "Every SwiftTUICharts primitive against a real repo.",
-    body:
-      "Seventeen subcommands render BarChart, ColumnChart, StackedBarChart, ComparisonChart, LineChart, Sparkline, Timeline, HeatStrip, CalendarHeatmap, BulletChart, ThresholdGauge, Meter, and Legend against the git history of whatever repo you point it at. Dashboards in a terminal.",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/git-viz",
-    img: `${base}/showcase/git-viz.png`,
   },
   {
     slug: "mrkdwn",
@@ -128,13 +134,13 @@ const tiles: Tile[] = [
     img: `${base}/showcase/mrkdwn.png`,
   },
   {
-    slug: "csvui",
-    title: "csvui",
-    subtitle: "A viewer-first CSV/TSV workbench.",
+    slug: "git-viz",
+    title: "git-viz",
+    subtitle: "Every SwiftTUICharts primitive against a real repo.",
     body:
-      "It indexes the source bytes once and decodes only the rows the viewport needs, so a 34,000-row GeoNames city table stays responsive. Sparse editing, search, filtering, sorting, file watching, and safe atomic saves.",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
-    img: `${base}/showcase/csvui.png`,
+      "Seventeen subcommands render BarChart, ColumnChart, StackedBarChart, ComparisonChart, LineChart, Sparkline, Timeline, HeatStrip, CalendarHeatmap, BulletChart, ThresholdGauge, Meter, and Legend against the git history of whatever repo you point it at. Dashboards in a terminal.",
+    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/git-viz",
+    img: `${base}/showcase/git-viz.png`,
   },
   {
     slug: "sextant",
@@ -186,21 +192,59 @@ const tiles: Tile[] = [
             <span class="eyebrow mono"><span class="num">/00</span>Showcase</span>
             <h1>Built with SwiftTUI.</h1>
             <p class="lede">
-              The framework already runs real, non-trivial apps, and runs the
-              same one on every host. Below: one component gallery rendered five
-              ways, then every maintained example app in{" "}
+              Real, non-trivial terminal apps, every one a maintained example in{" "}
               <span class="mono">swift-tui-examples</span> you can clone and run
-              with a single command.
+              with a single command. Then the encore: one component gallery,
+              rendered by every host the same views can travel to.
             </p>
           </header>
 
-          <!-- ── /01 · the same gallery, every host ──────────────────────── -->
+          <!-- ── /01 · maintained example apps ───────────────────────────── -->
+          <section class="examples" aria-labelledby="examples-title">
+            <header class="sub-head">
+              <span class="eyebrow mono"><span class="num">/01</span>Example apps</span>
+              <h2 id="examples-title">Built in the open.</h2>
+              <p class="sub-lede">
+                Maintained example apps from{" "}
+                <span class="mono">swift-tui-examples</span>. Each builds from a
+                fresh clone with one command.
+              </p>
+            </header>
+
+            <ol class="grid">
+              {tiles.map((t) => (
+                <li class="tile">
+                  <a class="link" href={t.repo} rel="noreferrer noopener">
+                    <div class="shot">
+                      <img
+                        src={t.img}
+                        alt={`${t.title} screenshot`}
+                        loading="lazy"
+                        width="1200"
+                        height="750"
+                      />
+                    </div>
+                    <div class="meta">
+                      <h3>{t.title}</h3>
+                      <p class="sub">{t.subtitle}</p>
+                      <p class="body">{t.body}</p>
+                      <span class="cta mono">view source →</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <!-- ── /02 · the same gallery, every host ──────────────────────── -->
           <section class="hosts" aria-labelledby="hosts-title">
             <header class="sub-head">
-              <span class="eyebrow mono"><span class="num">/01</span>Every host</span>
+              <span class="eyebrow mono"><span class="num">/02</span>Beyond the terminal</span>
               <h2 id="hosts-title">One gallery. Every host.</h2>
               <p class="sub-lede">
-                One SwiftTUI view, running in four different hosts.
+                The same <span class="mono">gallery-demo</span> view, drawn by
+                the terminal and by each host it can travel to. Terminal first,
+                not terminal only.
               </p>
             </header>
 
@@ -275,9 +319,10 @@ const tiles: Tile[] = [
               </div>
               <div class="web-meta">
                 <p class="device-body">
-                  The shared counter <span class="mono">View</span>, built to
-                  <span class="mono"> wasm32-wasi</span> and mounted on a canvas
-                  through <span class="mono">@swifttui/web</span>, without xterm.js.
+                  The counter from the home page, built to
+                  <span class="mono"> wasm32-wasi</span> and mounted through{" "}
+                  <span class="mono">@swifttui/web</span>: a canvas plus a real
+                  accessibility tree, no terminal emulator.
                 </p>
                 <div class="web-actions mono">
                   <a class="solid" href={webDemoHref}>open full demo →</a>
@@ -285,42 +330,6 @@ const tiles: Tile[] = [
                 </div>
               </div>
             </div>
-          </section>
-
-          <!-- ── /02 · maintained example apps ───────────────────────────── -->
-          <section class="examples" aria-labelledby="examples-title">
-            <header class="sub-head">
-              <span class="eyebrow mono"><span class="num">/02</span>Example apps</span>
-              <h2 id="examples-title">Built in the open.</h2>
-              <p class="sub-lede">
-                Maintained example apps from{" "}
-                <span class="mono">swift-tui-examples</span>.
-              </p>
-            </header>
-
-            <ol class="grid">
-              {tiles.map((t) => (
-                <li class="tile">
-                  <a class="link" href={t.repo} rel="noreferrer noopener">
-                    <div class="shot">
-                      <img
-                        src={t.img}
-                        alt={`${t.title} screenshot`}
-                        loading="lazy"
-                        width="1200"
-                        height="750"
-                      />
-                    </div>
-                    <div class="meta">
-                      <h3>{t.title}</h3>
-                      <p class="sub">{t.subtitle}</p>
-                      <p class="body">{t.body}</p>
-                      <span class="cta mono">view source →</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ol>
           </section>
         </div>
       </section>
@@ -430,12 +439,12 @@ const tiles: Tile[] = [
     text-wrap: pretty;
   }
 
-  .hosts {
+  .examples {
     padding: 32px 0 64px;
     border-bottom: 1px solid var(--home-ink);
   }
 
-  .examples {
+  .hosts {
     padding-top: 32px;
   }
 

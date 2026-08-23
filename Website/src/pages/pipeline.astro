@@ -63,7 +63,7 @@ const description =
         <div class="rp-main">
           <!-- ===================== INTRO ===================== -->
           <section class="lede" id="intro">
-            <p class="eyebrow">Onboarding walkthrough</p>
+            <p class="eyebrow">Under the hood</p>
             <h1>What happens between your <code>View</code> and the terminal</h1>
             <p class="lede-copy">
               A SwiftTUI frame is not "draw the view." It is a compiler-style
@@ -71,8 +71,9 @@ const description =
               through a chain of typed, immutable representations, each one closer
               to the terminal and able to answer a question the one before it
               could not. This page follows one small view down that ladder and links
-              each step to its source. New framework developers can use it as an
-              introduction. Renderer developers can use it as a reference.
+              each step to its source. You do not need any of it to build an app;
+              read it when you want to know why frames are deterministic and
+              snapshot-testable, or when you start working on the framework itself.
             </p>
             <dl class="lede-facts">
               <div>

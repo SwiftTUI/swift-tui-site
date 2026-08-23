@@ -3,8 +3,13 @@ import DemoTerminal from "./DemoTerminal.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const demoRepoHref = "https://github.com/SwiftTUI/swift-tui-counter-demo";
-const sourceHref =
-  `${demoRepoHref}/blob/main/counter/Sources/CounterCore/CounterApp.swift`;
+// The source pane shows the counter the way a terminal app would write it:
+// `import SwiftTUI`, one View, one App — the same sample as the swift-tui
+// README. The live demo beside it additionally paints a ripple on each
+// increment; that layer is omitted here (and labeled as such) so the first code
+// a visitor reads is a first app, not the multi-host library form. The full
+// file, ripple included, is one click away.
+const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/CounterView.swift`;
 ---
 
 <section class="home-hero" aria-labelledby="hero-title">
@@ -16,7 +21,8 @@ const sourceHref =
           Views, State, Observation, Gestures, Animations—
         </p>
         <p>
-          SwiftUI semantics, drawn in terminal cells.
+          SwiftUI semantics, drawn in terminal cells. One native binary for
+          macOS, Linux, and Windows.
         </p>
         <div class="hero-actions">
           <a class="home-button home-button--primary" href="#demo">
@@ -30,9 +36,19 @@ const sourceHref =
             View source
           </a>
         </div>
-        <a class="hero-docs-link" href={`${base}/docs/documentation/`}>
-          Read the API reference
-        </a>
+        <div class="hero-meta">
+          <a class="hero-docs-link" href={`${base}/guides/`}>
+            Read the docs
+          </a>
+          <a
+            class="hero-version mono"
+            href="https://github.com/SwiftTUI/swift-tui/blob/main/CHANGELOG.md"
+            rel="noreferrer noopener"
+            title="Beta, pre-1.0: pin with .upToNextMinor"
+          >
+            beta 0.9.7
+          </a>
+        </div>
       </div>
     </div>
 
@@ -41,51 +57,32 @@ const sourceHref =
         <header>
           <div>
             <strong id="counter-source-title">Source</strong>
-            <span>CounterApp.swift</span>
+            <span>The counter, minus its ripple animation</span>
           </div>
-          <a href={sourceHref} rel="noreferrer noopener">Open file</a>
+          <a href={sourceHref} rel="noreferrer noopener">Full source</a>
         </header>
         <pre
           class="counter-source"
           tabindex="0"
-        ><code><span class="kw">public import</span> <span class="ty">SwiftTUIRuntime</span>
+        ><code><span class="kw">import</span> <span class="ty">SwiftTUI</span>
 
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
-
-  <span class="at">@Environment</span>(\.terminalSize) <span class="kw">private var</span> terminalSize
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-  <span class="at">@State</span> <span class="kw">private var</span> activeRippleID: <span class="ty">Int</span>? = <span class="kw">nil</span>
 
   <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
     <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
       <span class="ty">TextFigure</span>(<span class="str">"\(count)"</span>, font: .future)
         .frame(minWidth: <span class="num">14</span>, alignment: .center)
-      <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123;
-        count += <span class="num">1</span>
-      &#125;
+      <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123; count += <span class="num">1</span> &#125;
     &#125;
     .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
-    .onChange(of: count) &#123;
-      <span class="kw">if</span> activeRippleID == <span class="kw">nil</span> &#123;
-        activeRippleID = count
-      &#125;
-    &#125;
-    .background &#123;
-      <span class="kw">if let</span> rippleID = activeRippleID &#123;
-        <span class="ty">RippleLayer</span>(reach: reach) &#123;
-          <span class="kw">if</span> activeRippleID == rippleID &#123;
-            activeRippleID = <span class="kw">nil</span>
-          &#125;
-        &#125;
-        .id(rippleID)
-      &#125;
-    &#125;
   &#125;
+&#125;
 
-  <span class="kw">private var</span> reach: <span class="ty">Double</span> &#123;
-    <span class="kw">let</span> horizontal = <span class="ty">Double</span>(terminalSize.width) / <span class="num">2</span>
-    <span class="kw">let</span> vertical = <span class="ty">Double</span>(terminalSize.height)
-    <span class="kw">return</span> (horizontal * horizontal + vertical * vertical).squareRoot()
+<span class="at">@main</span>
+<span class="kw">struct</span> <span class="ty">CounterApp</span>: <span class="ty">App</span> &#123;
+  <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">Scene</span> &#123;
+    <span class="ty">WindowGroup</span>(<span class="str">"Counter"</span>) &#123; <span class="ty">CounterView</span>() &#125;
   &#125;
 &#125;
 </code></pre>
@@ -96,9 +93,9 @@ const sourceHref =
       </div>
     </div>
     <div class="demo-local">
-      <p>Run this same counter in the terminal, SwiftUI, or a browser.</p>
+      <p>The same counter in your own terminal: one clone, one command.</p>
       <a class="home-button home-button--primary" href="#get-started">
-        Clone the counter
+        Run it locally
       </a>
     </div>
   </div>
@@ -146,8 +143,14 @@ const sourceHref =
     gap: 9px;
   }
 
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+  }
+
   .hero-docs-link {
-    justify-self: start;
     padding-bottom: 2px;
     border-bottom: 1px solid var(--home-line-strong);
     color: var(--home-muted);
@@ -155,6 +158,20 @@ const sourceHref =
   }
 
   .hero-docs-link:hover {
+    border-color: var(--home-accent);
+    color: var(--home-ink);
+  }
+
+  .hero-version {
+    padding: 3px 8px;
+    border: 1px solid var(--home-line-strong);
+    border-radius: 3px;
+    color: var(--home-quiet);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-version:hover {
     border-color: var(--home-accent);
     color: var(--home-ink);
   }
@@ -230,6 +247,7 @@ const sourceHref =
     padding-bottom: 2px;
     border-bottom: 1px solid var(--home-line-strong);
     color: var(--home-muted);
+    white-space: nowrap;
   }
 
   .source-pane > header a:hover {
@@ -244,8 +262,8 @@ const sourceHref =
     background: var(--home-paper);
     color: var(--home-code);
     font-family: var(--font-mono);
-    font-size: clamp(10.5px, 0.9vw, 12px);
-    line-height: 1.68;
+    font-size: clamp(11.5px, 0.95vw, 13px);
+    line-height: 1.72;
     tab-size: 2;
   }
 
@@ -346,7 +364,7 @@ const sourceHref =
     .counter-source {
       max-height: 470px;
       padding-inline: 14px;
-      font-size: 10px;
+      font-size: 10.5px;
     }
   }
 </style>
