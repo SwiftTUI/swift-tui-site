@@ -37,72 +37,94 @@ const cards = [
   },
 ];
 
-// Cells carry an explicit state (yes | partial | no) decoupled from their
-// label, so a "—" can still carry a qualifier (e.g. "— immediate-mode").
+// Cells carry an explicit state (yes | partial | no | plain) decoupled from
+// their label, so a "—" can still carry a qualifier (e.g. "— immediate-mode")
+// and an informational cell (Language) carries no verdict at all.
 // Verdicts fact-checked August 2026 against each framework's current release
-// (see the legend below for versions). When re-stamping, re-check the
-// releases — and Ratzilla's home, which moved from orhun/ to the ratatui org.
+// (see the legend below for versions); the Terminal OS, Animations, and Web
+// embed columns were researched 2026-08-24. When re-stamping, re-check the
+// releases — and the ratatui org, which now hosts both Ratzilla (moved from
+// orhun/) and tachyonfx (moved from junkdog/). Verdict notes:
+//   · Terminal OS — Textual and Ratatui run Windows in CI; Bubble Tea ships
+//     tty/termios/signals_windows.go; Ink states no OS support and tests on
+//     Linux only, scored ✓ on the strength of Node and its Windows-shipping
+//     consumers. SwiftTUI: macOS 15+, Linux, Windows 10 1809+.
+//   · Animations — Textual's animate() interpolates with easing (first-party);
+//     Harmonica is Charm's separate spring package, recommended by the Bubble
+//     Tea README; tachyonfx is a post-render effects crate in the ratatui org;
+//     Ink 7.1's useAnimation is a shared frame clock (frame · time · delta)
+//     with no value interpolation — partial.
+//   · Web embed — `textual serve` launches the app as a subprocess per visitor
+//     and streams a terminal over a websocket (textual-web is the same, via a
+//     public tunnel from your machine): nothing static to host, hence
+//     "local only". Ratzilla compiles to a static WASM bundle (DOM or WebGL2).
 const headers = [
-  "Terminal rendering",
+  "Language",
+  "Terminal OS",
   "Declarative UI",
-  "Pointer & gestures",
-  "Native app embed",
-  "Served to browser",
-  "Static WASM build",
+  "Gestures",
+  "Animations",
+  "Web embed",
+  "Native embed",
 ];
 const rows = [
   {
     name: "SwiftTUI",
     accent: true,
     cells: [
-      { s: "yes", t: "✓" },
+      { s: "plain", t: "Swift" },
+      { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "yes", t: "✓ SwiftUI-shaped" },
       { s: "yes", t: "✓ tap·drag·hover" },
-      { s: "yes", t: "✓ SwiftUIHost · Android arm64 preview" },
-      { s: "yes", t: "✓ WebHost · DOM" },
-      { s: "yes", t: "✓ WASI · DOM" },
+      { s: "yes", t: "✓ withAnimation · PhaseAnimator" },
+      { s: "yes", t: "✓ static WASI · WebHost" },
+      { s: "yes", t: "✓ macOS · iOS · Android preview" },
     ],
   },
   {
-    name: "Bubble Tea (Go)",
+    name: "Bubble Tea",
     cells: [
-      { s: "yes", t: "✓" },
+      { s: "plain", t: "Go" },
+      { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "yes", t: "✓ Elm arch" },
       { s: "partial", t: "~ mouse events" },
-      { s: "no", t: "—" },
+      { s: "partial", t: "~ Harmonica" },
       { s: "no", t: "—" },
       { s: "no", t: "—" },
     ],
   },
   {
-    name: "Textual (Python)",
+    name: "Textual",
     cells: [
-      { s: "yes", t: "✓" },
+      { s: "plain", t: "Python" },
+      { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "yes", t: "✓ widgets · CSS" },
       { s: "partial", t: "~ mouse · hover" },
-      { s: "no", t: "—" },
-      { s: "yes", t: "✓ serve · xterm" },
+      { s: "yes", t: "✓ animate() · easing" },
+      { s: "partial", t: "~ textual serve · local only" },
       { s: "no", t: "—" },
     ],
   },
   {
-    name: "Ratatui (Rust)",
+    name: "Ratatui",
     cells: [
-      { s: "yes", t: "✓" },
+      { s: "plain", t: "Rust" },
+      { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "no", t: "— immediate-mode" },
       { s: "partial", t: "~ backend only" },
+      { s: "partial", t: "~ tachyonfx" },
+      { s: "partial", t: "~ Ratzilla · static WASM" },
       { s: "no", t: "—" },
-      { s: "no", t: "—" },
-      { s: "partial", t: "~ Ratzilla · DOM" },
     ],
   },
   {
-    name: "Ink (JS/React)",
+    name: "Ink",
     cells: [
-      { s: "yes", t: "✓" },
+      { s: "plain", t: "JS/React" },
+      { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "yes", t: "✓ React" },
       { s: "no", t: "—" },
-      { s: "no", t: "—" },
+      { s: "partial", t: "~ useAnimation · ticks only" },
       { s: "no", t: "—" },
       { s: "no", t: "—" },
     ],
@@ -141,8 +163,8 @@ const rows = [
     <div class="compare-head">
       <h3>How it compares</h3>
       <p>
-        The first three columns are the day-one terminal experience; the last
-        three are where the same source can go later.
+        The first five columns are the day-one terminal experience; the last
+        two are where the same source can go later.
       </p>
     </div>
 
@@ -169,7 +191,9 @@ const rows = [
       Verified August 2026 against current releases: Bubble Tea 2.0 ·
       Textual 8.2 · Ratatui 0.30 · Ink 7.1. <span class="lk">✓</span>&nbsp;first-party
       · <span class="lk">~</span>&nbsp;partial, separate package, or raw mouse events
-      · <span class="lk">—</span>&nbsp;none. SwiftTUI's browser paths render
+      · <span class="lk">—</span>&nbsp;none · <span class="lk">local only</span>&nbsp;the
+      app runs as a process you host and streams a terminal to the browser;
+      there is no static build to deploy. SwiftTUI's browser paths render
       to the DOM with a real accessibility tree, not through a terminal emulator.
     </p>
 
@@ -299,13 +323,13 @@ const rows = [
   }
 
   .compare {
-    min-width: 920px;
+    min-width: 1080px;
     font-size: 12px;
   }
 
   .row {
     display: grid;
-    grid-template-columns: 1.2fr repeat(6, minmax(0, 1fr));
+    grid-template-columns: 1.1fr 0.6fr repeat(6, minmax(0, 1fr));
     border-bottom: 1px solid var(--home-line);
   }
 
@@ -340,7 +364,8 @@ const rows = [
     border-right: 0;
   }
 
-  .cell.name {
+  .cell.name,
+  .cell[data-state="plain"] {
     color: var(--home-ink);
   }
 
