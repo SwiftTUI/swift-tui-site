@@ -58,7 +58,8 @@ require_text "Scripts/check_site.sh" "$test_workflow"
 require_text ".swift-version" "$test_workflow"
 # Both lanes run on Linux (swift-tui-org plan 2026-08-25-001 Stage 4): nothing
 # in check_site.sh needs macOS, and the macOS gate was the org's largest
-# macOS consumer. binaryen/brotli come from apt, never brew.
+# macOS consumer. brotli comes from apt and binaryen from its pinned release
+# tarball (apt's binaryen 108 breaks the bundle) — never brew.
 require_text "runs-on: ubuntu-24.04" "$test_workflow"
 require_text "runs-on: ubuntu-24.04" "$deploy_workflow"
 forbid_text "runs-on: macos" "$test_workflow"
