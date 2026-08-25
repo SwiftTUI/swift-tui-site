@@ -1,25 +1,38 @@
 name: Test
 
+# Site repo gate. Runs on Linux since swift-tui-org plan 2026-08-25-001
+# Stage 4: nothing in Scripts/check_site.sh needs macOS — the WebExample
+# WASM cross-compile, the Astro build, and both DocC archives all run on
+# Linux x86_64 with the swiftly-managed toolchain — and on `macos-26` with no
+# caches this gate was the single largest macOS consumer in the org (37% of
+# all macOS runner time). The existing composition checks (Brotli-compressed
+# wasm parses, DocC output present) are the proof that the Linux build
+# produced the same artifact shape.
+
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+# The event name keeps each trigger in its own group, so a push to main cannot
+# cancel an in-flight workflow_dispatch run.
 concurrency:
-  group: site-test-${{ github.ref }}
+  group: site-test-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   BUN_VERSION: "1.3.14"
+  SWIFTLY_VERSION: "1.1.3"
 
 jobs:
   test:
     name: Site repo gate
-    runs-on: macos-26
-    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
 
     steps:
       - name: Checkout site
@@ -27,40 +40,134 @@ jobs:
         with:
           path: swift-tui-site
 
+      # binaryen (wasm-opt) and brotli come from apt (the macOS lane used Homebrew);
+      # libcurl is what swiftly's downloaded toolchains link against.
+      - name: Install Linux site gate dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            git \
+            libcurl4-openssl-dev \
+            python3 \
+            unzip \
+            binaryen \
+            brotli
+
+      # The toolchain version tracks the pinned .swift-version. The value is
+      # validated against a strict pattern before any downstream use so
+      # attacker-controlled file contents (e.g. on a fork PR) cannot inject
+      # shell into the steps below; it is then passed via env, never
+      # interpolated directly into a run script.
+      - name: Resolve pinned Swift version
+        id: swift
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < swift-tui-site/.swift-version)"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
+            echo "::error::Unexpected .swift-version contents: '$version'"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Swiftly toolchain
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.local/share/swiftly
+            ~/.local/bin/swiftly
+          key: ${{ runner.os }}-swiftly-${{ env.SWIFTLY_VERSION }}-${{ hashFiles('swift-tui-site/.swift-version') }}
+          restore-keys: |
+            ${{ runner.os }}-swiftly-${{ env.SWIFTLY_VERSION }}-
+
       - name: Install swiftly and Swift toolchain
         shell: bash
-        working-directory: swift-tui-site
         run: |
           set -euo pipefail
-          curl -fsSLO https://download.swift.org/swiftly/darwin/swiftly.pkg
-          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
-          ~/.swiftly/bin/swiftly init --skip-install --quiet-shell-followup --assume-yes
-          . "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/env.sh"
+          export SWIFTLY_HOME_DIR="$HOME/.local/share/swiftly"
+          export SWIFTLY_BIN_DIR="$HOME/.local/bin"
+          mkdir -p "$SWIFTLY_BIN_DIR"
+          export PATH="$SWIFTLY_BIN_DIR:$PATH"
+
+          if ! command -v swiftly >/dev/null 2>&1 || [ ! -f "${SWIFTLY_HOME_DIR}/env.sh" ]; then
+            tmpdir="$(mktemp -d)"
+            trap 'rm -rf "$tmpdir"' EXIT
+            cd "$tmpdir"
+            swiftly_archive="swiftly-${SWIFTLY_VERSION}-$(uname -m).tar.gz"
+            curl -fsSLO "https://download.swift.org/swiftly/linux/${swiftly_archive}"
+            tar -zxf "$swiftly_archive"
+            ./swiftly init --skip-install --quiet-shell-followup --assume-yes
+          fi
+
+          . "${SWIFTLY_HOME_DIR}/env.sh"
           hash -r
-          swift_version="$(tr -d '[:space:]' < .swift-version)"
+          swift_version="$(tr -d '[:space:]' < "$GITHUB_WORKSPACE/swift-tui-site/.swift-version")"
           swiftly install --use --assume-yes "$swift_version"
           swiftly run swift --version
-          echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
-          echo "SWIFTLY_HOME_DIR=$HOME/.swiftly" >> "$GITHUB_ENV"
+          echo "$SWIFTLY_BIN_DIR" >> "$GITHUB_PATH"
+          echo "SWIFTLY_HOME_DIR=$SWIFTLY_HOME_DIR" >> "$GITHUB_ENV"
+          echo "SWIFTLY_BIN_DIR=$SWIFTLY_BIN_DIR" >> "$GITHUB_ENV"
 
-      - name: Install wasm Swift SDK
+      - name: Install the wasm32-wasi Swift SDK
         shell: bash
+        env:
+          SWIFT_VERSION: ${{ steps.swift.outputs.version }}
         run: |
           set -euo pipefail
-          if ! swiftly run swift sdk list | grep -q "swift-6.3.3-RELEASE_wasm"; then
+          . "${SWIFTLY_HOME_DIR}/env.sh"
+          case "$SWIFT_VERSION" in
+            6.3.3)
+              WASM_SDK_CHECKSUM="cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7"
+              ;;
+            *)
+              echo "::error::No pinned wasm SDK checksum for Swift ${SWIFT_VERSION}"
+              exit 1
+              ;;
+          esac
+          if ! swiftly run swift sdk list | grep -q "swift-${SWIFT_VERSION}-RELEASE_wasm"; then
             swiftly run swift sdk install \
-              https://download.swift.org/swift-6.3.3-release/wasm-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_wasm.artifactbundle.tar.gz \
-              --checksum cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7
+              "https://download.swift.org/swift-${SWIFT_VERSION}-release/wasm-sdk/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE_wasm.artifactbundle.tar.gz" \
+              --checksum "$WASM_SDK_CHECKSUM"
           fi
+          swiftly run swift sdk list
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Install site gate dependencies
-        shell: bash
-        run: brew install binaryen brotli
+      # Keyed on docs/releases.yml, as the deploy workflow already does: the
+      # gate builds tagged sibling releases, so the release roster is the only
+      # input that changes which sources get compiled. The WebExample
+      # TerminalApp scratch is cached too — its swift-tui cross-compile from
+      # scratch is the single heaviest step, and the checkout it lives in is
+      # pinned to the same roster, so a hit is byte-for-byte the same source.
+      - name: Cache SwiftPM
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/org.swift.swiftpm
+            ~/.swiftpm
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/TerminalApp/.build
+          key: ${{ runner.os }}-swiftpm-site-${{ hashFiles('swift-tui-site/docs/releases.yml', 'swift-tui-site/.swift-version') }}
+          restore-keys: |
+            ${{ runner.os }}-swiftpm-site-
+
+      - name: Cache Bun deps
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.bun/install/cache
+            swift-tui-site/Website/node_modules
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/node_modules
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/node_modules
+          key: ${{ runner.os }}-bun-site-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-site-
 
       - name: Run site gate
         shell: bash

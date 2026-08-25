@@ -8,6 +8,11 @@ name: Deploy Website to Cloudflare Pages
 #   /              <- Astro site (swift-tui-site/Website/dist/)
 #   /docs/         <- DocC archive
 #   /webexample/   <- swift-tui-counter-demo/WebExample/pages-dist/
+#
+# Runs on Linux since swift-tui-org plan 2026-08-25-001 Stage 4: every step
+# here (wasm cross-compile, Astro, DocC, wrangler) runs on ubuntu with the
+# swiftly-managed toolchain, and the macOS runner it used to occupy was the
+# org's most expensive runner class for no platform reason.
 
 on:
   workflow_dispatch:
@@ -26,17 +31,22 @@ concurrency:
   group: cloudflare-pages-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  BUN_VERSION: "1.3.14"
+  SWIFTLY_VERSION: "1.1.3"
+
 jobs:
   deploy:
     name: Build and deploy to Cloudflare Pages
-    runs-on: macos-26
+    runs-on: ubuntu-24.04
     # 60, not 30: the two heavy steps are Swift builds from scratch whenever the
-    # SwiftPM/Bun cache keys move, which every version bump does. The 0.3.8
-    # release measured 859s for `Build WebExample` and 743s for `Build DocC
-    # archive` on a cold cache, against 456s/408s warm the day before — enough to
-    # blow a 30-minute budget. A timeout is also self-perpetuating here: the job
-    # is cancelled before its `Post Cache` steps run, so the cache it just paid
-    # to populate is never saved and the retry is cold again.
+    # SwiftPM/Bun cache keys move, which every version bump does. On macOS the
+    # 0.3.8 release measured 859s for `Build WebExample` and 743s for `Build
+    # DocC archive` on a cold cache, against 456s/408s warm the day before —
+    # enough to blow a 30-minute budget. A timeout is also self-perpetuating
+    # here: the job is cancelled before its `Post Cache` steps run, so the
+    # cache it just paid to populate is never saved and the retry is cold
+    # again. Lower this only after three cold Linux runs have been measured.
     timeout-minutes: 60
 
     env:
@@ -61,27 +71,77 @@ jobs:
             printf 'url=https://swifttui.sh\n' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install swiftly and Swift toolchain
+      - name: Install Linux build dependencies
         shell: bash
-        working-directory: swift-tui-site
         run: |
           set -euo pipefail
-          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg
-          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
-          ~/.swiftly/bin/swiftly init --skip-install --quiet-shell-followup --assume-yes
-          . "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/env.sh"
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            git \
+            libcurl4-openssl-dev \
+            python3 \
+            unzip \
+            binaryen \
+            brotli
+
+      # Validated against a strict pattern before use; see test.yml.
+      - name: Resolve pinned Swift version
+        id: swift
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < swift-tui-site/.swift-version)"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
+            echo "::error::Unexpected .swift-version contents: '$version'"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Swiftly toolchain
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.local/share/swiftly
+            ~/.local/bin/swiftly
+          key: ${{ runner.os }}-swiftly-${{ env.SWIFTLY_VERSION }}-${{ hashFiles('swift-tui-site/.swift-version') }}
+          restore-keys: |
+            ${{ runner.os }}-swiftly-${{ env.SWIFTLY_VERSION }}-
+
+      - name: Install swiftly and Swift toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          export SWIFTLY_HOME_DIR="$HOME/.local/share/swiftly"
+          export SWIFTLY_BIN_DIR="$HOME/.local/bin"
+          mkdir -p "$SWIFTLY_BIN_DIR"
+          export PATH="$SWIFTLY_BIN_DIR:$PATH"
+
+          if ! command -v swiftly >/dev/null 2>&1 || [ ! -f "${SWIFTLY_HOME_DIR}/env.sh" ]; then
+            tmpdir="$(mktemp -d)"
+            trap 'rm -rf "$tmpdir"' EXIT
+            cd "$tmpdir"
+            swiftly_archive="swiftly-${SWIFTLY_VERSION}-$(uname -m).tar.gz"
+            curl -fsSLO "https://download.swift.org/swiftly/linux/${swiftly_archive}"
+            tar -zxf "$swiftly_archive"
+            ./swiftly init --skip-install --quiet-shell-followup --assume-yes
+          fi
+
+          . "${SWIFTLY_HOME_DIR}/env.sh"
           hash -r
-          SWIFT_VERSION="$(tr -d '[:space:]' < .swift-version)"
-          swiftly install --use --assume-yes "$SWIFT_VERSION"
+          swift_version="$(tr -d '[:space:]' < "$GITHUB_WORKSPACE/swift-tui-site/.swift-version")"
+          swiftly install --use --assume-yes "$swift_version"
           swiftly list
           swiftly run swift --version
-          echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
-          echo "SWIFTLY_HOME_DIR=$HOME/.swiftly" >> "$GITHUB_ENV"
+          echo "$SWIFTLY_BIN_DIR" >> "$GITHUB_PATH"
+          echo "SWIFTLY_HOME_DIR=$SWIFTLY_HOME_DIR" >> "$GITHUB_ENV"
+          echo "SWIFTLY_BIN_DIR=$SWIFTLY_BIN_DIR" >> "$GITHUB_ENV"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.14"
+          bun-version: ${{ env.BUN_VERSION }}
 
       - name: Cache SwiftPM
         uses: actions/cache@v6
@@ -89,10 +149,11 @@ jobs:
           path: |
             ~/.cache/org.swift.swiftpm
             ~/.swiftpm
-          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-site/docs/releases.yml') }}
+            swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/TerminalApp/.build
+          key: ${{ runner.os }}-swiftpm-cfpages-${{ hashFiles('swift-tui-site/docs/releases.yml', 'swift-tui-site/.swift-version') }}-${{ inputs.counter_demo_ref }}
           restore-keys: |
             ${{ runner.os }}-swiftpm-cfpages-
-            ${{ runner.os }}-swiftpm-website-
+            ${{ runner.os }}-swiftpm-site-
 
       - name: Cache Bun deps
         uses: actions/cache@v6
@@ -105,21 +166,30 @@ jobs:
           key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}
           restore-keys: |
             ${{ runner.os }}-bun-cfpages-
-            ${{ runner.os }}-bun-website-
+            ${{ runner.os }}-bun-site-
 
       - name: Install wasm Swift SDK used by WebExample
         shell: bash
+        env:
+          SWIFT_VERSION: ${{ steps.swift.outputs.version }}
         run: |
           set -euo pipefail
-          if ! swiftly run swift sdk list | grep -q "swift-6.3.3-RELEASE_wasm"; then
+          . "${SWIFTLY_HOME_DIR}/env.sh"
+          case "$SWIFT_VERSION" in
+            6.3.3)
+              WASM_SDK_CHECKSUM="cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7"
+              ;;
+            *)
+              echo "::error::No pinned wasm SDK checksum for Swift ${SWIFT_VERSION}"
+              exit 1
+              ;;
+          esac
+          if ! swiftly run swift sdk list | grep -q "swift-${SWIFT_VERSION}-RELEASE_wasm"; then
             swiftly run swift sdk install \
-              https://download.swift.org/swift-6.3.3-release/wasm-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_wasm.artifactbundle.tar.gz \
-              --checksum cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7
+              "https://download.swift.org/swift-${SWIFT_VERSION}-release/wasm-sdk/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE_wasm.artifactbundle.tar.gz" \
+              --checksum "$WASM_SDK_CHECKSUM"
           fi
-
-      - name: Install Binaryen and Brotli
-        shell: bash
-        run: brew install binaryen brotli
+          swiftly run swift sdk list
 
       - name: Install Website deps
         shell: bash
