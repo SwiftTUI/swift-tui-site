@@ -42,7 +42,7 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.9.9` public beta build fetches the tagged `swift-tui-counter-demo`
+The `0.9.10` public beta build fetches the tagged `swift-tui-counter-demo`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -54,7 +54,7 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.9.9`) in lockstep. Update them only
+track the current organization release (`0.9.10`) in lockstep. Update them only
 as part of an organization release.
 
 ## License
