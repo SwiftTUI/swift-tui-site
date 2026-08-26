@@ -314,8 +314,8 @@ struct Dashboard: View {
             <p class="why">
               <strong>Why?</strong>
               Cells are finite and restrictive so defaults are tuned to match.
-              And to help a bit further, SwiftTUI polishes some behavior SwiftUI leaves undefined — because it
-              doesn't have to support heterogeneous AppKit and UIKit rendering under the hood.
+              SwiftTUI doesn't have to support heterogeneous AppKit and UIKit rendering under the hood,
+              and so can polish some behavior that SwiftUI leaves undefined.
             </p>
           </section>
 
@@ -330,20 +330,18 @@ struct Dashboard: View {
                   spinners go static and phase animations hold their first
                   phase. <code>CI=true</code> or a non-TTY stdout selects the
                   same stable built-in. By default, every{" "}
-                  <code>App</code> is also a CLI command that ships{" "}
+                  <code>App</code>'s CLI command ships{" "}
                   <code>--accessible</code> (<code>--no-color</code>{" "}
                   and <code>--reduce-motion</code>), and <code>--ascii</code> configs,{" "}
                   <em>and an in-browser view</em> triggered with <code>--web</code> and served
-                  via an in-binary http server (macOS, Linux, and iOS; on
-                  Windows the umbrella ships the terminal surface only) — all
-                  out of the box.
+                  by a small http server — all out of the box.
                 </p>
               </div>
             </div>
             <p class="why">
-              <strong>Why?</strong>: Many TUIs are have <a href="https://xogium.me/the-text-mode-lie-why-modern-tuis-are-a-nightmare-for-accessibility">serious accessibility issues</a>.
+              <strong>Why?</strong>: TUIs can have <a href="https://xogium.me/the-text-mode-lie-why-modern-tuis-are-a-nightmare-for-accessibility">serious accessibility issues</a>.
               SwiftTUI's declarative API allows it to provide alternative behaviors
-              for screen readers without putting more burden on the developer.
+              for screen readers without putting configuration burden on the developer.
             </p>
           </section>
 
@@ -386,9 +384,9 @@ struct Dashboard: View {
               <article class="add-card">
                 <h3>Border styling</h3>
                 <p>
-                  Terminal borders take a cell. They're chonky. SwiftTUI makes this
-                  regrettable truth a little nice by adding an API overload for per-side
-                  border styles... And even animatable perimeter gradients with <code>BorderBlend</code>.
+                  Terminal borders take a cell's worth of space and can be awkward.
+                  SwiftTUI makes them a little nicer with <code>.border(placement: .outset)</code>,{" "}
+                  per-side border styles, and animatable <code>BorderBlend</code> gradients.
                 </p>
               </article>
               <article class="add-card">
