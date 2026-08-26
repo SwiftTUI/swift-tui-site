@@ -180,8 +180,9 @@ const conceptLinks = [
 ];
 
 // Module tiers for the API reference. The everyday tier is what app code
-// imports; the hosts tier is per-deployment; the engine tier declares shared
-// vocabulary types but is rarely imported directly.
+// imports; the hosts tier is per-deployment. The engine/vocabulary modules
+// (Primitives, Graph, Core) are not published to the hosted site — their
+// re-exported vocabulary is reached through the modules that export it.
 const everydayModules = [
   { href: `${docs}/swifttui`, name: "SwiftTUI", copy: "the batteries-included app product" },
   { href: `${docs}/swifttuiviews`, name: "SwiftTUIViews", copy: "views, controls, layout, state, focus" },
@@ -192,6 +193,7 @@ const everydayModules = [
 const hostModules = [
   { href: `${docs}/swifttuicli`, name: "SwiftTUICLI", copy: "terminal-only runner" },
   { href: `${docs}/swifttuiwebhostcli`, name: "SwiftTUIWebHostCLI", copy: "terminal runner with --web" },
+  { href: `${docs}/swifttuiarguments`, name: "SwiftTUIArguments", copy: "SwiftTUIOptions and command parsing" },
   { href: `${docs}/swifttuiwebhost`, name: "SwiftTUIWebHost", copy: "localhost browser host" },
   { href: `${docs}/swifttuiwasi`, name: "SwiftTUIWASI", copy: "WASI and browser builds" },
   { href: `${docs}/swifttuiandroidhost`, name: "SwiftTUIAndroidHost", copy: "Android embedding" },
@@ -206,12 +208,6 @@ const hostModules = [
   },
 ];
 
-const vocabularyModules = [
-  { href: `${docs}/swifttuiprimitives`, name: "SwiftTUIPrimitives", copy: "geometry, color, style, animation math" },
-  { href: `${docs}/swifttuigraph`, name: "SwiftTUIGraph", copy: "reconciliation engine; PreferenceKey, DynamicProperty" },
-  { href: `${docs}/swifttuicore`, name: "SwiftTUICore", copy: "the render engine's frame pipeline" },
-  { href: `${docs}/swifttuiarguments`, name: "SwiftTUIArguments", copy: "SwiftTUIOptions and command parsing" },
-];
 ---
 
 <!doctype html>
@@ -433,19 +429,6 @@ const vocabularyModules = [
                         class="mono"
                         rel={m.external ? "noreferrer noopener" : undefined}
                       >{m.name}</a>
-                      <span> — {m.copy}</span>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-            <div class="module-tier">
-              <h3>Vocabulary you use, modules you don't import</h3>
-              <ul>
-                {
-                  vocabularyModules.map((m) => (
-                    <li>
-                      <a href={m.href} class="mono">{m.name}</a>
                       <span> — {m.copy}</span>
                     </li>
                   ))
