@@ -1,4 +1,5 @@
 import { cp, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { join, relative, resolve, sep } from "node:path";
 
 export const dataProjects = {
@@ -101,10 +102,25 @@ export async function writeDataRedirects(outputRoot: string, urls: Record<keyof 
   ];
   const original = await readFile(join(outputRoot, "site-redirects.txt"), "utf8");
   await writeFile(join(outputRoot, "site/_redirects"), `${redirects.join("\n")}\n\n${original}`);
-  await writeFile(join(outputRoot, "site/docc-data-routing.js"), dataFetchRouter([
+  const router = dataFetchRouter([
     [`/${viewsPath}/`, views], ...dataPaths.map(path => [`/${path}/`, other] as [string, string]),
-  ]));
-  await checkBudget(join(outputRoot, "site"));
+  ]);
+  // Custom domains can impose a browser cache lifetime on JavaScript. Tie the
+  // URL to its contents so a new deployment cannot reuse stale data routes.
+  const name = `docc-data-routing.${createHash("sha256").update(router).digest("hex")}.js`;
+  const site = join(outputRoot, "site");
+  const scriptPattern = /<script src="\/docc-data-routing(?:\.[a-f0-9]{64})?\.js"><\/script>/g;
+  const shells = await Promise.all(["docs/index.html", "docs/charts/index.html"].map(async path => {
+    const html = await readFile(join(site, path), "utf8");
+    if ([...html.matchAll(scriptPattern)].length !== 1) throw new Error(`Expected one DocC data router: ${path}`);
+    return [path, html.replace(scriptPattern, `<script src="/${name}"></script>`)] as const;
+  }));
+  await writeFile(join(site, name), router);
+  for (const [path, html] of shells) await writeFile(join(site, path), html);
+  for (const entry of await readdir(site)) {
+    if (entry !== name && /^docc-data-routing(?:\.[a-f0-9]{64})?\.js$/.test(entry)) await rm(join(site, entry));
+  }
+  await checkBudget(site);
 }
 
 export function dataFetchRouter(routes: [string, string][]): string {

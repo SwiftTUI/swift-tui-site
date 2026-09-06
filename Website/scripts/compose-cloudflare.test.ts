@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { rejects } from "node:assert/strict";
 import { runInNewContext } from "node:vm";
+import { createHash } from "node:crypto";
 import { checkBudget, composeCloudflare, dataFetchRouter, dataProjects, deploymentOrigin, filesUnder, writeDataRedirects } from "./compose-cloudflare";
 
 const roots: string[] = [];
@@ -69,6 +70,32 @@ test("uses immutable data URLs with the views rule ahead of the general data rul
   for (const url of [`https://${dataProjects.views}.pages.dev`, `https://main.${dataProjects.views}.pages.dev`, `${urls.views}/extra`, "https://1234abcd.other.pages.dev"]) {
     expect(() => deploymentOrigin(url, dataProjects.views)).toThrow("immutable deployment URL");
   }
+});
+
+test("new data deployments cannot reuse a cached routing script", async () => {
+  const f = await fixture();
+  await composeCloudflare(f.website, f.demo, f.output, "release-sha");
+  const urls = { views: `https://1234abcd.${dataProjects.views}.pages.dev`, other: `https://abcd1234.${dataProjects.other}.pages.dev` };
+  async function routerPath() {
+    const html = await readFile(join(f.output, "site/docs/index.html"), "utf8");
+    const path = html.match(/src="\/(docc-data-routing\.[a-f0-9]{64}\.js)"/)?.[1];
+    expect(path).toBeDefined();
+    expect(await readFile(join(f.output, "site/docs/charts/index.html"), "utf8")).toContain(`src="/${path}"`);
+    const body = await readFile(join(f.output, "site", path!), "utf8");
+    expect(path).toBe(`docc-data-routing.${createHash("sha256").update(body).digest("hex")}.js`);
+    return path!;
+  }
+  await writeDataRedirects(f.output, urls);
+  const first = await routerPath();
+  await writeDataRedirects(f.output, urls);
+  expect(await routerPath()).toBe(first);
+  const replacement = { ...urls, views: `https://9876abcd.${dataProjects.views}.pages.dev` };
+  await writeDataRedirects(f.output, replacement);
+  const second = await routerPath();
+  expect(second).not.toBe(first);
+  expect(await readFile(join(f.output, "site", second), "utf8")).toContain(replacement.views);
+  const scripts = (await filesUnder(join(f.output, "site"))).filter(path => path.includes("docc-data-routing"));
+  expect(scripts).toEqual([join(f.output, "site", second)]);
 });
 
 test("rejects overlapping output before deleting any input", async () => {

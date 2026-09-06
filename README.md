@@ -83,7 +83,9 @@ Generated DocC shells load a scoped fetch adapter for these JSON paths. It
 requests the data deployments directly because DocC interprets an HTTP data
 redirect as a renamed page. Other requests retain the browser's normal fetch
 behavior; redirected data requests omit credentials. The public JSON paths
-also remain usable through HTTP redirects.
+also remain usable through HTTP redirects. The adapter filename includes its
+content hash so custom-domain browser caching cannot retain another
+deployment's data routes.
 
 Wrangler is pinned to 4.129.0 for its structured deployment output. Each data
 project exposes `_publication.json` so deployment verification can check the
