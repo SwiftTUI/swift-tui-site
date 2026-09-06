@@ -4,7 +4,7 @@ name: Deploy Website to Cloudflare Pages
 # WebExample WASI demo) at root-relative paths and uploads it to Cloudflare
 # Pages via Wrangler.
 #
-# Layout of the uploaded artifact:
+# Layout of the main artifact (DocC JSON data uses two immutable Pages deployments):
 #   /              <- Astro site (swift-tui-site/Website/dist/)
 #   /docs/         <- DocC archive
 #   /webexample/   <- swift-tui-counter-demo/WebExample/pages-dist/
@@ -20,7 +20,7 @@ on:
       counter_demo_ref:
         description: Public swift-tui-counter-demo branch or tag to build
         required: true
-        default: "0.11.0"
+        default: "0.11.1"
         type: string
 
 permissions:
@@ -245,50 +245,21 @@ jobs:
         working-directory: swift-tui-site
         run: Scripts/build_docc_site.sh
 
-      - name: Compose Cloudflare Pages artifact
+      - name: Compose Cloudflare Pages artifacts
         shell: bash
+        working-directory: swift-tui-site
         env:
-          ARTIFACT_ROOT: ${{ github.workspace }}/swift-tui-site/_cf-pages-artifact
-          DOCS_ROOT: ${{ github.workspace }}/swift-tui-site/_cf-pages-artifact/docs
-          WEBEXAMPLE_ROOT: ${{ github.workspace }}/swift-tui-site/_cf-pages-artifact/webexample
-        run: |
-          set -euo pipefail
-          rm -rf "$ARTIFACT_ROOT"
-          mkdir -p "$ARTIFACT_ROOT" "$DOCS_ROOT" "$WEBEXAMPLE_ROOT"
-          cp -R swift-tui-site/Website/dist/. "$ARTIFACT_ROOT/"
-          cp -R swift-tui-site/Website/dist/docs/. "$DOCS_ROOT/"
-          rm -rf "$DOCS_ROOT/documentation"
-          rm -rf "$DOCS_ROOT/charts/documentation"
-          cp -R swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/pages-dist/. "$WEBEXAMPLE_ROOT/"
-          wasm_path="$WEBEXAMPLE_ROOT/TerminalApp/dist/assets/app.wasm"
-          if [ ! -f "$wasm_path" ]; then
-            echo "::error::Missing WebExample wasm at $wasm_path"
-            exit 1
-          fi
-          if ! brotli --test "$wasm_path"; then
-            echo "::error::WebExample wasm should already be Brotli-compressed by bun run build:wasm"
-            exit 1
-          fi
-          compressed_wasm_size="$(wc -c < "$wasm_path" | tr -d '[:space:]')"
-          pages_asset_limit=$((25 * 1024 * 1024))
-          if [ "$compressed_wasm_size" -ge "$pages_asset_limit" ]; then
-            echo "::error::Brotli-compressed WebExample wasm is ${compressed_wasm_size} bytes"
-            echo "::error::Still above Cloudflare Pages' 25 MiB single-file limit"
-            exit 1
-          fi
-          echo "Verified Brotli-compressed WebExample wasm at ${compressed_wasm_size} bytes"
-          artifact_file_count="$(find "$ARTIFACT_ROOT" -type f | wc -l | tr -d '[:space:]')"
-          pages_file_limit="${CLOUDFLARE_PAGES_FILE_LIMIT:-20000}"
-          echo "Cloudflare Pages artifact contains ${artifact_file_count} files"
-          find "$ARTIFACT_ROOT" -mindepth 1 -maxdepth 1 -print | while IFS= read -r child; do
-            count="$(find "$child" -type f | wc -l | tr -d '[:space:]')"
-            echo "  ${child#$ARTIFACT_ROOT/}: ${count} files"
-          done
-          if [ "$artifact_file_count" -gt "$pages_file_limit" ]; then
-            echo "::error::Cloudflare Pages artifact has ${artifact_file_count} files"
-            echo "::error::Above the ${pages_file_limit}-file deployment limit"
-            exit 1
-          fi
+          CF_COMMIT_SHA: ${{ github.sha }}
+        run: bun run Website/scripts/compose-cloudflare.ts
+
+      - name: Deploy and verify DocC data
+        shell: bash
+        working-directory: swift-tui-site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_COMMIT_SHA: ${{ github.sha }}
+        run: bun run Website/scripts/deploy-docc-data.ts
 
       - name: Resolve deploy branch
         id: branch
@@ -310,7 +281,7 @@ jobs:
           CF_COMMIT_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          deploy_log="$(bunx wrangler@latest pages deploy _cf-pages-artifact \
+          deploy_log="$(bunx wrangler@4.129.0 pages deploy _cf-pages-artifact/site \
             --project-name="$CF_PROJECT" \
             --branch="$CF_BRANCH" \
             --commit-hash="$CF_COMMIT_SHA" \

@@ -1,6 +1,7 @@
 .build/
 .build-docs-work/
 _cf-pages-artifact/
+.wrangler/
 Website/.astro/
 Website/dist/
 Website/node_modules/

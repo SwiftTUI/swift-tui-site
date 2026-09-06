@@ -1,8 +1,8 @@
 # SwiftTUI Website
 
 Source for **[swifttui.sh](https://swifttui.sh)**: the public SwiftTUI site, the
-combined DocC archive, and the in-browser WebExample demo, composed into one
-deployable artifact. See it live: <https://swifttui.sh>
+combined DocC archive, and the in-browser WebExample demo. See it live:
+<https://swifttui.sh>
 
 This repo builds the site that explains and demos
 [SwiftTUI](https://github.com/SwiftTUI/swift-tui). For the org-wide build and
@@ -42,7 +42,7 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.11.0` public beta build fetches the tagged `swift-tui-counter-demo`
+The `0.11.1` public beta build fetches the tagged `swift-tui-counter-demo`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -54,8 +54,40 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.11.0`) in lockstep. Update them only
+track the current organization release (`0.11.1`) in lockstep. Update them only
 as part of an organization release.
+
+## Cloudflare deployment
+
+The dispatch-only deployment workflow builds the complete site, then runs
+`Website/scripts/compose-cloudflare.ts`. The generated `_cf-pages-artifact/`
+contains three independent static deployments, each checked against the Free
+plan's 20,000-file and 25 MiB single-file limits:
+
+- `site/`: the website, both DocC application shells and search indexes, and
+  the compressed browser demo, deployed to the existing `swift-tui` project.
+- `views/`: SwiftTUIViews DocC JSON, deployed to `swift-tui-docc-views`.
+- `other/`: the remaining framework and Charts DocC JSON, deployed to
+  `swift-tui-docc-data`.
+
+The two data projects are direct-upload Pages projects with production branch
+`main`, in the same account as the site. The workflow uses its existing
+`CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets for all three.
+`deploy-docc-data.ts` uploads and verifies both data deployments before writing
+the main site's redirects. These redirects name immutable deployment URLs;
+keep those deployments while a site release references them. Public page URLs
+remain under `swifttui.sh/docs/`. Data responses allow cross-origin reads.
+The ordinary local `Website/dist/` retains the entire self-contained archive.
+
+Generated DocC shells load a scoped fetch adapter for these JSON paths. It
+requests the data deployments directly because DocC interprets an HTTP data
+redirect as a renamed page. Other requests retain the browser's normal fetch
+behavior; redirected data requests omit credentials. The public JSON paths
+also remain usable through HTTP redirects.
+
+Wrangler is pinned to 4.129.0 for its structured deployment output. Each data
+project exposes `_publication.json` so deployment verification can check the
+exact source revision and CORS headers before publishing the main site.
 
 ## License
 

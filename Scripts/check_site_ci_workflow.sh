@@ -45,12 +45,13 @@ forbid_text "swift-tui-examples/Examples/WebExample" "$deploy_workflow"
 require_text ".build/public-inputs/swift-tui-counter-demo/WebExample" "$deploy_workflow"
 require_text "brotli --test" "$deploy_workflow"
 require_text "WebAssembly.compile" "$deploy_workflow"
-require_text "CLOUDFLARE_PAGES_FILE_LIMIT" "$deploy_workflow"
+require_text "Website/scripts/compose-cloudflare.ts" "$deploy_workflow"
+require_text "Website/scripts/deploy-docc-data.ts" "$deploy_workflow"
 require_text ".swift-version" "$deploy_workflow"
 # Both DocC archives ship shell-copy-pruned: the framework mount and the
 # Charts mount each rely on the /docs*/documentation _redirects rewrites.
-require_text 'rm -rf "$DOCS_ROOT/documentation"' "$deploy_workflow"
-require_text 'rm -rf "$DOCS_ROOT/charts/documentation"' "$deploy_workflow"
+require_text 'docs/documentation' "$site_root/Website/scripts/compose-cloudflare.ts"
+require_text 'docs/charts/documentation' "$site_root/Website/scripts/compose-cloudflare.ts"
 # The deploy stays clean-clone for siblings: no direct Charts checkout either.
 forbid_text "repository: SwiftTUI/swift-tui-charts" "$deploy_workflow"
 

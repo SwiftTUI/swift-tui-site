@@ -49,5 +49,6 @@ if [[ ! -f "$composed_wasm_path" ]]; then
 fi
 
 "$site_root/Scripts/build_docc_site.sh"
+bun run "$website_dir/scripts/compose-cloudflare.ts"
 
 printf '[check_site] ok\n'
