@@ -1,7 +1,7 @@
 # Website
 
 Astro site that frames the
-[`swift-tui-counter-demo/WebExample`](https://github.com/SwiftTUI/swift-tui-counter-demo/tree/0.11.3/WebExample)
+[`swift-tui-counter-demo/WebExample`](https://github.com/SwiftTUI/swift-tui-counter-demo/tree/0.12.0/WebExample)
 WASI demo in an iframe.
 Deployed at <https://swifttui.sh>.
 
