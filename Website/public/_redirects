@@ -18,6 +18,10 @@
 /docs/charts/documentation /docs/charts/ 200
 /docs/charts/documentation/* /docs/charts/ 200
 
+# Terminal embedding has its own DocC shell.
+/docs/terminal-view/documentation /docs/terminal-view/ 200
+/docs/terminal-view/documentation/* /docs/terminal-view/ 200
+
 # The dedicated Sextant product page was retired; Sextant is now one of the
 # example tiles on /showcase/. Keep the previously published URL working.
 /sextant /showcase/ 301

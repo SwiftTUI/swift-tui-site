@@ -8,7 +8,7 @@ export const dataProjects = {
 } as const;
 
 const viewsPath = "docs/data/documentation/swifttuiviews";
-const dataPaths = ["docs/data", "docs/charts/data"];
+const dataPaths = ["docs/data", "docs/charts/data", "docs/terminal-view/data"];
 const fileLimit = 20_000;
 const sizeLimit = 25 * 1024 * 1024;
 
@@ -55,6 +55,7 @@ export async function composeCloudflare(
   await cp(webExampleDist, join(site, "webexample"), { recursive: true });
   await rm(join(site, "docs/documentation"), { recursive: true, force: true });
   await rm(join(site, "docs/charts/documentation"), { recursive: true, force: true });
+  await rm(join(site, "docs/terminal-view/documentation"), { recursive: true, force: true });
 
   const counts: Record<string, number> = {};
   for (const key of ["views", "other"] as const) {
@@ -69,7 +70,7 @@ export async function composeCloudflare(
   }
   // DocC treats HTTP data redirects as renamed pages. Its scoped loader must
   // request the data origin directly; public JSON URLs still have redirects.
-  for (const path of ["docs/index.html", "docs/charts/index.html"]) {
+  for (const path of ["docs/index.html", "docs/charts/index.html", "docs/terminal-view/index.html"]) {
     const shell = await readFile(join(site, path), "utf8");
     if (!shell.includes("</head>")) throw new Error(`Missing DocC HTML head: ${path}`);
     await writeFile(join(site, path), shell.replace("</head>", '<script src="/docc-data-routing.js"></script></head>'));
@@ -110,7 +111,7 @@ export async function writeDataRedirects(outputRoot: string, urls: Record<keyof 
   const name = `docc-data-routing.${createHash("sha256").update(router).digest("hex")}.js`;
   const site = join(outputRoot, "site");
   const scriptPattern = /<script src="\/docc-data-routing(?:\.[a-f0-9]{64})?\.js"><\/script>/g;
-  const shells = await Promise.all(["docs/index.html", "docs/charts/index.html"].map(async path => {
+  const shells = await Promise.all(["docs/index.html", "docs/charts/index.html", "docs/terminal-view/index.html"].map(async path => {
     const html = await readFile(join(site, path), "utf8");
     if ([...html.matchAll(scriptPattern)].length !== 1) throw new Error(`Expected one DocC data router: ${path}`);
     return [path, html.replace(scriptPattern, `<script src="/${name}"></script>`)] as const;

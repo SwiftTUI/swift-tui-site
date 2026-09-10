@@ -22,12 +22,15 @@ async function fixture() {
     "docs/data/documentation/swifttuiviews/palettestyle.json": '{"title":"PaletteStyle"}',
     "docs/data/documentation/swifttui.json": '{"title":"SwiftTUI"}',
     "docs/charts/data/documentation/swifttuicharts/chart.json": '{"title":"Chart"}',
+    "docs/terminal-view/data/documentation/swifttuiterminalview/terminalview.json": '{"title":"TerminalView"}',
   };
   const authored = {
     ...data, "index.html": "Site", "docs/index.html": "<html><head></head><body>DocC shell</body></html>",
     "docs/charts/index.html": "<html><head></head><body>Charts shell</body></html>", "docs/index/index.json": "Search index",
+    "docs/terminal-view/index.html": "<html><head></head><body>Terminal view shell</body></html>",
     "docs/documentation/swifttuiviews/palettestyle/index.html": "Duplicate shell",
     "docs/charts/documentation/swifttuicharts/chart/index.html": "Duplicate charts shell",
+    "docs/terminal-view/documentation/swifttuiterminalview/terminalview/index.html": "Duplicate terminal view shell",
     "_redirects": "/docs/documentation/* /docs/ 200\n",
   };
   for (const [path, text] of Object.entries(authored)) {
@@ -42,7 +45,7 @@ async function fixture() {
 test("preserves every DocC data byte and keeps shells, search, and demo on the main site", async () => {
   const f = await fixture();
   const counts = await composeCloudflare(f.website, f.demo, f.output, "release-sha");
-  expect(counts).toEqual({ views: 3, other: 4, site: 7 });
+  expect(counts).toEqual({ views: 3, other: 5, site: 8 });
   for (const [path, content] of Object.entries(f.data)) {
     const shard = path.includes("/swifttuiviews/") ? "views" : "other";
     expect(await readFile(join(f.output, shard, path), "utf8")).toBe(content);
@@ -52,6 +55,7 @@ test("preserves every DocC data byte and keeps shells, search, and demo on the m
   expect(mainFiles.some(path => path.includes("/documentation/"))).toBe(false);
   expect(await readFile(join(f.output, "site/docs/index/index.json"), "utf8")).toBe("Search index");
   expect(await readFile(join(f.output, "site/docs/charts/index.html"), "utf8")).toContain('src="/docc-data-routing.js"');
+  expect(await readFile(join(f.output, "site/docs/terminal-view/index.html"), "utf8")).toContain('src="/docc-data-routing.js"');
   expect(await readFile(join(f.output, "site/webexample/TerminalApp/dist/assets/app.wasm"), "utf8")).toBe("compressed wasm");
   expect(await readFile(join(f.output, "views/_headers"), "utf8")).toContain("Access-Control-Allow-Origin: *");
 });
@@ -64,6 +68,7 @@ test("uses immutable data URLs with the views rule ahead of the general data rul
   const redirects = await readFile(join(f.output, "site/_redirects"), "utf8");
   expect(redirects.split("\n")[0]).toBe(`/docs/data/documentation/swifttuiviews/* ${urls.views}/docs/data/documentation/swifttuiviews/:splat 302`);
   expect(redirects).toContain(`/docs/charts/data/* ${urls.other}/docs/charts/data/:splat 302`);
+  expect(redirects).toContain(`/docs/terminal-view/data/* ${urls.other}/docs/terminal-view/data/:splat 302`);
   expect(redirects).toContain("/docs/documentation/* /docs/ 200");
   await writeDataRedirects(f.output, urls);
   expect(await readFile(join(f.output, "site/_redirects"), "utf8")).toBe(redirects);
@@ -81,6 +86,7 @@ test("new data deployments cannot reuse a cached routing script", async () => {
     const path = html.match(/src="\/(docc-data-routing\.[a-f0-9]{64}\.js)"/)?.[1];
     expect(path).toBeDefined();
     expect(await readFile(join(f.output, "site/docs/charts/index.html"), "utf8")).toContain(`src="/${path}"`);
+    expect(await readFile(join(f.output, "site/docs/terminal-view/index.html"), "utf8")).toContain(`src="/${path}"`);
     const body = await readFile(join(f.output, "site", path!), "utf8");
     expect(path).toBe(`docc-data-routing.${createHash("sha256").update(body).digest("hex")}.js`);
     return path!;

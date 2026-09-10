@@ -11,3 +11,9 @@ swiftRepos:
     doccCommand: Scripts/build_docc_archive.sh --hosting-base-path docs/charts --output-path .build-docs
     outputPath: .build-docs
     mountPath: docs/charts
+  - name: swift-tui-terminal-view
+    repository: SwiftTUI/swift-tui-terminal-view
+    ref: 0.12.1
+    doccCommand: Scripts/build_docc_archive.sh --hosting-base-path docs/terminal-view --output-path .build-docs
+    outputPath: .build-docs
+    mountPath: docs/terminal-view

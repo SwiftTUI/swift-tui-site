@@ -14,9 +14,10 @@ site_root="$tmp_dir/site"
 source_parent="$tmp_dir/parent"
 source_checkout="$source_parent/source"
 charts_checkout="$source_parent/charts-source"
+terminalview_checkout="$source_parent/terminalview-source"
 
 mkdir -p "$site_root/Scripts" "$site_root/docs" "$site_root/Website/dist" \
-  "$source_checkout" "$charts_checkout"
+  "$source_checkout" "$charts_checkout" "$terminalview_checkout"
 cp "$build_script" "$site_root/Scripts/build_docc_site.sh"
 
 # Two fixture repos with distinct mounts: the framework archive at docs and
@@ -36,6 +37,12 @@ swiftRepos:
     doccCommand: ./make-docs.sh
     outputPath: .build-docs
     mountPath: docs/charts
+  - name: swift-tui-terminal-view
+    repository: SwiftTUI/swift-tui-terminal-view
+    ref: terminalview-fixture
+    doccCommand: ./make-docs.sh
+    outputPath: .build-docs
+    mountPath: docs/terminal-view
 EOF
 
 git -C "$source_parent" init -q
@@ -56,12 +63,22 @@ printf 'local overlay charts docs\n' > .build-docs/index.html
 EOF
 chmod +x "$charts_checkout/make-docs.sh"
 
+cat > "$terminalview_checkout/make-docs.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p .build-docs
+printf 'local overlay terminalview docs\n' > .build-docs/index.html
+EOF
+chmod +x "$terminalview_checkout/make-docs.sh"
+
 SWIFTTUI_CHECKOUT="$source_checkout" \
 SWIFTTUI_CHARTS_CHECKOUT="$charts_checkout" \
+SWIFTTUI_TERMINAL_VIEW_CHECKOUT="$terminalview_checkout" \
   "$site_root/Scripts/build_docc_site.sh" >/dev/null
 
 grep -q "local overlay docs" "$site_root/Website/dist/docs/index.html"
 grep -q "local overlay charts docs" "$site_root/Website/dist/docs/charts/index.html"
+grep -q "local overlay terminalview docs" "$site_root/Website/dist/docs/terminal-view/index.html"
 # The charts mount lives INSIDE the framework mount; re-check the framework
 # index after both copies to prove the second archive did not overwrite it.
 grep -q "local overlay docs" "$site_root/Website/dist/docs/index.html"

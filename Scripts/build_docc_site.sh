@@ -9,6 +9,7 @@ set -euo pipefail
 # Local checkout inputs:
 #   swift-tui        -> SWIFTTUI_CHECKOUT
 #   swift-tui-charts -> SWIFTTUI_CHARTS_CHECKOUT
+#   swift-tui-terminal-view -> SWIFTTUI_TERMINAL_VIEW_CHECKOUT
 #
 # When the variable for a repo is set it MUST point at an existing directory —
 # the script fails loudly rather than silently cloning a public tag while a
@@ -23,6 +24,7 @@ checkout_variable_for_repo() {
   case "$1" in
   swift-tui) printf 'SWIFTTUI_CHECKOUT' ;;
   swift-tui-charts) printf 'SWIFTTUI_CHARTS_CHECKOUT' ;;
+  swift-tui-terminal-view) printf 'SWIFTTUI_TERMINAL_VIEW_CHECKOUT' ;;
   *) printf '' ;;
   esac
 }

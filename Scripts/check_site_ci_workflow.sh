@@ -48,12 +48,14 @@ require_text "WebAssembly.compile" "$deploy_workflow"
 require_text "Website/scripts/compose-cloudflare.ts" "$deploy_workflow"
 require_text "Website/scripts/deploy-docc-data.ts" "$deploy_workflow"
 require_text ".swift-version" "$deploy_workflow"
-# Both DocC archives ship shell-copy-pruned: the framework mount and the
+# All DocC archives ship shell-copy-pruned: the framework mount and the
 # Charts mount each rely on the /docs*/documentation _redirects rewrites.
 require_text 'docs/documentation' "$site_root/Website/scripts/compose-cloudflare.ts"
 require_text 'docs/charts/documentation' "$site_root/Website/scripts/compose-cloudflare.ts"
+require_text 'docs/terminal-view/documentation' "$site_root/Website/scripts/compose-cloudflare.ts"
 # The deploy stays clean-clone for siblings: no direct Charts checkout either.
 forbid_text "repository: SwiftTUI/swift-tui-charts" "$deploy_workflow"
+forbid_text "repository: SwiftTUI/swift-tui-terminal-view" "$deploy_workflow"
 
 require_text "Scripts/check_site.sh" "$test_workflow"
 require_text ".swift-version" "$test_workflow"
@@ -73,6 +75,7 @@ forbid_text "repository: SwiftTUI/swift-tui" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui-examples" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui-web" "$test_workflow"
 forbid_text "repository: SwiftTUI/swift-tui-charts" "$test_workflow"
+forbid_text "repository: SwiftTUI/swift-tui-terminal-view" "$test_workflow"
 forbid_text 'secrets.SWIFTTUI_CI_TOKEN || github.token' "$test_workflow"
 
 printf '[check_site_ci_workflow] ok\n'
