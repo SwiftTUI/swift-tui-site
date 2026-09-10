@@ -390,9 +390,13 @@ struct Dashboard: View {
               </article>
               <article class="add-card">
                 <h3>Open style protocols</h3>
-                <p>SwiftTUI's style API protocols (<code>ButtonStyle</code>, <code>ListStyle</code>,{" "}
-                  <code>PickerStyle</code>, etc.) are public and extensible or will be soon.
-                   Even the families SwiftUI keeps closed.
+                <p>
+                  All 28 style families (<code>ButtonStyle</code>, <code>ListStyle</code>,{" "}
+                  <code>PickerStyle</code>, <code>TabViewStyle</code>, <code>SheetStyle</code>,{" "}
+                  <code>PaletteStyle</code>, and the rest) are public, extensible protocols,
+                  including the ones SwiftUI keeps closed. Conform once, then restyle a control,
+                  a subtree, or the whole app with one modifier. Start with{" "}
+                  <a href={`${base}/docs/documentation/swifttuiviews/style-system`}>The Style System</a>.
                 </p>
               </article>
               <article class="add-card">
