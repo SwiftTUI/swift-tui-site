@@ -42,7 +42,7 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.13.1` public beta build fetches the tagged `swift-tui-counter-demo`
+The `0.13.2` public beta build fetches the tagged `swift-tui-counter-demo`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -54,7 +54,7 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.13.1`) in lockstep. Update them only
+track the current organization release (`0.13.2`) in lockstep. Update them only
 as part of an organization release.
 
 ## Cloudflare deployment
@@ -64,10 +64,10 @@ The dispatch-only deployment workflow builds the complete site, then runs
 contains three independent static deployments, each checked against the Free
 plan's 20,000-file and 25 MiB single-file limits:
 
-- `site/`: the website, both DocC application shells and search indexes, and
+- `site/`: the website, all three DocC application shells and search indexes, and
   the compressed browser demo, deployed to the existing `swift-tui` project.
 - `views/`: SwiftTUIViews DocC JSON, deployed to `swift-tui-docc-views`.
-- `other/`: the remaining framework and Charts DocC JSON, deployed to
+- `other/`: the remaining framework, Charts, and TerminalView DocC JSON, deployed to
   `swift-tui-docc-data`.
 
 The two data projects are direct-upload Pages projects with production branch
@@ -78,6 +78,10 @@ the main site's redirects. These redirects name immutable deployment URLs;
 keep those deployments while a site release references them. Public page URLs
 remain under `swifttui.sh/docs/`. Data responses allow cross-origin reads.
 The ordinary local `Website/dist/` retains the entire self-contained archive.
+The deployment copy excludes each archive's `linkable-entities.json` compiler
+digest, which supports linking from other documentation archives and can exceed
+the per-file limit. Browser page data and search indexes remain in the deployment;
+the complete local archives retain the digest for documentation build tools.
 
 Generated DocC shells load a scoped fetch adapter for these JSON paths. It
 requests the data deployments directly because DocC interprets an HTTP data

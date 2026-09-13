@@ -56,6 +56,12 @@ export async function composeCloudflare(
   await rm(join(site, "docs/documentation"), { recursive: true, force: true });
   await rm(join(site, "docs/charts/documentation"), { recursive: true, force: true });
   await rm(join(site, "docs/terminal-view/documentation"), { recursive: true, force: true });
+  // This compiler digest supports linking from other documentation archives.
+  // Browser pages use data/ and index/ instead. Preserve the complete input
+  // archive while excluding this potentially oversized digest from Pages.
+  for (const path of ["docs", "docs/charts", "docs/terminal-view"]) {
+    await rm(join(site, path, "linkable-entities.json"), { force: true });
+  }
 
   const counts: Record<string, number> = {};
   for (const key of ["views", "other"] as const) {

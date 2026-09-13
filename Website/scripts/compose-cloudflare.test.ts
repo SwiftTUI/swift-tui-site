@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdir, mkdtemp, readFile, rm, truncate, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, truncate, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { rejects } from "node:assert/strict";
@@ -58,6 +58,26 @@ test("preserves every DocC data byte and keeps shells, search, and demo on the m
   expect(await readFile(join(f.output, "site/docs/terminal-view/index.html"), "utf8")).toContain('src="/docc-data-routing.js"');
   expect(await readFile(join(f.output, "site/webexample/TerminalApp/dist/assets/app.wasm"), "utf8")).toBe("compressed wasm");
   expect(await readFile(join(f.output, "views/_headers"), "utf8")).toContain("Access-Control-Allow-Origin: *");
+});
+
+test("excludes oversized compiler linking digests without changing the input archives", async () => {
+  const f = await fixture();
+  const paths = ["docs", "docs/charts", "docs/terminal-view"]
+    .map(path => join(path, "linkable-entities.json"));
+  for (const path of paths) {
+    await writeFile(join(f.website, path), "compiler digest");
+    await truncate(join(f.website, path), 25 * 1024 * 1024);
+  }
+  expect(await composeCloudflare(f.website, f.demo, f.output, "sha"))
+    .toEqual({ views: 3, other: 5, site: 8 });
+  for (const path of paths) {
+    await rejects(stat(join(f.output, "site", path)), { code: "ENOENT" });
+    expect((await stat(join(f.website, path))).size).toBe(25 * 1024 * 1024);
+    expect((await readFile(join(f.website, path))).subarray(0, 15).toString()).toBe("compiler digest");
+  }
+  // Oversized browser assets must still fail deployment validation.
+  await truncate(join(f.website, "docs/index/index.json"), 25 * 1024 * 1024);
+  await rejects(composeCloudflare(f.website, f.demo, f.output, "sha"), /25 MiB asset limit/);
 });
 
 test("uses immutable data URLs with the views rule ahead of the general data rule", async () => {
