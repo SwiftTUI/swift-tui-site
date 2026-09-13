@@ -11,7 +11,7 @@ const cards = [
     n: "01",
     title: "State in, screen out",
     body:
-      "Change a value and the runtime recomputes layout and rewrites exactly the cells that changed. No draw loop, no buffer diffing, no repaint bookkeeping.",
+      "Change tracked state and the runtime updates the views that depend on it, validates retained work, and emits changed terminal cells. No app-owned draw loop or repaint bookkeeping.",
     sym: "View · @State · @Observable · body",
   },
   {
@@ -32,7 +32,7 @@ const cards = [
     n: "04",
     title: "One binary, testable without a TTY",
     body:
-      "Swift 6 compiles your interface into a single executable with checked concurrency. A frame is a pure function of the view tree and a size, so tests compare integer-cell frames with no terminal attached.",
+      "Compile a native executable for each supported platform with Swift's checked concurrency. Render deterministic snapshots at a chosen size and test layout without a terminal attached.",
     sym: "SwiftPM · Swift 6 · RenderOnce",
   },
 ];
@@ -194,7 +194,7 @@ const rows = [
       · <span class="lk">—</span>&nbsp;none · <span class="lk">local only</span>&nbsp;the
       app runs as a process you host and streams a terminal to the browser;
       there is no static build to deploy. SwiftTUI's browser paths render
-      to the DOM with a real accessibility tree, not through a terminal emulator.
+      through Canvas or DOM with a semantic accessibility tree, not through a terminal emulator.
     </p>
 
     <p class="why-from-swiftui">

@@ -10,13 +10,18 @@ runtime, capability-negotiation, and terminal-safety claims consistent with the
 repository documentation and DocC catalogs.
 
 The deploy workflow (`.github/workflows/cloudflare-pages.yml`) composes a
-single Cloudflare Pages artifact:
+complete local artifact:
 
 ```
 /              <- this Astro site (Website/dist/)
 /docs/         <- DocC archive
 /webexample/   <- WebExample WASI demo
 ```
+
+Publication splits this into the main website and two DocC data deployments,
+with immutable data URLs behind the same public documentation routes. See the
+[repository README](../README.md#cloudflare-deployment) for composition and
+asset budgets.
 
 The iframe loads `/webexample/` from the same origin. Thus, the COOP/COEP
 headers in `public/_headers` also isolate the iframe.
@@ -39,3 +44,9 @@ the path of a WebExample checkout only for unpublished local inputs. Full
 website builds generate DocC from the repositories in
 `../docs/docc-repos.yml`. Then the builds copy the archive to
 `Website/dist/docs/`.
+
+The deployment workflow documents `main` through its `docs_ref` input, and local
+documentation builds also default to `main`. Set `DOCC_SOURCE_REF` to a shared
+tag to build that snapshot, or to an empty string to use the manifest refs.
+The guides describe current behavior without a release
+history; package installation examples remain concrete and reproducible.

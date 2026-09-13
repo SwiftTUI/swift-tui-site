@@ -14,8 +14,8 @@ const title = "SwiftTUI documentation";
 const description =
   "SwiftTUI's documentation, organized by task: the first-hour path, the reference guides for views, state, and focus, charts, what lies beyond the terminal, and the module-by-module API reference.";
 
-// Deep links into the composed DocC archives (built at the release tags the
-// site pins in docs/docc-repos.yml). Guides are organized here by task; the
+// Deep links into the composed DocC archives, built from current source.
+// Guides are organized here by task; the
 // archive itself is organized by module.
 const docs = `${base}/docs/documentation`;
 const charts = `${base}/docs/charts/documentation/swifttuicharts`;
@@ -54,6 +54,36 @@ const firstHour = [
 
 const buildGuides = [
   {
+    href: `${docs}/swifttuiviews/forms-and-controls`,
+    title: "Forms and Controls",
+    copy: "Compose buttons, pickers, toggles, sliders, and text entry into a working form.",
+  },
+  {
+    href: `${docs}/swifttuiviews/commands-and-key-input`,
+    title: "Commands and Key Input",
+    copy: "Focus-scoped arrows and Escape, keyboard shortcuts, submit actions, and command palettes.",
+  },
+  {
+    href: `${docs}/swifttuiviews/scrolling`,
+    title: "Scrolling",
+    copy: "Finite viewports, compositional lazy stacks, nested wheel routing, indicators, and scrolling from code.",
+  },
+  {
+    href: `${docs}/swifttuiviews/animating-views`,
+    title: "Animating Views",
+    copy: "State animation, default fades, numeric text, nested matched geometry, keyframes, and reduced motion.",
+  },
+  {
+    href: `${docs}/swifttuiviews/navigation-and-tabs`,
+    title: "Navigation and Tabs",
+    copy: "Typed navigation paths, destinations, tab selection, and view lifetime.",
+  },
+  {
+    href: `${docs}/swifttuianimatedimage`,
+    title: "Animated Images and GIFs",
+    copy: "Decode and author frames, control finite or continuous playback, and preserve GIF loop metadata on export.",
+  },
+  {
     href: `${docs}/swifttuiviews/style-system`,
     title: "The Style System",
     copy: "All 28 open style families in one place: built-ins, scoping, custom conformances, routes, theming, diagnostics, and tests.",
@@ -71,7 +101,7 @@ const buildGuides = [
   {
     href: `${docs}/swifttuiviews/testing-styles`,
     title: "Testing Styles",
-    copy: "Unit-test a style without a live render through the style-fixture SPI.",
+    copy: "Exercise custom styles with fixture configurations, snapshots, and runtime route checks.",
   },
   {
     href: `${docs}/swifttuiviews/focus`,
@@ -91,7 +121,7 @@ const buildGuides = [
   {
     href: `${docs}/swifttuiviews/shapes`,
     title: "Shapes",
-    copy: "Fill, stroke, and inset built-in and custom Path shapes, rasterized to Braille subpixels.",
+    copy: "Arcs and angles, fills and strokes, shape clipping, and compatible-topology path animation.",
   },
   {
     href: `${docs}/swifttuiviews/aspectcorrectshapes`,
@@ -135,6 +165,26 @@ const buildGuides = [
 // one clearly labeled group.
 const runtimeGuides = [
   {
+    href: `${docs}/swifttuiruntime/performance-for-app-authors`,
+    title: "Performance for App Authors",
+    copy: "Stable identity, certified memo reuse, lazy content, and a measurement-led profiling workflow.",
+  },
+  {
+    href: `${docs}/swifttuiruntime/logging-and-diagnostics`,
+    title: "Logging and Diagnostics",
+    copy: "Safe logging while the app owns the screen, runtime issues, traces, and debug bundles.",
+  },
+  {
+    href: `${docs}/swifttui/testing-your-app`,
+    title: "Testing Your App",
+    copy: "Render deterministic frames without a TTY and test state, layout, and interaction.",
+  },
+  {
+    href: `${docs}/swifttui/distributing-your-app`,
+    title: "Distributing Your App",
+    copy: "Package a native executable, standard flags, shell completions, and platform requirements.",
+  },
+  {
     href: `${docs}/swifttuiruntime/environment-variables`,
     title: "Environment Variables",
     copy: "Every SWIFTTUI_* environment variable the framework reads, grouped by subsystem.",
@@ -147,7 +197,7 @@ const runtimeGuides = [
   {
     href: `${docs}/swifttuiruntime/terminalembedding`,
     title: "Terminal Embedding",
-    copy: "Host external terminal programs inside SwiftTUI layout with SwiftTUITerminal.",
+    copy: "Host external terminal programs with SwiftTUITerminalView from the separate terminal-view package.",
   },
 ];
 
@@ -155,6 +205,21 @@ const runtimeGuides = [
 // matrix for narrower builds. Host caveats live in these articles and on the
 // host repos, not on this hub.
 const hostGuides = [
+  {
+    href: `${docs}/swifttuiviews/adapting-to-hosts`,
+    title: "Adapting an Interface to Its Host",
+    copy: "One shared tree with touch targets, keyboard access, navigation, and scrolling suited to its host.",
+  },
+  {
+    href: `${docs}/swifttuiwasi/deploying-to-the-browser`,
+    title: "Deploying to the Browser",
+    copy: "Serve a local app with --web or publish a static WASI bundle with the browser host packages.",
+  },
+  {
+    href: "https://github.com/SwiftTUI/swift-tui-swiftui#readme",
+    title: "Embedding in SwiftUI",
+    copy: "Native macOS and iOS hosting, touch panning, text input, and optional keyboard controls.",
+  },
   {
     href: `${docs}/swifttuiruntime/hosts-and-platforms`,
     title: "Hosts and Platforms",
@@ -173,6 +238,16 @@ const hostGuides = [
 ];
 
 const conceptLinks = [
+  {
+    href: `${base}/capabilities/`,
+    title: "What You Can Build",
+    copy: "Drawing, animation, scrolling workspaces, and interaction, with examples and links into the guides.",
+  },
+  {
+    href: "https://github.com/SwiftTUI/swift-tui/blob/main/docs/PUBLIC_MODULE_MAP.md",
+    title: "Public Module Map",
+    copy: "Generated product ownership, supported direct imports, and transitive re-exports from source.",
+  },
   {
     href: `${base}/differences-from-swiftui/`,
     title: "Differences from SwiftUI",
@@ -219,7 +294,6 @@ const hostModules = [
   { href: `${docs}/swifttuiwebhost`, name: "SwiftTUIWebHost", copy: "localhost browser host" },
   { href: `${docs}/swifttuiwasi`, name: "SwiftTUIWASI", copy: "WASI and browser builds" },
   { href: `${docs}/swifttuiandroidhost`, name: "SwiftTUIAndroidHost", copy: "Android embedding" },
-  { href: `${docs}/swifttuiterminal`, name: "SwiftTUITerminal", copy: "embedded terminal panes" },
   { href: `${docs}/swifttuianimatedimage`, name: "SwiftTUIAnimatedImage", copy: "animated GIF and image views" },
   { href: `${docs}/swifttuiprofiling`, name: "SwiftTUIProfiling", copy: "opt-in profiling and diagnostics" },
   {
@@ -311,8 +385,8 @@ const hostModules = [
           <div class="section-head">
             <h2 id="build-title">Build your interface</h2>
             <p>
-              The reference guides, one per subsystem, from the{" "}
-              <code>SwiftTUIViews</code> catalog. Read them as you need them.
+              Views, controls, drawing, and animated images. Read the guides
+              as you need them.
             </p>
           </div>
           <div class="card-grid">

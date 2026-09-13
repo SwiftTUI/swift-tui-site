@@ -70,6 +70,12 @@ const paths = [
         <a href={`${base}/docs/documentation/swifttuiruntime/hosts-and-platforms`}>
           Hosts and Platforms</a>.
       </p>
+      <p>
+        Keep the state and actions shared while adapting control size,
+        navigation, and scrolling to keyboard or touch. Read{" "}
+        <a href={`${base}/docs/documentation/swifttuiviews/adapting-to-hosts`}>
+          Adapting an Interface to Its Host</a>.
+      </p>
     </div>
 
     <div class="closing">
@@ -166,7 +172,7 @@ const paths = [
     margin-top: 44px;
   }
 
-  .beyond > p:last-child {
+  .beyond > p:not(.home-kicker) {
     color: var(--home-muted);
     font-size: 14.5px;
     line-height: 1.65;

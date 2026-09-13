@@ -22,6 +22,11 @@ on:
         required: true
         default: "0.13.2"
         type: string
+      docs_ref:
+        description: Public branch or tag to document across framework, Charts, and TerminalView
+        required: true
+        default: "main"
+        type: string
 
 permissions:
   contents: read
@@ -243,6 +248,8 @@ jobs:
       - name: Build DocC archive
         shell: bash
         working-directory: swift-tui-site
+        env:
+          DOCC_SOURCE_REF: ${{ inputs.docs_ref }}
         run: Scripts/build_docc_site.sh
 
       - name: Compose Cloudflare Pages artifacts

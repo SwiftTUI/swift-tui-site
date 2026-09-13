@@ -6,6 +6,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import Hero from "../components/Hero.astro";
 import GetStarted from "../components/GetStarted.astro";
 import WhySwiftTUI from "../components/WhySwiftTUI.astro";
+import Capabilities from "../components/Capabilities.astro";
 import Proof from "../components/Proof.astro";
 import Next from "../components/Next.astro";
 import SiteFooter from "../components/SiteFooter.astro";
@@ -21,7 +22,7 @@ const title = "SwiftTUI · Build terminal interfaces in Swift";
 // carries the core pitch only: terminal UIs, SwiftUI semantics, one binary,
 // try the demo. Host caveats live on the host repos, not here.
 const description =
-  "Build terminal user interfaces in Swift with SwiftUI semantics: views, state, focus, gestures, and animation, compiled to one native binary for macOS, Linux, and Windows. Try the live demo, then run the same app in your own terminal.";
+  "Build terminal user interfaces in Swift with views, state, focus, drawing, and animation. Compile native apps for macOS, Linux, and Windows, and share the same views with browser and native hosts. Try the live demo.";
 const ogImage = `${canonical}og.png`;
 
 const softwareSourceCodeJsonLd = {
@@ -112,6 +113,7 @@ const softwareSourceCodeJsonLd = {
       <Hero />
       <GetStarted />
       <WhySwiftTUI />
+      <Capabilities />
       <Proof />
       <Next />
     </main>

@@ -1,0 +1,143 @@
+---
+import "../styles/site.css";
+import "../styles/marketing.css";
+import "../styles/from-swiftui.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteIcons from "../components/SiteIcons.astro";
+import ThemeScript from "../components/ThemeScript.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
+const canonical = `${site}${base}/capabilities/`;
+const title = "What you can build with SwiftTUI";
+const description = "Draw shapes and layered images, animate state, compose scrolling workspaces, and adapt one SwiftTUI interface to keyboard and touch.";
+const docs = `${base}/docs/documentation`;
+const clipExample = `Text("A clipped card")
+  .frame(width: 24, height: 7)
+  .background(Color.blue)
+  .clipShape(RoundedRectangle(cornerRadius: 2))`;
+const motionExample = String.raw`Text("\(count)")
+  .contentTransition(.numericText())
+
+Button("Increment") {
+  withAnimation(.snappy) { count += 1 }
+}`;
+const lazyExample = String.raw`ScrollView {
+  LazyVStack(alignment: .leading) {
+    Text("Pinned")
+    ForEach(0..<4, id: \.self) { index in
+      Text("Pinned item \(index)")
+    }
+    Divider()
+    Text("History")
+    ForEach(0..<1000, id: \.self) { index in
+      Text("Event \(index)")
+    }
+  }
+}
+.frame(height: 12)`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${site}${base}/og.png`} />
+    <meta property="og:image:alt" content="SwiftTUI: build terminal interfaces in Swift" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${site}${base}/og.png`} />
+    <meta name="theme-color" content="#f5f7f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)" />
+    <ThemeScript />
+    <SiteIcons />
+  </head>
+  <body class="marketing-subpage">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main class="fsw" id="main">
+      <div class="doc-shell">
+        <aside class="toc" aria-label="On this page">
+          <p class="toc-kicker">Building blocks</p>
+          <nav class="toc-nav">
+            <a href="#drawing">Drawing and images</a>
+            <a href="#motion">Motion and feedback</a>
+            <a href="#collections">Scrolling workspaces</a>
+            <a href="#interaction">Keyboard and touch</a>
+          </nav>
+        </aside>
+        <div class="fsw-main">
+          <header class="lede">
+            <p class="eyebrow">What you can build</p>
+            <h1>A terminal interface can be a whole workspace.</h1>
+            <p class="lede-copy">Compose drawing, animation, editable collections, and focused controls. The same SwiftTUI tree can run in a terminal, a browser, or a native app, with interaction suited to its host.</p>
+          </header>
+
+          <section class="doc-section" id="drawing" aria-labelledby="drawing-title">
+            <h2 id="drawing-title">Draw shapes. Compose images.</h2>
+            <p>Build a custom shape from lines, Bézier curves, and arcs. Fill it with a color or gradient, stroke its outline, or use it to clip a subtree. Built-in circles account for the terminal's cell proportions.</p>
+            <pre tabindex="0" aria-label="Swift shape clipping example"><code>{clipExample}</code></pre>
+            <p>Shape clips use cell-center coverage and intersect when nested. They affect drawing; use <code>contentShape</code> separately for hit testing. Custom paths can morph when their ordered segment kinds match.</p>
+            <p>Layer images in authored order with opacity and blend modes. Decode an animated GIF or build frames in code, then choose one play, finite repeats, or continuous playback. A finite animation leaves its last frame visible; reduced motion uses a static first frame.</p>
+            <p class="guide-links"><a href={`${docs}/swifttuiviews/shapes`}>Shapes and paths</a><a href={`${docs}/swifttuianimatedimage`}>Images and GIF playback</a></p>
+            <figure>
+              <img src={`${base}/showcase/gifeditor.png`} width="1600" height="1000" loading="lazy" decoding="async" alt="GIF Editor with a drawing canvas, layer controls, and frame timeline" />
+              <figcaption><a href="https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor">Explore the GIF Editor source</a>: drawing, frame editing, preview, and export in a shared view tree.</figcaption>
+            </figure>
+          </section>
+
+          <section class="doc-section" id="motion" aria-labelledby="motion-title">
+            <h2 id="motion-title">Make a state change visible.</h2>
+            <p>Use springs and timing curves for state changes, roll changing numbers, or choreograph an effect with phases and keyframes. Matched geometry carries an element between layouts and follows moving sources through nested content.</p>
+            <pre tabindex="0" aria-label="Swift numeric text animation example"><code>{motionExample}</code></pre>
+            <p>Animated insertion and removal fade by default. Choose an explicit transition to change that effect, or <code>.transition(.identity)</code> to suppress it. Scoped animation lets a foreground or tint change use its own timing without animating unrelated content.</p>
+            <p>Built-in effects settle when Reduce Motion is enabled, and completion callbacks still run. Design feedback that remains understandable with no animation: the count, status, or result should still be present.</p>
+            <p class="guide-links"><a href={`${docs}/swifttuiviews/animating-views`}>Animating views</a><a href={`${base}/#demo`}>Try the animated counter</a></p>
+          </section>
+
+          <section class="doc-section" id="collections" aria-labelledby="collections-title">
+            <h2 id="collections-title">Compose a scrolling workspace.</h2>
+            <p>Put headers, conditional sections, and multiple data sources in a lazy stack. In a finite scroll viewport, eligible content is realized around the visible band. For row selection, editing controls, or aligned columns, use a data-backed <code>List</code> or <code>Table</code>.</p>
+            <pre tabindex="0" aria-label="Swift compositional lazy stack example"><code>{lazyExample}</code></pre>
+            <p>Nested scroll views keep independent content extents and hand unused wheel input outward at their boundaries. A finite viewport keeps its size even with short content, and scrolling does not change selection. Unbounded size proposals and content that needs exhaustive layout still realize the full content.</p>
+            <p>Tab switches preserve authored state and owned model references. View tasks stop while a tab is dormant and restart when it returns. Hoist a shared model when its lifetime must also survive removing the tab.</p>
+            <p class="guide-links"><a href={`${docs}/swifttuiviews/scrolling`}>Scrolling and lazy content</a><a href={`${docs}/swifttuiviews/collections`}>Lists and tables</a><a href={`${docs}/swifttuiviews/dormant-tab-state`}>Tab state and lifetime</a></p>
+          </section>
+
+          <section class="doc-section" id="interaction" aria-labelledby="interaction-title">
+            <h2 id="interaction-title">Keep behavior with the control.</h2>
+            <p>Buttons, pickers, editors, menus, and presentations have open style protocols. Change their appearance while keeping focus, actions, accessible labels, and pointer routes. Use the public configuration and route helpers when building a custom style.</p>
+            <p>Arrow and Escape commands follow the focused hosting chain. Return <code>.handled</code> to consume one or <code>.ignored</code> to let it continue. Menus follow their source control, and each presentation keeps its own state and dismissal binding.</p>
+            <p>On touch surfaces, provide visible actions, room to tap, and scroll panning. The native SwiftUI host requests the keyboard for focused text inputs; a manual keyboard toggle is optional. Adapt navigation and layout within the shared tree instead of asking a phone user to drive a keyboard-only interface.</p>
+            <p>Browser surfaces paint to Canvas or DOM and expose a semantic accessibility tree. Native hosts have their own accessibility coverage and limits, documented alongside their integration APIs.</p>
+            <p class="guide-links"><a href={`${docs}/swifttuiviews/style-system`}>The style system</a><a href={`${docs}/swifttuiviews/commands-and-key-input`}>Commands and key input</a><a href={`${docs}/swifttuiviews/adapting-to-hosts`}>Adapting to the host</a></p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .doc-section h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 520; line-height: 1.12; letter-spacing: -0.035em; margin-bottom: 22px; }
+  .doc-section > p { max-width: 76ch; color: var(--home-muted); font-size: 16px; line-height: 1.7; margin: 18px 0; }
+  pre { max-width: 100%; overflow-x: auto; padding: 24px; margin: 26px 0; background: var(--home-paper-soft); border: 1px solid var(--home-line); color: var(--home-code); font-size: 13px; line-height: 1.7; }
+  p code { color: var(--home-ink); font-size: 0.9em; overflow-wrap: anywhere; }
+  .guide-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+  .guide-links a, figcaption a { color: var(--home-accent-ink); text-decoration: underline; text-underline-offset: 4px; }
+  figure { margin: 30px 0 0; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--home-line-strong); }
+  figcaption { margin-top: 12px; color: var(--home-muted); font-size: 13px; line-height: 1.6; }
+  @media (max-width: 620px) { pre { padding: 16px; font-size: 12px; } }
+</style>

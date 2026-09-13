@@ -14,11 +14,21 @@ set -euo pipefail
 # When the variable for a repo is set it MUST point at an existing directory —
 # the script fails loudly rather than silently cloning a public tag while a
 # pre-tag overlay intended to test local source.
+# DOCC_SOURCE_REF defaults to main for current documentation. Set it to an
+# empty string to use the manifest refs, or to a shared tag for that snapshot.
+# Local checkout inputs take precedence. Package dependencies remain tagged.
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 manifest_path="${site_root}/docs/docc-repos.yml"
 work_root="${site_root}/.build-docs-work"
 website_dist="${site_root}/Website/dist"
+DOCC_SOURCE_REF="${DOCC_SOURCE_REF-main}"
+
+if [ -n "${DOCC_SOURCE_REF:-}" ] &&
+  ! [[ "$DOCC_SOURCE_REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]]; then
+  printf '[build_docc_site] DOCC_SOURCE_REF must be a branch, tag, or commit ID\n' >&2
+  exit 1
+fi
 
 checkout_variable_for_repo() {
   case "$1" in
@@ -116,6 +126,7 @@ rm -rf "$work_root"
 mkdir -p "$work_root"
 
 while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_path; do
+  ref="${DOCC_SOURCE_REF:-$ref}"
   clone_dir="${work_root}/${repo_name}"
   output_root="${website_dist}/${mount_path}"
 
@@ -157,14 +168,19 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
   (
     cd "$clone_dir"
     if [ "$using_source_checkout" -eq 0 ]; then
-      git fetch --tags origin "$ref" >/dev/null 2>&1 || true
-      git checkout --quiet "$ref"
+      git fetch --tags origin "$ref" >/dev/null
+      git checkout --quiet --detach FETCH_HEAD
+      printf '[build_docc_site] source %s ref=%s revision=%s\n' \
+        "$repo_name" "$ref" "$(git rev-parse HEAD)"
+    else
+      printf '[build_docc_site] source %s local-checkout=%s\n' \
+        "$repo_name" "$source_checkout"
     fi
     sh -c "$docc_command"
   )
 
   cp -R "${clone_dir}/${output_path}"/. "$output_root"/
-  printf '[build_docc_site] copied %s DocC archive at %s to %s\n' "$repo_name" "$ref" "$output_root"
+  printf '[build_docc_site] copied %s DocC archive to %s\n' "$repo_name" "$output_root"
 done <<EOF
 $entries
 EOF

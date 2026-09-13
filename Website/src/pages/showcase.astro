@@ -70,7 +70,7 @@ const hosts: Host[] = [
     slug: "ios",
     platform: "iOS",
     host: "SwiftUIHost",
-    body: "The same scenes in a native iOS app shell, with keyboard and pointer input and a VoiceOver-readable semantic overlay.",
+    body: "The same scenes in a native iOS app shell, with touch panning, keyboard entry for focused text inputs, and a VoiceOver-readable semantic overlay.",
     href: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/SwiftUIExample",
     img: `${base}/showcase/host-ios.png`,
   },
@@ -102,7 +102,7 @@ const tiles: Tile[] = [
     title: "GIF Editor",
     subtitle: "Canvas, layers, timeline, and undo/redo in the terminal.",
     body:
-      "A full GIF editor written as ordinary SwiftTUI Views. Click tools, paint on a canvas, scrub a timeline, export an animated GIF. It proves that desktop-class UX fits inside integer-cell rendering.",
+      "A GIF editor written as ordinary SwiftTUI views. Paint on a canvas, edit layers, scrub a timeline, and export animated GIFs with finite or continuous playback. Preview and export honor the authored total play count.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
     img: `${base}/showcase/gifeditor.png`,
   },
@@ -120,7 +120,7 @@ const tiles: Tile[] = [
     title: "Terminal Workspace",
     subtitle: "Zellij-style tabs, splits, and a command palette.",
     body:
-      "Multi-pane terminal workspace built on SwiftTUITerminal. Persisted layouts, focused chrome, command palette, embedded pty sessions. The framework is large enough to host its own multiplexer.",
+      "Multi-pane terminal workspace built on SwiftTUITerminalView. Persisted layouts, focused chrome, a command palette, and embedded PTY sessions from the separate terminal-view package.",
     repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace",
     img: `${base}/showcase/terminal-workspace.png`,
   },

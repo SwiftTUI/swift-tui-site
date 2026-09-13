@@ -57,6 +57,15 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 track the current organization release (`0.13.2`) in lockstep. Update them only
 as part of an organization release.
 
+The public documentation describes current source. Website deployment defaults
+its `docs_ref` input to `main` for the framework, Charts, and TerminalView; the
+build logs record the exact fetched revision of each archive. The native
+package dependencies and browser demo keep their independent release pins.
+Local builds also default to `main`. Set `DOCC_SOURCE_REF=` to reproduce the
+refs in `docc-repos.yml`, or select a shared tag with the workflow input or
+environment variable. A missing ref fails the build. The local
+checkout variables take precedence over the ref override for source overlays.
+
 ## Cloudflare deployment
 
 The dispatch-only deployment workflow builds the complete site, then runs

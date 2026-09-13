@@ -20,9 +20,7 @@ mkdir -p "$site_root/Scripts" "$site_root/docs" "$site_root/Website/dist" \
   "$source_checkout" "$charts_checkout" "$terminalview_checkout"
 cp "$build_script" "$site_root/Scripts/build_docc_site.sh"
 
-# Two fixture repos with distinct mounts: the framework archive at docs and
-# the charts archive at docs/charts. Both must be present after the build and
-# neither may overwrite the other.
+# Three fixture repos have distinct mounts. All must survive composition.
 cat > "$site_root/docs/docc-repos.yml" <<'EOF'
 swiftRepos:
   - name: swift-tui
@@ -74,6 +72,7 @@ chmod +x "$terminalview_checkout/make-docs.sh"
 SWIFTTUI_CHECKOUT="$source_checkout" \
 SWIFTTUI_CHARTS_CHECKOUT="$charts_checkout" \
 SWIFTTUI_TERMINAL_VIEW_CHECKOUT="$terminalview_checkout" \
+DOCC_SOURCE_REF=nonexistent-remote-ref \
   "$site_root/Scripts/build_docc_site.sh" >/dev/null
 
 grep -q "local overlay docs" "$site_root/Website/dist/docs/index.html"
@@ -90,5 +89,53 @@ if SWIFTTUI_CHARTS_CHECKOUT="$source_parent/does-not-exist" \
   printf '[build_docc_site_test] FAIL: missing SWIFTTUI_CHARTS_CHECKOUT did not fail\n' >&2
   exit 1
 fi
+
+# Public builds fetch their selected ref, with isolated local remotes so the
+# test needs no network, credentials, or user Git configuration.
+remote_root="$tmp_dir/remotes"
+mkdir -p "$remote_root"
+while read -r repo tag; do
+  remote="$remote_root/$repo"
+  git -c init.defaultBranch=main init -q "$remote"
+  printf '#!/bin/sh\nmkdir -p .build-docs\nprintf "tagged %s\\n" > .build-docs/index.html\n' \
+    "$repo" > "$remote/make-docs.sh"
+  chmod +x "$remote/make-docs.sh"
+  git -C "$remote" add make-docs.sh
+  git -C "$remote" -c core.hooksPath=/dev/null -c commit.gpgsign=false \
+    -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm tagged
+  git -C "$remote" -c tag.gpgsign=false tag "$tag"
+  printf '#!/bin/sh\nmkdir -p .build-docs\nprintf "head %s\\n" > .build-docs/index.html\n' \
+    "$repo" > "$remote/make-docs.sh"
+  git -C "$remote" add make-docs.sh
+  git -C "$remote" -c core.hooksPath=/dev/null -c commit.gpgsign=false \
+    -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm head
+done <<'EOF'
+swift-tui fixture
+swift-tui-charts charts-fixture
+swift-tui-terminal-view terminalview-fixture
+EOF
+
+git_config="$tmp_dir/gitconfig"
+git config --file "$git_config" "url.file://$remote_root/.insteadOf" https://github.com/SwiftTUI/
+export GIT_CONFIG_GLOBAL="$git_config" GIT_CONFIG_NOSYSTEM=1
+unset SWIFTTUI_CHECKOUT SWIFTTUI_CHARTS_CHECKOUT SWIFTTUI_TERMINAL_VIEW_CHECKOUT DOCC_SOURCE_REF
+
+DOCC_SOURCE_REF= "$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/tagged.log" 2>&1
+grep -q 'tagged swift-tui$' "$site_root/Website/dist/docs/index.html"
+grep -q 'tagged swift-tui-charts$' "$site_root/Website/dist/docs/charts/index.html"
+grep -q 'tagged swift-tui-terminal-view$' "$site_root/Website/dist/docs/terminal-view/index.html"
+
+"$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/head.log" 2>&1
+grep -q 'head swift-tui$' "$site_root/Website/dist/docs/index.html"
+grep -q 'head swift-tui-charts$' "$site_root/Website/dist/docs/charts/index.html"
+grep -q 'head swift-tui-terminal-view$' "$site_root/Website/dist/docs/terminal-view/index.html"
+grep -q "ref=main revision=$(git -C "$remote_root/swift-tui" rev-parse HEAD)" "$tmp_dir/head.log"
+
+for invalid_ref in missing-ref --help 'main;echo'; do
+  if DOCC_SOURCE_REF="$invalid_ref" "$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/invalid.log" 2>&1; then
+    printf '[build_docc_site_test] FAIL: invalid ref succeeded: %s\n' "$invalid_ref" >&2
+    exit 1
+  fi
+done
 
 printf '[build_docc_site_test] ok\n'
