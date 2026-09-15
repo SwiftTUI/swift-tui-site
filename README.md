@@ -27,7 +27,7 @@ bun run --cwd Website build:full  # full artifact — wasm demo + site + DocC
 ```
 
 `dev`, `check`, and `build` need only Bun. `build:full` and `build:wasm` also
-compile and compress the WebExample wasm. These commands require Swift 6.3.x
+compile and compress the WebExample wasm. These commands require Swift 6.4.x
 through `swiftly`, Binaryen, and Brotli. If a tool is absent, `build:full` stops
 at the wasm step.
 
@@ -42,7 +42,7 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.13.3` public beta build fetches the tagged `swift-tui-counter-demo`
+The `0.13.4` public beta build fetches the tagged `swift-tui-counter-demo`
 repo into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
@@ -54,7 +54,7 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.13.3`) in lockstep. Update them only
+track the current organization release (`0.13.4`) in lockstep. Update them only
 as part of an organization release.
 
 The public documentation describes current source. Website deployment defaults

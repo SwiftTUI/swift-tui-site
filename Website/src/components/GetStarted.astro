@@ -9,7 +9,7 @@ const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
       <p class="home-kicker">Get started</p>
       <h2 id="start-title">A terminal and a toolchain. That's it.</h2>
       <p>
-        SwiftTUI apps are plain SwiftPM packages. Any Swift 6.3+ toolchain
+        SwiftTUI apps are plain SwiftPM packages. Any Swift 6.4+ toolchain
         builds and runs them from the command line on macOS, Linux, or
         Windows: no Xcode project, no simulator, no app store.
       </p>
@@ -24,7 +24,7 @@ const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
           </div>
           <a href={demoRepo} rel="noreferrer noopener">Open repo</a>
         </header>
-        <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows — any Swift 6.3+ toolchain</span>
+        <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows — any Swift 6.4+ toolchain</span>
 git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
 cd swift-tui-counter-demo
 swift run --package-path counter counter</code></pre>
@@ -51,7 +51,7 @@ swift run --package-path counter counter</code></pre>
           <pre tabindex="0"><code><span class="cm">// Package.swift</span>
 .package(
   url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
-  .upToNextMinor(from: <span class="str">"0.13.3"</span>)
+  .upToNextMinor(from: <span class="str">"0.13.4"</span>)
 ),
 <span class="cm">// in your executable target:</span>
 .product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>

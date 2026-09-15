@@ -20,7 +20,7 @@ counter-demo and web artifacts by default. Use
 ## Toolchains
 
 - Use **Bun** for the Astro app and scripts. Run commands with `--cwd Website`.
-- Use **`swiftly`** Swift 6.3.x for the WASI build that `build:wasm` starts.
+- Use **`swiftly`** Swift 6.4.x for the WASI build that `build:wasm` starts.
 - Use **Binaryen/Brotli** for wasm compression.
 
 ## Commands
