@@ -1,70 +1,65 @@
 ---
+import Button from "./Button.astro";
 import DemoTerminal from "./DemoTerminal.astro";
+import Section from "./Section.astro";
+import Strip from "./Strip.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const repo = "https://github.com/SwiftTUI/swift-tui";
 const demoRepoHref = "https://github.com/SwiftTUI/swift-tui-counter-demo";
 // The source pane shows the counter the way a terminal app would write it:
-// `import SwiftTUI`, one View, one App — the same sample as the swift-tui
-// README. The live demo beside it additionally paints a ripple on each
-// increment; that layer is omitted here (and labeled as such) so the first code
-// a visitor reads is a first app, not the multi-host library form. The full
-// file, ripple included, is one click away.
+// `import SwiftTUI`, one View, one App, the same sample as the swift-tui
+// README. The live demo beside it also paints a ripple on each increment;
+// that layer is left out here so the first code a visitor reads is a first
+// app. The full file is one click away.
 const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/CounterView.swift`;
+
+const strip = [
+  {
+    title: "Declarative.",
+    text: "Views, state, focus, gestures and animation with SwiftUI's semantics. Change state; the runtime redraws the cells that changed.",
+  },
+  {
+    title: "Native.",
+    text: "One Swift 6 binary per platform, built with SwiftPM and checked concurrency. Truecolor, images and mouse are negotiated per terminal.",
+  },
+  {
+    title: "Portable.",
+    text: "The same views run in the browser through WASI and inside SwiftUI on macOS and iOS, with Android in preview.",
+  },
+];
 ---
 
-<section class="home-hero" aria-labelledby="hero-title">
-  <div class="shell">
-    <div class="hero-intro">
-      <h1 id="hero-title">Build Swift Terminal User Interfaces</h1>
-      <div class="hero-deck">
-        <p>
-          Views, State, Observation, Gestures, Animations—
-        </p>
-        <p>
-          SwiftUI semantics, drawn in terminal cells. Compile native apps for
-          macOS, Linux, and Windows, then take the same views to other hosts.
-        </p>
-        <div class="hero-actions">
-          <a class="home-button home-button--primary" href="#demo">
-            Try the web demo
-          </a>
-          <a
-            class="home-button"
-            href="https://github.com/SwiftTUI/swift-tui"
-            rel="noreferrer noopener"
-          >
-            View source
-          </a>
-        </div>
-        <div class="hero-meta">
-          <a class="hero-docs-link" href={`${base}/guides/`}>
-            Read the docs
-          </a>
-          <a
-            class="hero-version mono"
-            href="https://github.com/SwiftTUI/swift-tui/blob/main/CHANGELOG.md"
-            rel="noreferrer noopener"
-            title="Public beta: the API is still being proven"
-          >
-            Public beta
-          </a>
-        </div>
-      </div>
+<Section id="top" class="hero" aria-labelledby="hero-title">
+  <div class="hero__copy">
+    <h1 id="hero-title" class="h0 hero__title">SwiftUI semantics, drawn in terminal cells.</h1>
+    <p class="lead">
+      A deep subset of SwiftUI, reimplemented for terminal UIs: views,
+      state, observation, focus, gestures, animation, and more.
+    </p>
+    <div class="button-row hero__actions">
+      <Button href={`${base}/#get-started`} variant="primary" icon="terminal">
+        Get started
+      </Button>
+      <Button href={repo} variant="secondary" icon="github" external>
+        Read the code
+      </Button>
     </div>
+    <p class="caption hero__note">
+      For macOS, Linux, and Windows.
+    </p>
+  </div>
 
-    <div class="code-to-frame">
-      <article class="source-pane" aria-labelledby="counter-source-title">
-        <header>
-          <div>
-            <strong id="counter-source-title">Source</strong>
-            <span>The counter, minus its ripple animation</span>
-          </div>
-          <a href={sourceHref} rel="noreferrer noopener">Full source</a>
-        </header>
-        <pre
-          class="counter-source"
-          tabindex="0"
-        ><code><span class="kw">import</span> <span class="ty">SwiftTUI</span>
+  <div class="code-to-frame media-frame" id="demo">
+    <article class="source-pane" aria-labelledby="counter-source-title">
+      <header class="pane-head">
+        <div>
+          <strong id="counter-source-title">Source</strong>
+          <span>The counter, minus its ripple animation</span>
+        </div>
+        <a class="link" href={sourceHref} rel="noreferrer noopener">Full source</a>
+      </header>
+      <pre class="counter-source" tabindex="0"><code><span class="kw">import</span> <span class="ty">SwiftTUI</span>
 
 <span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
   <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
@@ -86,120 +81,51 @@ const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/Counte
   &#125;
 &#125;
 </code></pre>
-      </article>
+    </article>
 
-      <div class="render-pane">
-        <DemoTerminal id="demo" />
-      </div>
-    </div>
-    <div class="demo-local">
-      <p>The same counter in your own terminal: one clone, one command.</p>
-      <a class="home-button home-button--primary" href="#get-started">
-        Run it locally
-      </a>
+    <div class="render-pane">
+      <DemoTerminal id="demo-terminal" />
     </div>
   </div>
-</section>
+</Section>
+
+<Section pad="flush" aria-label="What SwiftTUI is">
+  <Strip items={strip} />
+</Section>
 
 <style>
-  .home-hero {
-    padding: clamp(33.333px, 5.333vw, 70.667px) 0 70px;
+  .hero {
+    padding-top: var(--space-16);
   }
 
-  .hero-intro {
+  .hero__copy {
     display: grid;
-    grid-template-columns: minmax(0, 1.34fr) minmax(300px, 0.66fr);
-    gap: clamp(44px, 8vw, 124px);
-    align-items: end;
-    padding-bottom: clamp(54px, 8vw, 92px);
+    gap: var(--space-4);
+    justify-items: center;
+    max-width: 62ch;
+    margin: 0 auto var(--space-12);
+    text-align: center;
   }
 
-  h1 {
-    max-width: 15ch;
-    font-size: clamp(58px, 7.8vw, 108px);
-    font-weight: 520;
-    line-height: 0.91;
-    letter-spacing: -0.072em;
-    text-wrap: balance;
+  .hero__title {
+    color: var(--text-accent);
+    max-width: 18ch;
   }
 
-  .hero-deck {
-    display: grid;
-    gap: 24px;
-    padding-bottom: 6px;
+  .hero__actions {
+    justify-content: center;
+    margin-top: var(--space-2);
   }
 
-  .hero-deck > p {
-    max-width: 39ch;
-    color: var(--home-muted);
-    font-size: clamp(17px, 1.45vw, 21px);
-    line-height: 1.55;
-    text-wrap: pretty;
+  .hero__note {
+    color: var(--text-muted);
   }
 
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-  }
-
-  .hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 18px;
-  }
-
-  .hero-docs-link {
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-muted);
-    font-size: 13px;
-  }
-
-  .hero-docs-link:hover {
-    border-color: var(--home-accent);
-    color: var(--home-ink);
-  }
-
-  .hero-version {
-    padding: 3px 8px;
-    border: 1px solid var(--home-line-strong);
-    border-radius: 3px;
-    color: var(--home-quiet);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-  }
-
-  .hero-version:hover {
-    border-color: var(--home-accent);
-    color: var(--home-ink);
-  }
-
+  /* ── source beside the live frame ─────────────────────────────── */
   .code-to-frame {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     min-height: 520px;
-    border: 1px solid var(--home-ink);
-    background: var(--home-paper);
-  }
-
-  .demo-local {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    min-height: 78px;
-    padding: 14px 16px;
-    border-right: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-    border-left: 1px solid var(--home-ink);
-  }
-
-  .demo-local p {
-    color: var(--home-muted);
-    font-size: 14px;
-    line-height: 1.5;
   }
 
   .source-pane,
@@ -210,111 +136,57 @@ const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/Counte
   .source-pane {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
-    border-right: 1px solid var(--home-line-strong);
+    border-right: var(--border-width) solid var(--border-default);
   }
 
-  .source-pane > header {
+  .pane-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    min-height: 60px;
-    padding: 10px 15px;
-    border-bottom: 1px solid var(--home-line);
-    font-family: var(--font-mono);
+    gap: var(--space-4);
+    min-height: var(--space-12);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--border-width) solid var(--border-default);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
-  .source-pane > header > div {
+  .pane-head > div {
     display: grid;
-    gap: 2px;
   }
 
-  .source-pane > header strong,
-  .source-pane > header span,
-  .source-pane > header a {
-    font-size: 11px;
+  .pane-head strong {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 15px;
   }
 
-  .source-pane > header strong {
-    font-weight: 600;
-  }
-
-  .source-pane > header span {
-    color: var(--home-muted);
-  }
-
-  .source-pane > header a {
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-muted);
-    white-space: nowrap;
-  }
-
-  .source-pane > header a:hover {
-    border-color: var(--home-accent);
-    color: var(--home-ink);
+  .pane-head span {
+    color: var(--text-muted);
+    font-size: 12px;
   }
 
   .counter-source {
-    margin: 0;
-    padding: 24px 20px 28px;
-    overflow: auto;
-    background: var(--home-paper);
-    color: var(--home-code);
-    font-family: var(--font-mono);
+    border: 0;
+    border-radius: 0;
+    padding: var(--space-6) var(--space-4);
+    background: var(--surface);
     font-size: clamp(11.5px, 0.95vw, 13px);
-    line-height: 1.72;
-    tab-size: 2;
-  }
-
-  .counter-source .kw,
-  .counter-source .at {
-    color: var(--home-accent-ink);
-    font-weight: 650;
-  }
-
-  .counter-source .ty {
-    color: var(--home-code-type);
-  }
-
-  .counter-source .str {
-    color: var(--home-code-string);
-  }
-
-  .counter-source .num {
-    color: var(--home-code-number);
-  }
-
-  .counter-source .cm {
-    color: var(--home-quiet);
+    line-height: 1.7;
   }
 
   .render-pane {
     min-height: 520px;
   }
 
-  @media (max-width: 980px) {
-    .hero-intro {
-      grid-template-columns: 1fr;
-      gap: 30px;
-      align-items: start;
-    }
-
-    h1 {
-      max-width: 13ch;
-    }
-
-    .hero-deck {
-      max-width: 600px;
-    }
-
+  @media (max-width: 979px) {
     .code-to-frame {
       grid-template-columns: 1fr;
     }
 
     .source-pane {
       order: 2;
-      border-top: 1px solid var(--home-line-strong);
+      border-top: var(--border-width) solid var(--border-default);
       border-right: 0;
     }
 
@@ -324,37 +196,17 @@ const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/Counte
     }
   }
 
-  @media (max-width: 620px) {
-    .home-hero {
-      padding-top: 29.333px;
+  @media (max-width: 639px) {
+    .hero {
+      padding-top: var(--space-8);
     }
 
-    h1 {
-      max-width: 100%;
-      font-size: clamp(48px, 14vw, 68px);
-      overflow-wrap: normal;
-    }
-
-    .hero-actions {
-      display: grid;
-    }
-
-    .home-button {
-      width: 100%;
+    .hero__copy {
+      margin-bottom: var(--space-8);
     }
 
     .code-to-frame {
       min-height: 0;
-    }
-
-    .demo-local {
-      display: grid;
-      align-items: stretch;
-      padding: 16px;
-    }
-
-    .demo-local .home-button {
-      width: 100%;
     }
 
     .render-pane {
@@ -363,8 +215,7 @@ const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/Counte
 
     .counter-source {
       max-height: 470px;
-      padding-inline: 14px;
-      font-size: 10.5px;
+      font-size: 11px;
     }
   }
 </style>

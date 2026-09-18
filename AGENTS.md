@@ -31,11 +31,20 @@ bun run --cwd Website check       # astro check (type/diagnostics)
 bun run --cwd Website dev         # local dev server
 bun run --cwd Website build       # astro build (site only)
 bun run --cwd Website build:full  # wasm demo + site + DocC
+bun run --cwd Website docc-theme  # regenerate the DocC theme from the tokens
 Scripts/build_docc_site.sh        # compose DocC (also via Website build:docc)
 ```
 
 `//:swift_tui_site_native_gate` in the org root runs: install (frozen) +
 `check` + `build` + `build_docc_site.sh`.
+
+## Styling
+
+Every colour, font, radius and spacing value lives in
+`Website/src/styles/tokens.css` (the SwiftTUI design system); no other file
+names one. Edit tokens there, then run `bun run --cwd Website docc-theme` so
+the DocC theme under `Website/docs-theme/` follows. See the design-system
+section of [`Website/README.md`](Website/README.md).
 
 ## Conventions
 

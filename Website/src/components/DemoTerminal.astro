@@ -5,32 +5,24 @@ import { resolve } from "node:path";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const iframeSrc = `${base}/webexample/?embed=marketing`;
 const webExampleHref = `${base}/webexample/`;
-const sourceHref =
-  "https://github.com/SwiftTUI/swift-tui-counter-demo/tree/main/WebExample";
+const sourceHref = "https://github.com/SwiftTUI/swift-tui-counter-demo/tree/main/WebExample";
 const isDev = import.meta.env.DEV;
 const webExampleDir =
-  process.env.WEBEXAMPLE_DIR ??
-  "../.build/public-inputs/swift-tui-counter-demo/WebExample";
+  process.env.WEBEXAMPLE_DIR ?? "../.build/public-inputs/swift-tui-counter-demo/WebExample";
 const hasLocalArtifact =
   existsSync(resolve(process.cwd(), webExampleDir, "pages-dist/index.html")) &&
-  existsSync(
-    resolve(
-      process.cwd(),
-      webExampleDir,
-      "pages-dist/TerminalApp/dist/assets/app.wasm",
-    ),
-  );
+  existsSync(resolve(process.cwd(), webExampleDir, "pages-dist/TerminalApp/dist/assets/app.wasm"));
 const showDevFallback = isDev && !hasLocalArtifact;
 
 interface Props {
   id?: string;
 }
 
-const { id = "demo" } = Astro.props;
+const { id = "demo-terminal" } = Astro.props;
 ---
 
 <section class="demo" id={id} aria-label="Live SwiftTUI counter">
-  <header class="demo-header">
+  <header class="demo-head">
     <div>
       <strong>Live demo</strong>
       <span>The counter, compiled to WebAssembly</span>
@@ -41,13 +33,12 @@ const { id = "demo" } = Astro.props;
   {
     showDevFallback ? (
       <div class="demo-fallback" role="status">
-        <p class="fallback-label">Local WASI artifact not built</p>
+        <p class="demo-fallback__label">Local WASI artifact not built</p>
         <strong>The counter is composed during the full site build.</strong>
         <p>
-          Run <code>bun run build:wasm:dev</code> in <code>Website/</code>,
-          then reload this page.
+          Run <code>bun run build:wasm:dev</code> in <code>Website/</code>, then reload this page.
         </p>
-        <a href={sourceHref} rel="noreferrer noopener">
+        <a class="swifttui-btn swifttui-btn--secondary" href={sourceHref} rel="noreferrer noopener">
           Inspect the browser host source
         </a>
       </div>
@@ -61,7 +52,9 @@ const { id = "demo" } = Astro.props;
 
         <div class="demo-state demo-state--idle" data-state-view="idle">
           <p>A real SwiftTUI app, running live in your browser.</p>
-          <button type="button" data-load-demo>Load live counter</button>
+          <button class="swifttui-btn swifttui-btn--primary" type="button" data-load-demo>
+            Load live counter
+          </button>
         </div>
 
         <div
@@ -71,32 +64,30 @@ const { id = "demo" } = Astro.props;
           role="status"
           aria-live="polite"
         >
-          <span class="loading-mark" aria-hidden="true"></span>
+          <span class="loading-mark" aria-hidden="true" />
           <p>Starting the WASI runtime</p>
         </div>
 
-        <div
-          class="demo-state demo-state--error"
-          data-state-view="error"
-          hidden
-          role="alert"
-        >
+        <div class="demo-state demo-state--error" data-state-view="error" hidden role="alert">
           <strong>The live frame did not start.</strong>
           <p>The source and static site remain available.</p>
-          <div>
-            <button type="button" data-retry-demo>Retry</button>
-            <a href={sourceHref} rel="noreferrer noopener">View source</a>
+          <div class="button-row">
+            <button class="swifttui-btn swifttui-btn--primary" type="button" data-retry-demo>
+              Retry
+            </button>
+            <a class="swifttui-btn swifttui-btn--secondary" href={sourceHref} rel="noreferrer noopener">
+              View source
+            </a>
           </div>
         </div>
-
       </swift-tui-demo>
     )
   }
 
-  <footer class="demo-footer">
+  <footer class="demo-foot">
     <span>Real SwiftTUI view</span>
     <span>Static WASI bundle</span>
-    <span>Canvas with one-way semantic accessibility tree</span>
+    <span>Canvas with a semantic accessibility tree</span>
   </footer>
 </section>
 
@@ -117,12 +108,8 @@ const { id = "demo" } = Astro.props;
     }
 
     connectedCallback() {
-      this.querySelector("[data-load-demo]")?.addEventListener("click", () =>
-        this.start(),
-      );
-      this.querySelector("[data-retry-demo]")?.addEventListener("click", () =>
-        this.retry(),
-      );
+      this.querySelector("[data-load-demo]")?.addEventListener("click", () => this.start());
+      this.querySelector("[data-retry-demo]")?.addEventListener("click", () => this.retry());
       window.addEventListener("message", this.onMessage);
 
       if ("IntersectionObserver" in window) {
@@ -184,58 +171,58 @@ const { id = "demo" } = Astro.props;
 </script>
 
 <style>
+  /* The terminal itself is dark in both themes: it is a screen, not a card. */
   .demo {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     min-height: 100%;
-    background: #101512;
-    color: #e8eee9;
+    background: var(--color-offgray-1000);
+    color: var(--color-offgray-100);
   }
 
-  .demo-header,
-  .demo-footer {
-    font-family: var(--font-mono);
+  .demo-head,
+  .demo-foot {
+    font-size: 12px;
+    line-height: 16px;
   }
 
-  .demo-header {
+  .demo-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    min-height: 60px;
-    padding: 10px 15px;
-    border-bottom: 1px solid #2a342d;
+    gap: var(--space-4);
+    min-height: var(--space-12);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--border-width) solid var(--color-offgray-900);
   }
 
-  .demo-header > div {
+  .demo-head > div {
     display: grid;
-    gap: 2px;
   }
 
-  .demo-header strong,
-  .demo-header span,
-  .demo-header a {
-    font-size: 11px;
+  .demo-head strong {
+    color: var(--color-white);
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.5;
   }
 
-  .demo-header strong {
-    color: #f4f8f5;
-    font-weight: 600;
+  .demo-head span {
+    color: var(--color-offgray-400);
   }
 
-  .demo-header span {
-    color: #89968d;
+  .demo-head a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--divider-accent);
+    white-space: nowrap;
   }
 
-  .demo-header a {
-    padding-bottom: 2px;
-    border-bottom: 1px solid #557065;
-    color: #cbd5ce;
-  }
-
-  .demo-header a:hover {
-    border-color: #62d6bf;
-    color: #f4f8f5;
+  .demo-head a:hover {
+    text-decoration-style: double;
+    text-decoration-color: currentColor;
   }
 
   swift-tui-demo {
@@ -243,7 +230,7 @@ const { id = "demo" } = Astro.props;
     display: block;
     min-height: 350px;
     overflow: hidden;
-    background: #101512;
+    background: var(--color-offgray-1000);
   }
 
   swift-tui-demo iframe {
@@ -253,7 +240,7 @@ const { id = "demo" } = Astro.props;
     width: 100%;
     height: 100%;
     border: 0;
-    background: #101512;
+    background: var(--color-offgray-1000);
   }
 
   .demo-state {
@@ -263,57 +250,41 @@ const { id = "demo" } = Astro.props;
     display: grid;
     place-content: center;
     justify-items: start;
-    gap: 15px;
-    padding: 28px;
-    background: #101512;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--color-offgray-1000);
   }
 
-  .demo-state[hidden],
-  .demo-ready[hidden] {
+  .demo-state[hidden] {
     display: none;
   }
 
   .demo-state p,
   .demo-state strong {
     max-width: 32ch;
-    margin: 0;
+  }
+
+  .demo-state strong {
+    color: var(--color-white);
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 16.8px;
   }
 
   .demo-state p {
-    color: #9aa79e;
+    color: var(--color-offgray-300);
     font-size: 14px;
   }
 
-  .demo-state button,
-  .demo-state a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 42px;
-    padding: 0 15px;
-    border: 1px solid #62d6bf;
-    border-radius: 3px;
-    background: #62d6bf;
-    color: #101512;
-    font-size: 13px;
-    font-weight: 650;
-  }
-
-  .demo-state button:hover,
-  .demo-state a:hover {
-    background: #8be1cf;
-  }
-
   .demo-state--loading {
-    align-content: center;
     justify-items: center;
   }
 
   .loading-mark {
-    width: 24px;
+    width: var(--space-6);
     height: 2px;
-    background: #62d6bf;
-    animation: loading 900ms ease-in-out infinite alternate;
+    background: var(--color-accent);
+    animation: loading 1s ease-in-out infinite alternate;
     transform-origin: left center;
   }
 
@@ -328,93 +299,63 @@ const { id = "demo" } = Astro.props;
     }
   }
 
-  .demo-state--error > div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .demo-state--error a {
-    border-color: #4a584f;
-    background: transparent;
-    color: #e8eee9;
-  }
-
-  .demo-ready {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    z-index: 2;
-    margin: 0;
-    padding: 6px 9px;
-    border: 1px solid #314039;
-    background: rgb(16 21 18 / 88%);
-    color: #b8c4bc;
-    font-family: var(--font-mono);
-    font-size: 10px;
-  }
-
   .demo-fallback {
     display: grid;
     align-content: center;
-    gap: 13px;
+    justify-items: start;
+    gap: var(--space-3);
     min-height: 350px;
-    padding: 30px;
+    padding: var(--space-6);
   }
 
   .demo-fallback p,
   .demo-fallback strong {
     max-width: 44ch;
-    margin: 0;
+  }
+
+  .demo-fallback strong {
+    color: var(--color-white);
+    font-family: var(--font-serif);
+    font-weight: 400;
   }
 
   .demo-fallback p {
-    color: #9aa79e;
+    color: var(--color-offgray-300);
   }
 
-  .demo-fallback .fallback-label {
-    color: #62d6bf;
+  .demo-fallback__label {
+    color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 11px;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
   }
 
   .demo-fallback code {
-    color: #d5ddd7;
-    font-family: var(--font-mono);
-    font-size: 0.9em;
+    background: var(--color-offgray-900);
+    color: var(--color-offgray-100);
   }
 
-  .demo-fallback a {
-    justify-self: start;
-    padding-bottom: 2px;
-    border-bottom: 1px solid #62d6bf;
-    color: #d5ddd7;
-    font-size: 13px;
-  }
-
-  .demo-footer {
+  .demo-foot {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px 18px;
-    padding: 10px 15px;
-    border-top: 1px solid #2a342d;
-    color: #7f8c83;
-    font-size: 10px;
+    gap: var(--space-1-5) var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    border-top: var(--border-width) solid var(--color-offgray-900);
+    color: var(--color-offgray-400);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 599px) {
     swift-tui-demo,
     .demo-fallback {
       min-height: 300px;
     }
 
-    .demo-header {
-      align-items: flex-start;
-    }
-
-    .demo-footer {
+    .demo-foot {
       display: grid;
     }
   }

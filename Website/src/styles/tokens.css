@@ -1,0 +1,426 @@
+/* SwiftTUI — generated from tokens.json */
+:root, [data-theme="light"] {
+  --color-accent: #00e3ac; /* Brand mint, the logo gradient's middle band and the one hue. Fill only in light (primary button, cover slabs: 1.5:1 on page, so never as text there); text and fill in dark (11.2:1 on page). Text on it: text-on-accent (color-ink). */
+  --cream: #7f7866; /* Cream base hue the cream scale is mixed from (color-mix in oklch with white/black). Rarely painted directly. */
+  --color-cream-50: #f5f4f3; /* Navigation bar fill in light (nav-background). Warm off-white. */
+  --color-cream-100: #d1cfc8; /* At 20% over white it makes the light page ground; solid, a warm tint block. */
+  --color-cream-200: #b9b5ab; /* Warm mid tint; decorative fills. */
+  --color-cream-300: #aaa599; /* Warm mid tint; decorative fills. */
+  --color-cream-700: #5c574a; /* Deep warm tone; decorative only. */
+  --color-cream-900: #38352d; /* Deep warm tone. At 20% it is the dark-theme kbd chip fill. */
+  --offgray: #727a89; /* Cool gray base hue (source: --offgray). Body text colour in light, the offgray scale is mixed from it. */
+  --color-offgray-50: #e3e4e7; /* Ghost-button hover wash in light (at 80%); secondary text in dark. */
+  --color-offgray-100: #ced1d6; /* Light borders: grid nodes and card outlines (at 70%); kbd text in dark. */
+  --color-offgray-200: #c0c3ca; /* Secondary button border in light (at 50%); card top rule (at 80%). */
+  --color-offgray-300: #abafb8; /* Body copy in dark (text-body); secondary button fill in dark at 5%. */
+  --color-offgray-400: #878e9b; /* Muted text in dark; dark borders at 20–60%. */
+  --color-offgray-500: #727a89; /* Same value as offgray. 3.97:1 on the light page, so not text there; the light body copy moved to offgray-600. */
+  --color-offgray-600: #626976; /* Body copy in light (text-body): 5.07:1 on page, 5.52:1 on surface. At 14% the dark default border; kbd text in light. */
+  --color-offgray-700: #535964; /* Muted/metadata text in light (text-muted): 6.47:1 on page, 7.05:1 on surface. */
+  --color-offgray-800: #474c55; /* Base html/body colour before utilities; dark card fill at 8%. */
+  --color-offgray-900: #35383f; /* Grid node border in dark. */
+  --color-offgray-950: #212328; /* Dark gradient start for the Watch Demo pill; heading text on the news bar in light. */
+  --color-offgray-1000: #0d0d0f; /* Near-black. Wordmark letters in light; info-bar fill in dark at 95%. */
+  --color-accent-50: #edf9f3; /* Lightest mint wash: news bar hover fill in light. */
+  --color-accent-100: #d5f0e4; /* Mint tint: testimonial avatar frame (20%), news bar shimmer (40%) in light; news headline in dark. */
+  --color-accent-200: #b3e5d0; /* Feature-strip dividers at 50% in light. */
+  --color-accent-300: #7cd5b3; /* Mint tint at the brand lightness with low chroma: hover borders and avatar outlines. */
+  --color-accent-400: #00be8c; /* Mid mint (L .71). Card and control hover border in light; hero line-art. 2.2:1 on page, never text. */
+  --color-accent-500: #00a274; /* Deep mint (L .63). Dithering layers; 3.0:1 on light page, large text only. */
+  --color-accent-600: #008860; /* Deep mint (L .56), inside the logo gradient's lower band. Icons in light (4.1:1 on page, passes the 3:1 icon bar). */
+  --color-accent-700: #007954; /* Deepest mint (L .50), the logo gradient's bottom edge. Accent text in light: 5.0:1 on page, 5.4:1 on surface. */
+  --color-signal-red: #e30037; /* The logo's complementary red (oklch 21°, the mint's opposite). Decorative only: one small slab on the cover, the hero motif. Never a button, link, border or text; never beside mint at equal weight (they collapse together for deuteranopes). */
+  --color-ink: #000a2e; /* The logo's silhouette navy. Labels on mint fills (text-on-accent, 11.6:1) and the logo letters in light. Not for body text: headings stay color-black so the ink reads as the mark's, not the page's. */
+  --color-accent-aqua: #70f8e8; /* Top of the logo's gradient. Decorative only: cover and hero art highlights; 1.2:1 on page. */
+  --color-gray-50: #f9fafb; /* Kbd chip fill in light at 50%. */
+  --color-gray-300: #d1d5dc; /* Inactive carousel indicator in light. */
+  --color-gray-500: #6a7282; /* Kbd chip border in light at 20%. */
+  --color-gray-600: #4a5565; /* Dark card borders at 30–40%; dark hover wash at 10%. */
+  --color-gray-700: #364153; /* Inactive carousel indicator in dark. */
+  --color-gray-900: #101828; /* Dark gradient end of the Watch Demo pill. */
+  --color-black: #000000; /* High-contrast text in light (headings, button labels). */
+  --color-white: #ffffff; /* Surfaces and grid nodes in light; high-contrast text and wordmark letters in dark; text on accent fills. */
+  --motif-subtle-1: #e30037a6; /* Hero shader motif, first subtle tone: a red wash in light. Decorative only. */
+  --motif-subtle-2: #00e3ac59; /* Hero shader motif, second subtle tone: a mint wash in light. Decorative only. */
+  --motif-accent-1: #00be8c; /* Hero shader motif accent one: accent-400. Decorative only. */
+  --motif-accent-2: var(--color-signal-red); /* Hero shader motif accent two: the complementary red, its only appearance besides the cover. Decorative only. */
+  --dithering-back: #00a27480; /* Back layer of the dithered hero background: accent-500 at 50%. Decorative only. */
+  --dithering-front: #00a274; /* Front layer of the dithered hero background: accent-500. Decorative only. */
+  --nav-bg-color: #f7f7f2; /* Source variable set on html.light/html.dark for the nav; the painted nav uses nav-background. */
+  --page: #fffffe; /* Page ground: bg-cream-100/20 over white in light, hsl(218 13% 7.5%) in dark. */
+  --surface: #ffffff; /* Popovers, the letter card and menu panels (popover-bg). */
+  --surface-card: #ffffff99; /* Feature and extension cards: white at 60% in light, offgray-800 at 8% in dark. A translucent fill laid over the page ground so the rails show through. */
+  --nav-background: #ffffffee; /* Sticky header fill (nav-background). */
+  --text-high-contrast: var(--color-black); /* Headings, card titles and secondary/ghost button labels on `page`, `surface` and `surface-card`. */
+  --text-body: var(--color-offgray-600); /* Body copy, descriptions and nav links on `page`, `surface` and `surface-card`: offgray-600 in light (5.07:1 on page, clears 4.5:1), offgray-300 in dark. */
+  --text-strong: var(--color-offgray-800); /* Stronger body text (the base html colour) on `page` and `surface`; use when text-body's light contrast is not enough. */
+  --text-muted: var(--color-offgray-700); /* Metadata, timestamps and captions on `page` and `surface`. One step darker than text-body in light (6.47:1) because it is set at 12–13px; dimmer than body in dark. */
+  --text-accent: var(--color-accent-700); /* Accent headings (the italic hero, 'Open Source'), the 'News:' label and inline links on page and surface: accent-700 in light (5.0:1), the raw brand mint in dark (11.2:1). */
+  --text-on-accent: var(--color-ink); /* Label and icon on color-accent fills (primary button): the logo's ink, 11.6:1 on mint, 9.6:1 on btn-primary-hover. White fails on mint (1.7:1). */
+  --icon: var(--color-accent-600); /* 14px Lucide icons beside labels (icons-base): accent-600 in light (4.1:1), brand mint in dark. */
+  --logo-mark: var(--color-accent); /* Fill of the logo's mark: the brand mint in both themes; letters carry the contrast (logo-text). */
+  --logo-text: var(--color-ink); /* Fill of wordmark letters beside the mark: the mark's own ink in light, white in dark. */
+  --border-default: #dadde2; /* Default 1px border: grid rails, header rules, dividers (default-border-color). */
+  --border-card: #ced1d6b3; /* Card outline at rest: offgray-100 at 70% / offgray-600 at 25%. */
+  --border-hover: var(--color-accent-400); /* Card and control outline on hover: accent-400 in light, brand mint at 50% in dark. */
+  --border-secondary-button: #c0c3ca80; /* Secondary button border: offgray-200 at 50% / offgray-400 at 20%. */
+  --divider-accent: #b3e5d080; /* Vertical dividers between the Fast / Agentic / Collaborative columns: accent-200 at 50% / brand mint at 8%. */
+  --btn-primary-hover: #00cf9b; /* Primary button hover fill: brand mint two steps deeper in lightness (oklch L .78); shadows drop to none on hover. text-on-accent stays 10.6:1. */
+  --btn-secondary-bg: #ffffff80; /* Secondary button fill at rest. */
+  --btn-secondary-hover: #e3e4e780; /* Secondary button hover fill. */
+  --btn-ghost-hover: #e3e4e7cc; /* Ghost/nav button hover wash. */
+  --news-bar-tint: #d5f0e466; /* Centre of the horizontal shimmer behind the news bar: accent-100 at 40% / accent-500 at 8%. */
+  --news-bar-hover: var(--color-accent-50); /* News bar hover fill. */
+  --news-bar-text: var(--color-offgray-950); /* News headline on page and news-bar-hover. */
+  --info-bar-bg: #fffffff2; /* Slide-up 'Learn More →' bar inside hover cards. */
+  --node-stroke: var(--color-offgray-300); /* Stroke of the ┼ junction at rail intersections: one step stronger than border-default, so the crossing reads as a glyph set on the rails. offgray-300 in light, offgray-900 in dark. */
+  --avatar-frame: #d5f0e433; /* Padding frame behind testimonial avatars: accent-100 at 20% / 5%. */
+  --avatar-outline: #7cd5b380; /* 1px outline of the avatar frame: accent-300 at 50% / 20%. */
+  --focus-ring: #008860b3; /* 3px focus-visible outline, 2px offset: accent-600 at 70% in light, brand mint at 60% in dark. */
+  --focus-ring-contrast: #ffffff80; /* Focus outline on dark footer surfaces (fv-style-contrast). */
+  --selection-bg: #eceadf; /* Text selection background. */
+  --selection-text: #201e13; /* Text colour inside a selection on `selection-bg`. */
+  --sh-default: 6px 6px 0 #00a2740f, -6px -6px 0 #00a2740f; /* Two-sided offset mint slab behind media frames (source: --sh-default). */
+  --sh-alt: 6px 6px 0 #00a2740f; /* One-sided variant, bottom-right (source: --sh-alt). */
+  --sh-alt-opposite: -6px -6px 0 #00a2740f; /* One-sided variant, top-left (source: --sh-alt-opposite). */
+  --shadow-btn-primary: inset 0 -2px 0 0 #007954, 0 1px 3px 0 #e6effe; /* Primary button at rest: a 2px inset bottom lip plus a soft drop; none on hover/active. */
+  --shadow-btn-secondary: inset 0 -2px 0 0 #6f7b901a; /* Secondary button and extension cards: a 2px inset bottom lip; none on hover. */
+  --shadow-card-inset: inset 0 -2px 0 0 #6f7b900d; /* Feature cards and their info bar: a faint 2px inset lip. */
+  --shadow-demo-pill: 0 20px 25px -5px #878e9b80, 0 8px 10px -6px #878e9b80; /* The floating Watch Demo pill (shadow-xl in offgray-400/50, black/20 in dark). */
+}
+[data-theme="dark"] {
+  --color-accent: #00e3ac;
+  --cream: #7f7866;
+  --color-cream-50: #f5f4f3;
+  --color-cream-100: #d1cfc8;
+  --color-cream-200: #b9b5ab;
+  --color-cream-300: #aaa599;
+  --color-cream-700: #5c574a;
+  --color-cream-900: #38352d;
+  --offgray: #727a89;
+  --color-offgray-50: #e3e4e7;
+  --color-offgray-100: #ced1d6;
+  --color-offgray-200: #c0c3ca;
+  --color-offgray-300: #abafb8;
+  --color-offgray-400: #878e9b;
+  --color-offgray-500: #727a89;
+  --color-offgray-600: #626976;
+  --color-offgray-700: #535964;
+  --color-offgray-800: #474c55;
+  --color-offgray-900: #35383f;
+  --color-offgray-950: #212328;
+  --color-offgray-1000: #0d0d0f;
+  --color-accent-50: #edf9f3;
+  --color-accent-100: #d5f0e4;
+  --color-accent-200: #b3e5d0;
+  --color-accent-300: #7cd5b3;
+  --color-accent-400: #00be8c;
+  --color-accent-500: #00a274;
+  --color-accent-600: #008860;
+  --color-accent-700: #007954;
+  --color-signal-red: #e30037;
+  --color-ink: #000a2e;
+  --color-accent-aqua: #70f8e8;
+  --color-gray-50: #f9fafb;
+  --color-gray-300: #d1d5dc;
+  --color-gray-500: #6a7282;
+  --color-gray-600: #4a5565;
+  --color-gray-700: #364153;
+  --color-gray-900: #101828;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --motif-subtle-1: #161a22;
+  --motif-subtle-2: #1d242f66;
+  --motif-accent-1: #00be8c;
+  --motif-accent-2: var(--color-signal-red);
+  --dithering-back: #00a27480;
+  --dithering-front: #00a274;
+  --nav-bg-color: #121417;
+  --page: #111216;
+  --surface: #111216;
+  --surface-card: #474c5514;
+  --nav-background: #121316ee;
+  --text-high-contrast: var(--color-white);
+  --text-body: var(--color-offgray-300);
+  --text-strong: var(--color-offgray-100);
+  --text-muted: var(--color-offgray-400);
+  --text-accent: var(--color-accent);
+  --text-on-accent: var(--color-ink);
+  --icon: var(--color-accent);
+  --logo-mark: var(--color-accent);
+  --logo-text: var(--color-white);
+  --border-default: #62697624;
+  --border-card: #62697640;
+  --border-hover: #00e3ac80;
+  --border-secondary-button: #878e9b33;
+  --divider-accent: #00e3ac14;
+  --btn-primary-hover: #00cf9b;
+  --btn-secondary-bg: #abafb80d;
+  --btn-secondary-hover: #c0c3ca1a;
+  --btn-ghost-hover: #727a891a;
+  --news-bar-tint: #00a27414;
+  --news-bar-hover: #00886014;
+  --news-bar-text: var(--color-accent-100);
+  --info-bar-bg: #0d0d0ff2;
+  --node-stroke: var(--color-offgray-900);
+  --avatar-frame: #d5f0e40d;
+  --avatar-outline: #7cd5b333;
+  --focus-ring: #00e3ac99;
+  --focus-ring-contrast: #ffffff80;
+  --selection-bg: #eceadf;
+  --selection-text: #201e13;
+  --sh-default: 5px 5px 0 #00e3ac0d, -5px -5px 0 #00e3ac0d;
+  --sh-alt: 5px 5px 0 #00e3ac0a;
+  --sh-alt-opposite: -5px -5px 0 #00e3ac0a;
+  --shadow-btn-primary: inset 0 -2px 0 0 #007954, 0 1px 3px 0 #00000066;
+  --shadow-btn-secondary: inset 0 -2px 0 0 #a9b0bc14;
+  --shadow-card-inset: inset 0 -2px 0 0 #5962730d;
+  --shadow-demo-pill: 0 20px 25px -5px #00000033, 0 8px 10px -6px #00000033;
+}
+:root {
+  --spacing: 4px; /* Base unit (--spacing: .25rem); every gap and padding is a multiple. */
+  --space-0-5: 2px; /* Hairline gaps: kbd chip gap, the 2px card radius (Tailwind step 0.5). */
+  --space-1: 4px; /* Icon–label gaps inside kbd chips; carousel indicator height is half this. */
+  --space-1-5: 6px; /* Button icon gap and kbd chip horizontal padding; the grid node size (Tailwind step 1.5). */
+  --space-2: 8px; /* Gap between quote and author; news bar vertical padding; between buttons. */
+  --space-2-5: 10px; /* Button horizontal padding (pl-2.5); card padding (Tailwind step 2.5). */
+  --space-3: 12px; /* Ghost button padding; testimonial avatar gap; nav inner padding. */
+  --space-4: 16px; /* Section and card padding; column gutter on small screens. */
+  --space-6: 24px; /* Card padding on large screens; letter card padding. */
+  --space-8: 32px; /* Avatar size; button height for h-8 (32px). */
+  --space-9: 36px; /* Primary/secondary button height (h-9); avatar frame. */
+  --space-12: 48px; /* Outer column rail width on desktop; large card padding. */
+  --space-16: 64px; /* News bar horizontal padding on desktop; section breathing room. */
+  --space-24: 96px; /* Hero vertical rhythm. */
+  --radius-xs: 0; /* Kbd chips, avatar frames, wordmark focus, the letter card. Square: a box-drawing corner (┌ ┐ └ ┘) has no curve. */
+  --radius-sm: 0; /* Buttons, feature cards, extension cards, icon buttons. The default corner: square, as ┌ ┐ └ ┘ draw it. */
+  --radius-md: 4px; /* Rarely; larger panels. */
+  --radius-lg: 6px; /* Rarely; dialogs. */
+  --radius-xl: 8px; /* Rarely; media frames. */
+  --radius-2xl: 10px; /* Rarely. */
+  --radius-full: 9999px; /* Only the round social icon buttons and carousel dots. */
+  --container-max-w: 1080px; /* Content column max width; min-widths step 680/920/1120 by breakpoint. */
+  --blog-content-width: 740px; /* Blog post measure. */
+  --markdown-layout-width: 45rem; /* Docs/markdown measure (720px). */
+  --cell-w: 8px; /* One terminal cell wide: Geist Mono's 0.6em advance at 13.33px. Two spacing units; every glyph-like detail is measured in cells. */
+  --cell-h: 16px; /* One terminal cell tall: a 1.2em line at 13.33px, which Geist Mono's box-drawing glyphs overshoot so stacked │ still join. Four spacing units. */
+  --node-w: calc(var(--cell-w) + var(--border-width)); /* Width of the ┼ junction at rail intersections: one cell plus the stroke, so the stroke centres on a whole pixel. */
+  --node-h: calc(var(--cell-h) + var(--border-width)); /* Height of the ┼ junction: one cell plus the stroke. */
+  --node-vertical-offset: calc(var(--cell-h) / 2 + var(--border-width)); /* Drop that centres the ┼ junction on a section's bottom rail: half a cell plus the rail. */
+  --node-horizontal-offset: calc(var(--cell-w) / 2 + var(--border-width)); /* Outset that centres the ┼ junction on a column rail: half a cell plus the rail. */
+  --border-width: 1px; /* Every rail, border and divider: the light box-drawing stroke (─ │), Geist Mono's 0.084em at 13.33px snapped to the pixel. */
+  --border-double-width: 3px; /* A double rule (═ ║): stroke, gap, stroke at 1:1:1, which is exactly how `border-style: double` paints 3px. */
+  --header-height: 57px; /* Sticky header height. */
+  --focus-outline-width: 3px; /* focus-visible outline width. */
+  --focus-outline-offset: 2px; /* focus-visible outline offset. */
+  --font-writer: "iA Writer Quattro S", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --text-h0: 340 48px/1.2 var(--font-serif); /* Hero headline; italic and text-accent on the home page. clamp(2.6rem, 2rem + 2.5vw, 3rem); weight 320 in dark. */
+  --text-h1: 390 32px/1.2 var(--font-serif); /* Page titles. clamp(1.7rem, 1.5rem + 1.85vw, 2rem); weight 320 in dark. */
+  --text-h2: 390 25.6px/1.25 var(--font-serif); /* Section headings, text-high-contrast or text-accent. clamp(1.4rem, 1.5rem + 1.55vw, 1.6rem); weight 360 in dark. */
+  --text-h3: 380 21.6px/1.3 var(--font-serif); /* Sub-section headings. clamp(1.2rem, 1rem + 1vw, 1.35rem); weight 360 in dark. */
+  --text-h4: 410 18.4px/1.2 var(--font-serif); /* Minor headings. weight 360 in dark. */
+  --text-h5: 400 16.8px/1.1 var(--font-serif); /* Feature titles inside tabs and cards (h3 elements carry .h5). */
+  --text-h6: 400 15.2px/1.1 var(--font-serif); /* Footer column headings, in color-white on the dark footer. */
+  --text-card-title: 400 15px/1.5 var(--font-serif); /* Feature-card and blog-card titles (text-[0.9375rem]) in text-high-contrast. */
+  --text-body-sm: 400 14px/20px var(--font-writer); /* Nav links, buttons and the news bar (text-sm tracking-tight). */
+  --text-caption: 400 13px/1.5 var(--font-writer); /* Card descriptions, hero footnote, the Watch Demo label (text-[.8125rem]). */
+  --text-label-xs: 400 12px/16px var(--font-writer); /* Info bars and testimonial roles (text-xs). */
+  --text-quote: 400 16px/1.5 var(--font-writer); /* Testimonial blockquotes with hanging punctuation. */
+  --text-code: 400 14px/20px var(--font-mono); /* Inline code and code blocks; Shiki light-plus / one-dark-pro themes. */
+  --text-subheader: 400 11px/1.5 var(--font-mono); /* Uppercase eyebrow above a section heading (.subheader). */
+}
+.h0 {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 340;
+  letter-spacing: -0.02em;
+}
+.h1 {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 390;
+  letter-spacing: 0;
+}
+.h2 {
+  font-family: var(--font-serif);
+  font-size: 25.6px;
+  line-height: 1.25;
+  font-weight: 390;
+  letter-spacing: 0;
+}
+.h3 {
+  font-family: var(--font-serif);
+  font-size: 21.6px;
+  line-height: 1.3;
+  font-weight: 380;
+  letter-spacing: 0.005em;
+}
+.h4 {
+  font-family: var(--font-serif);
+  font-size: 18.4px;
+  line-height: 1.2;
+  font-weight: 410;
+  letter-spacing: 0;
+}
+.h5 {
+  font-family: var(--font-serif);
+  font-size: 16.8px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.h6 {
+  font-family: var(--font-serif);
+  font-size: 15.2px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body {
+  font-family: var(--font-writer);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-sm {
+  font-family: var(--font-writer);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+.caption {
+  font-family: var(--font-writer);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.label-xs {
+  font-family: var(--font-writer);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.quote {
+  font-family: var(--font-writer);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.subheader {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+@font-face {
+  font-family: "iA Writer Quattro S";
+  src: url("/fonts/iAWriterQuattroS-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Quattro S";
+  src: url("/fonts/iAWriterQuattroS-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Quattro S";
+  src: url("/fonts/iAWriterQuattroS-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Quattro S";
+  src: url("/fonts/iAWriterQuattroS-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+/* IBM Plex Serif and Sans are not shipped with the design system; these are the
+   latin subsets from Google Fonts, self-hosted so the cross-origin-isolated
+   origin (COEP require-corp) needs no third-party request. */
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("/fonts/IBMPlexSerif-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("/fonts/IBMPlexSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("/fonts/IBMPlexSerif-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("/fonts/IBMPlexSerif-LightItalic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("/fonts/IBMPlexSerif-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

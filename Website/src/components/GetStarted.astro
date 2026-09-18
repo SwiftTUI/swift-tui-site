@@ -1,247 +1,142 @@
 ---
+import Section from "./Section.astro";
+import SectionHead from "./SectionHead.astro";
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
 ---
 
-<section class="start" id="get-started" aria-labelledby="start-title">
-  <div class="shell">
-    <header class="start-head">
-      <p class="home-kicker">Get started</p>
-      <h2 id="start-title">A terminal and a toolchain. That's it.</h2>
-      <p>
-        SwiftTUI apps are plain SwiftPM packages. Any Swift 6.4+ toolchain
-        builds and runs them from the command line on macOS, Linux, or
-        Windows: no Xcode project, no simulator, no app store.
-      </p>
-    </header>
+<Section id="get-started" aria-labelledby="start-title">
+  <SectionHead id="start-title" eyebrow="Get started">
+    <Fragment slot="title">A terminal and a toolchain.</Fragment>
+    SwiftTUI apps are plain SwiftPM packages. Any Swift 6.4 toolchain builds
+    and runs them from the command line on macOS, Linux or Windows: no Xcode
+    project, no simulator, no app store.
+  </SectionHead>
 
-    <div class="start-grid">
-      <article class="start-run" aria-labelledby="start-run-title">
-        <header>
-          <div>
-            <strong id="start-run-title">Run the counter</strong>
-            <span>swift-tui-counter-demo</span>
-          </div>
-          <a href={demoRepo} rel="noreferrer noopener">Open repo</a>
-        </header>
-        <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows — any Swift 6.4+ toolchain</span>
+  <div class="start-grid">
+    <article class="swifttui-card swifttui-card--static start-run" aria-labelledby="start-run-title">
+      <header class="pane-head">
+        <div>
+          <strong id="start-run-title">Run the counter</strong>
+          <span>swift-tui-counter-demo</span>
+        </div>
+        <a class="link" href={demoRepo} rel="noreferrer noopener">Open repo</a>
+      </header>
+      <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows: any Swift 6.4 toolchain</span>
 git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
 cd swift-tui-counter-demo
 swift run --package-path counter counter</code></pre>
-        <p class="start-note">
-          The counter from the demo above, drawn in your own terminal.{" "}
-          <span class="mono">Space</span> or a click increments;{" "}
-          <span class="mono">Ctrl-C</span> quits and restores your shell.
-        </p>
-      </article>
+      <p class="caption start-note">
+        The counter from the demo above, drawn in your own terminal.{" "}
+        <kbd class="swifttui-kbd">Space</kbd> or a click increments;{" "}
+        <kbd class="swifttui-kbd">Ctrl-C</kbd> quits and restores your shell.
+      </p>
+    </article>
 
-      <div class="start-side">
-        <article aria-labelledby="start-toolchain-title">
-          <h3 id="start-toolchain-title">Pick a toolchain</h3>
-          <p>
+    <div class="start-side">
+      <article class="swifttui-card swifttui-card--static" aria-labelledby="start-toolchain-title">
+        <div class="swifttui-card__body">
+          <h3 class="swifttui-card__title" id="start-toolchain-title">Pick a toolchain</h3>
+          <p class="swifttui-card__desc prose">
             <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a>{" "}
             on macOS and Linux, a current Xcode on a Mac, or the{" "}
             <a href="https://www.swift.org/install/windows/" rel="noreferrer noopener">
               swift.org installer</a> on Windows.
           </p>
-        </article>
+        </div>
+      </article>
 
-        <article aria-labelledby="start-package-title">
-          <h3 id="start-package-title">Start your own app</h3>
-          <pre tabindex="0"><code><span class="cm">// Package.swift</span>
+      <article class="swifttui-card swifttui-card--static" aria-labelledby="start-package-title">
+        <div class="swifttui-card__body">
+          <h3 class="swifttui-card__title" id="start-package-title">Start your own app</h3>
+          <pre class="start-package" tabindex="0"><code><span class="cm">// Package.swift</span>
 .package(
   url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
   .upToNextMinor(from: <span class="str">"0.13.5"</span>)
 ),
 <span class="cm">// in your executable target:</span>
 .product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>
-          <p class="start-next">
-            Paste the counter above into <span class="mono">main.swift</span> and{" "}
-            <span class="mono">swift run</span>. Then the{" "}
+          <p class="swifttui-card__desc prose">
+            Paste the counter above into <code>main.swift</code> and{" "}
+            <code>swift run</code>. Then the{" "}
             <a href={`${base}/guides/#first-hour`}>first-hour guides</a>.
           </p>
-        </article>
-      </div>
+        </div>
+      </article>
     </div>
   </div>
-</section>
+</Section>
 
 <style>
-  .start {
-    padding: clamp(57.333px, 7.333vw, 100px) 0 clamp(64px, 8vw, 110px);
-  }
-
-  .start-head {
-    display: grid;
-    gap: 17px;
-    max-width: 780px;
-    margin-bottom: 46px;
-  }
-
-  .start-head h2 {
-    font-size: clamp(42px, 6vw, 76px);
-    font-weight: 520;
-    line-height: 0.96;
-    letter-spacing: -0.058em;
-    text-wrap: balance;
-  }
-
-  .start-head > p:last-child {
-    max-width: 57ch;
-    color: var(--home-muted);
-    font-size: 17px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
   .start-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
-    border: 1px solid var(--home-ink);
-    background: var(--home-paper);
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    gap: var(--space-4);
+    align-items: start;
   }
 
   .start-run {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    min-width: 0;
-    border-right: 1px solid var(--home-line-strong);
   }
 
-  .start-run > header {
+  .pane-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    min-height: 60px;
-    padding: 10px 15px;
-    border-bottom: 1px solid var(--home-line);
-    font-family: var(--font-mono);
+    gap: var(--space-4);
+    min-height: var(--space-12);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--border-width) solid var(--border-default);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
-  .start-run > header > div {
+  .pane-head > div {
     display: grid;
-    gap: 2px;
   }
 
-  .start-run > header strong,
-  .start-run > header span,
-  .start-run > header a {
-    font-size: 11px;
+  .pane-head strong {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 15px;
   }
 
-  .start-run > header strong {
-    font-weight: 600;
-  }
-
-  .start-run > header span {
-    color: var(--home-muted);
-  }
-
-  .start-run > header a {
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-muted);
-  }
-
-  .start-run > header a:hover {
-    border-color: var(--home-accent);
-    color: var(--home-ink);
-  }
-
-  pre {
-    margin: 0;
-    padding: 22px 20px;
-    overflow-x: auto;
-    color: var(--home-code);
+  .pane-head span {
+    color: var(--text-muted);
+    font-size: 12px;
     font-family: var(--font-mono);
+  }
+
+  .start-run pre {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: var(--space-4);
     font-size: clamp(11px, 0.95vw, 12.5px);
     line-height: 1.75;
-    tab-size: 2;
-  }
-
-  pre .cm {
-    color: var(--home-quiet);
-  }
-
-  pre .str {
-    color: var(--home-code-string);
   }
 
   .start-note {
-    padding: 14px 15px 16px;
-    border-top: 1px solid var(--home-line);
-    color: var(--home-muted);
-    font-size: 13px;
-    line-height: 1.55;
-  }
-
-  .start-note .mono,
-  .start-next .mono {
-    color: var(--home-ink);
-    font-size: 0.92em;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border-top: var(--border-width) solid var(--border-default);
   }
 
   .start-side {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    min-width: 0;
+    gap: var(--space-4);
   }
 
-  .start-side article {
-    padding: 18px 19px 20px;
+  .start-package {
+    margin: var(--space-3) 0;
+    padding: var(--space-3);
+    font-size: 12px;
   }
 
-  .start-side article:first-child {
-    border-bottom: 1px solid var(--home-line-strong);
-  }
-
-  .start-side h3 {
-    font-size: 15px;
-    font-weight: 650;
-    letter-spacing: -0.015em;
-  }
-
-  .start-side article > p {
-    margin-top: 9px;
-    max-width: 52ch;
-    color: var(--home-muted);
-    font-size: 13.5px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .start-side article > p a {
-    padding-bottom: 1px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-ink);
-  }
-
-  .start-side article > p a:hover {
-    border-color: var(--home-accent);
-  }
-
-  .start-side article > p .mono {
-    color: var(--home-ink);
-    font-size: 0.92em;
-  }
-
-  .start-side pre {
-    padding: 14px 0 16px;
-  }
-
-  .start-next {
-    margin-top: 4px;
-  }
-
-  @media (max-width: 900px) {
+  @media (max-width: 899px) {
     .start-grid {
       grid-template-columns: 1fr;
-    }
-
-    .start-run {
-      border-right: 0;
-      border-bottom: 1px solid var(--home-line-strong);
     }
   }
 </style>

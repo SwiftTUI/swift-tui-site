@@ -17,8 +17,12 @@ charts_checkout="$source_parent/charts-source"
 terminalview_checkout="$source_parent/terminalview-source"
 
 mkdir -p "$site_root/Scripts" "$site_root/docs" "$site_root/Website/dist" \
+  "$site_root/Website/docs-theme" \
   "$source_checkout" "$charts_checkout" "$terminalview_checkout"
 cp "$build_script" "$site_root/Scripts/build_docc_site.sh"
+cp "$(dirname "$build_script")/apply_docc_theme.sh" "$site_root/Scripts/apply_docc_theme.sh"
+printf '{"theme":{}}\n' > "$site_root/Website/docs-theme/theme-settings.json"
+printf '/* fixture theme */\n' > "$site_root/Website/docs-theme/docs-theme.css"
 
 # Three fixture repos have distinct mounts. All must survive composition.
 cat > "$site_root/docs/docc-repos.yml" <<'EOF'
@@ -48,8 +52,10 @@ git -C "$source_parent" init -q
 cat > "$source_checkout/make-docs.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-mkdir -p .build-docs
+mkdir -p .build-docs/documentation/fixture
 printf 'local overlay docs\n' > .build-docs/index.html
+printf '<html><head><title>x</title></head><body>shell</body></html>\n' \
+  > .build-docs/documentation/fixture/index.html
 EOF
 chmod +x "$source_checkout/make-docs.sh"
 
@@ -81,6 +87,15 @@ grep -q "local overlay terminalview docs" "$site_root/Website/dist/docs/terminal
 # The charts mount lives INSIDE the framework mount; re-check the framework
 # index after both copies to prove the second archive did not overwrite it.
 grep -q "local overlay docs" "$site_root/Website/dist/docs/index.html"
+# The site theme lands in every mount, and every shell with a <head> links
+# its own mount's stylesheet by absolute path.
+for mount in docs docs/charts docs/terminal-view; do
+  test -f "$site_root/Website/dist/$mount/theme-settings.json"
+  test -f "$site_root/Website/dist/$mount/docs-theme.css"
+done
+grep -q '<link rel="stylesheet" href="/docs/docs-theme.css"></head>' \
+  "$site_root/Website/dist/docs/documentation/fixture/index.html"
+test "$(grep -o 'docs-theme.css' "$site_root/Website/dist/docs/documentation/fixture/index.html" | wc -l | tr -d ' ')" = 1
 
 # A set-but-missing local checkout must fail loudly, not clone a public tag.
 if SWIFTTUI_CHARTS_CHECKOUT="$source_parent/does-not-exist" \

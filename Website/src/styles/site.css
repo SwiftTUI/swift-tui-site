@@ -1,418 +1,737 @@
-/* ── tokens ─────────────────────────────────────────────────────
-   One palette, two naming schemes. The site's original token names
-   (--ink*, --accent, --panel*, --line*, --warn) are kept so existing
-   components adapt for free, and the render-pipeline applet's token
-   names (--text/--muted/--quiet, --inset, --main-actor, --tail, --tok-*,
-   etc.) are defined alongside them so the ported walkthrough reads from
-   the same source. Colour only — fonts stay Geist. Dark is the default;
-   :root[data-theme="light"] below overrides every colour token.
-   ─────────────────────────────────────────────────────────────── */
+/* ── site.css ───────────────────────────────────────────────────────────
+   Base layer for swifttui.sh. Loaded after tokens.css (every colour, font,
+   radius and spacing value; the only file that names a colour) and
+   components.css (the design system's Button, Kbd, NewsBar, FeatureCard,
+   Testimonial, GridFrame and Navigation rules). Everything here composes
+   those tokens: the page skeleton with its visible rails, the type scale,
+   code, and the few site-specific primitives the pages share.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* ── system knobs ─────────────────────────────────────────────────────── */
 :root {
-  /* surfaces */
-  --bg:         #0d1117;
-  --bg-soft:    #0f141b;
-  --panel:      #161b22;
-  --panel-2:    #1a2029;
-  --inset:      #0b0f15;
-  --line:       #232a33;
-  --line-soft:  #1c222b;
-  --line-strong:#30363d;
-  --line-warm:  #3b434e;
-
-  /* text — site names alias the applet's text tokens */
-  --text:       #e6edf3;
-  --muted:      #9aa6b2;
-  --quiet:      #6e7a87;
-  --ink:        var(--text);
-  --ink-2:      var(--muted);
-  --ink-3:      var(--quiet);
-  --ink-4:      #566370;
-
-  /* brand accent — a two-layer system pulled from the logo (logo.svg):
-     the primary leans *bluer* than the mark (a cyan-teal sampled toward the
-     #00d5bf / #00556a highlights+shadows), the secondary *matches* the mark's
-     blue-green emerald body (#00aa80 / #00bf95). Components keep reading
-     --accent; the duo surfaces together via --accent-grad (hero word, dot,
-     ambient glow), so the brand reads as teal→cyan rather than only emerald. */
-  --accent:      #1fb6cf;            /* layer 1 — bluer-than-logo cyan-teal */
-  --accent-rgb:  31, 182, 207;       /* channels for rgba() glow expressions */
-  --accent-soft: rgba(31, 182, 207, 0.13);
-  --accent-dim:  rgba(31, 182, 207, 0.42);
-  --accent-hover:#3fcde4;
-  --on-accent:   #04232b;            /* dark teal ink on solid accent fills (~6.6:1) */
-
-  --accent-2:      #00bf95;          /* layer 2 — logo blue-green emerald */
-  --accent-2-rgb:  0, 191, 149;
-  --accent-2-soft: rgba(0, 191, 149, 0.13);
-  --accent-2-hover:#19d3a6;
-
-  --accent-grad: linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 100%);
-
-  /* meaning-carrying accents: warm = main actor, teal = off-actor */
-  --main-actor: #d8a657;
-  --main-actor-soft: rgba(216, 166, 87, 0.12);
-  --tail:       #4bb6a8;
-  --tail-soft:  rgba(75, 182, 168, 0.12);
-  --ok:         #57ab5a;
-  --drop:       #cf6679;
-  --warn:       var(--main-actor);
-
-  /* syntax — retuned onto the brand axis instead of the GitHub blue/red set.
-     Types carry the brand cyan (layer 1) and strings a clearly lighter mint
-     (layer 2) so the two stay distinct where they hug — Text("…"), Button("…").
-     Keywords reuse the established brand warm (--main-actor gold) for warm/cool
-     contrast against both; numbers + @property-wrappers keep a quiet violet. */
-  --tok-kw:     #e0a85c;   /* keywords — brand gold */
-  --tok-type:   #45c8db;   /* types — brand cyan (layer 1) */
-  --tok-str:    #5fdcab;   /* strings — brand mint (layer 2), lighter than type */
-  --tok-num:    #c8a6f5;   /* numbers + @attributes — quiet violet */
-  --tok-com:    #6e7a87;
-
-  /* chrome + code surfaces */
-  --topbar-bg:  rgba(13, 17, 23, 0.86);
-  --code-fg:    #c9d4de;
-  --code-ln:    #43505c;
-
-  /* terminal device chrome */
-  --term-bg:    #060606;
-  --term-red:   #ff5f56;
-  --term-yellow:#ffbd2e;
-  --term-green: #27c93f;
-  --term-dot:   #1f1f1f;
-
-  --font-sans:  "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono:  "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-  --sans:       var(--font-sans);
-  --mono:       var(--font-mono);
-
-  --radius:     10px;
-  --radius-sm:  7px;
-  --shell-max:  1320px;
-  --gutter:     24px;
+  /* Heading weights: light in light, lighter still in dark. Never bold. */
+  --h0-weight: 340;
+  --h1-weight: 390;
+  --h2-weight: 390;
+  --h3-weight: 380;
+  --h4-weight: 410;
+  --gutter: var(--space-4);
+  --section-x: var(--space-4);
+  --section-y: var(--space-8);
+  --toc-top: calc(var(--header-height) + var(--space-4));
 }
 
-/* ── light theme ────────────────────────────────────────────────
-   Mirrors the applet's GitHub-light palette. Only colour tokens
-   change; the var() aliases (--ink*, --warn) follow automatically.
-   ─────────────────────────────────────────────────────────────── */
-:root[data-theme="light"] {
-  color-scheme: light;
-
-  --bg:         #ffffff;
-  --bg-soft:    #f6f8fa;
-  --panel:      #ffffff;
-  --panel-2:    #f6f8fa;
-  --inset:      #f6f8fa;
-  --line:       #d8dee4;
-  --line-soft:  #e6eaef;
-  --line-strong:#d0d7de;
-  --line-warm:  #c2c9d1;
-
-  --text:       #1f2328;
-  --muted:      #57606a;
-  --quiet:      #818b98;
-  --ink-4:      #a0a8b0;
-
-  /* same two-layer accent, deepened so white text clears AA on solid fills
-     (--accent ~4.6:1 with #fff) and both layers read as text on white. */
-  --accent:      #0a7d92;            /* deep cyan-teal */
-  --accent-rgb:  10, 125, 146;
-  --accent-soft: rgba(10, 125, 146, 0.10);
-  --accent-dim:  rgba(10, 125, 146, 0.32);
-  --accent-hover:#0a6576;
-  --on-accent:   #ffffff;
-
-  --accent-2:      #0c7e62;          /* deep logo emerald */
-  --accent-2-rgb:  12, 126, 98;
-  --accent-2-soft: rgba(12, 126, 98, 0.10);
-  --accent-2-hover:#0a6b53;
-  /* --accent-grad inherits the var() definition above, so it re-tints here. */
-
-  --main-actor: #9a6700;
-  --main-actor-soft: rgba(154, 103, 0, 0.12);
-  --tail:       #1b7c70;
-  --tail-soft:  rgba(27, 124, 112, 0.12);
-  --ok:         #1a7f37;
-  --drop:       #cf222e;
-
-  /* same roles, deepened so each clears AA on the white code surface. */
-  --tok-kw:     #9a6700;   /* keywords — brand gold (matches --main-actor) */
-  --tok-type:   #0a7d92;   /* types — brand cyan */
-  --tok-str:    #0f7a52;   /* strings — brand emerald */
-  --tok-num:    #8250df;   /* numbers + @attributes — quiet violet */
-  --tok-com:    #6e7781;
-
-  --topbar-bg:  rgba(255, 255, 255, 0.85);
-  --code-fg:    #1f2328;
-  --code-ln:    #8c959f;
-
-  --term-bg:    #f6f8fa;
-  --term-dot:   #d0d7de;
+:root[data-theme="dark"] {
+  --h0-weight: 320;
+  --h1-weight: 320;
+  --h2-weight: 360;
+  --h3-weight: 360;
+  --h4-weight: 360;
 }
 
-/* ── reset / base ───────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+@media (min-width: 768px) {
+  :root {
+    --section-x: var(--space-6);
+    --section-y: var(--space-12);
+  }
+}
+
+/* ── legacy names ─────────────────────────────────────────────────────────
+   The pipeline walkthrough and the long-form pages were written against the
+   previous palette. Each old name resolves to exactly one token, so those
+   sheets pick up the system without a rewrite and both themes follow for
+   free. Remove a line once nothing reads it. */
+:root {
+  --bg: var(--page);
+  --bg-soft: var(--surface);
+  --panel: var(--surface);
+  --panel-2: var(--btn-ghost-hover);
+  --inset: var(--surface);
+  --line: var(--border-default);
+  --line-soft: var(--border-card);
+  --line-strong: var(--border-default);
+  --line-warm: var(--border-hover);
+  --text: var(--text-strong);
+  --muted: var(--text-body);
+  --quiet: var(--text-muted);
+  --ink: var(--text-high-contrast);
+  --ink-2: var(--text-body);
+  --ink-3: var(--text-muted);
+  --ink-4: var(--text-muted);
+  --accent: var(--text-accent);
+  --accent-soft: var(--news-bar-tint);
+  --accent-dim: var(--divider-accent);
+  --accent-hover: var(--btn-primary-hover);
+  --on-accent: var(--text-on-accent);
+  --main-actor: var(--text-high-contrast);
+  --main-actor-soft: var(--btn-ghost-hover);
+  --tail: var(--text-accent);
+  --tail-soft: var(--news-bar-tint);
+  --ok: var(--text-accent);
+  --drop: var(--text-muted);
+  --warn: var(--text-high-contrast);
+  --tok-kw: var(--text-high-contrast);
+  --tok-type: var(--text-accent);
+  --tok-str: var(--text-strong);
+  --tok-num: var(--text-muted);
+  --tok-com: var(--text-muted);
+  --code-fg: var(--text-strong);
+  --code-ln: var(--text-muted);
+  --topbar-bg: var(--nav-background);
+  --term-bg: var(--color-offgray-1000);
+  --home-paper: var(--page);
+  --home-paper-soft: var(--surface);
+  --home-ink: var(--text-high-contrast);
+  --home-muted: var(--text-body);
+  --home-quiet: var(--text-muted);
+  --home-line: var(--border-default);
+  --home-line-soft: var(--border-card);
+  --home-line-strong: var(--border-default);
+  --home-accent: var(--color-accent);
+  --home-accent-ink: var(--text-accent);
+  --home-accent-on: var(--text-on-accent);
+  --home-terminal-accent: var(--color-accent);
+  --home-code: var(--text-strong);
+  --home-code-type: var(--text-accent);
+  --home-code-string: var(--text-strong);
+  --home-code-number: var(--text-muted);
+  --mono: var(--font-mono);
+  --sans: var(--font-writer);
+  --radius: var(--radius-sm);
+  --shell-max: var(--container-max-w);
+}
+
+/* ── reset / base ─────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
 html {
-  color-scheme: dark;
+  color-scheme: light;
+  background: var(--page);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Guard the scrolling element itself (iOS scrolls <html>, not <body>) so the
-     page can't pan horizontally and leave the sticky header clamped to the
-     original viewport width. `clip` hard-clips without creating a scroll
-     container, so it doesn't break the header's position: sticky; `hidden` is
-     the fallback for engines without `overflow: clip`. */
+  /* Clip, not hidden: the page must never pan sideways, and `clip` does not
+     create a scroll container, so the sticky header keeps working. */
   overflow-x: hidden;
   overflow-x: clip;
 }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--page);
+  color: var(--text-body);
+  font-family: var(--font-writer);
+  font-size: 16px;
+  line-height: 1.5;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+p,
+ul,
+ol,
+dl,
+figure,
+blockquote {
+  margin: 0;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--header-height) + var(--space-4));
+}
+
+:focus-visible {
+  outline: var(--focus-outline-width) solid var(--focus-ring);
+  outline-offset: var(--focus-outline-offset);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
-[id] { scroll-margin-top: 76px; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  line-height: 1.5;
-  min-height: 100dvh;
-  /* clip (not hidden) avoids forcing overflow-y to `auto`, which would make
-     <body> a scroll container and detach the header's sticky positioning. */
-  overflow-x: hidden;
-  overflow-x: clip;
-}
-a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
-img, svg { display: block; }
-::selection { background: var(--accent-dim); color: var(--text); }
 
-/* one persistent grain layer; never on a scrolling container */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0.045;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+/* ── type ─────────────────────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--font-serif);
+  color: var(--text-high-contrast);
+  text-wrap: balance;
 }
 
-/* ambient corner glow — accent, very low alpha */
-.ambient {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(900px 540px at 86% -10%, rgba(31, 182, 207, 0.10), transparent 60%),
-    radial-gradient(760px 520px at -8% 12%, rgba(0, 191, 149, 0.07), transparent 60%);
-}
-/* light mode: a fainter wash of the same two-layer accent, no overlay grain */
-:root[data-theme="light"] .ambient {
-  background:
-    radial-gradient(900px 540px at 86% -10%, rgba(10, 125, 146, 0.06), transparent 60%),
-    radial-gradient(760px 520px at -8% 12%, rgba(12, 126, 98, 0.05), transparent 60%);
-}
-:root[data-theme="light"] .grain { display: none; }
-
-/* ── layout primitives ──────────────────────────────────────── */
-.shell {
-  width: 100%;
-  max-width: var(--shell-max);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-  position: relative;
-  z-index: 1;
-}
-
-/* mono helpers */
-.mono { font-family: var(--font-mono); font-feature-settings: "ss02", "zero"; }
-.kbd  {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 4px;
-  border: 1px solid var(--line-strong);
-  background: var(--panel-2);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-2);
+h1,
+.h1 {
+  font-size: clamp(1.7rem, 1.5rem + 1.85vw, 2rem);
+  line-height: 1.2;
+  font-weight: var(--h1-weight);
   letter-spacing: 0;
 }
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px 4px 8px;
-  border: 1px solid var(--line-strong);
-  background: var(--panel-2);
-  border-radius: 999px;
+
+.h0 {
+  font-size: clamp(2.6rem, 2rem + 2.5vw, 3rem);
+  line-height: 1.2;
+  font-weight: var(--h0-weight);
+  letter-spacing: -0.02em;
+}
+
+h2,
+.h2 {
+  font-size: 25.6px;
+  line-height: 1.25;
+  font-weight: var(--h2-weight);
+  letter-spacing: 0;
+}
+
+h3,
+.h3 {
+  font-size: 21.6px;
+  line-height: 1.3;
+  font-weight: var(--h3-weight);
+  letter-spacing: 0.005em;
+}
+
+h4,
+.h4 {
+  font-size: 18.4px;
+  line-height: 1.2;
+  font-weight: var(--h4-weight);
+}
+
+h5,
+.h5 {
+  font-size: 16.8px;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+h6,
+.h6 {
+  font-size: 15.2px;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.accent {
+  color: var(--text-accent);
+}
+
+/* Lead paragraphs under a heading take the UI tracking. */
+.lead {
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  color: var(--text-body);
+  text-wrap: pretty;
+}
+
+.caption {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+.label-xs {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* The uppercase mono eyebrow above a section heading. */
+.eyebrow,
+.subheader {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--ink-2);
-  letter-spacing: 0.02em;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-}
-.tag .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent-grad);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-  animation: dot-pulse 2.4s ease-in-out infinite;
-}
-@keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); }
-  50%      { box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.04); }
+  color: var(--text-muted);
 }
 
-/* anchored fade-up reveal driven by --i index variable */
-@keyframes reveal {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.reveal {
-  animation: reveal 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--i, 0) * 70ms);
-}
-@media (prefers-reduced-motion: reduce) {
-  .reveal { animation: none; opacity: 1; transform: none; }
+.eyebrow--accent {
+  color: var(--text-accent);
 }
 
-/* ── brand hand-off: large hero mark → compact header lockup ───────
-   On the homepage (`.is-handoff`, set server-side in index.astro) the
-   oversized hero mark carries the brand at the top of the page, so the
-   small header lockup stays hidden until you scroll past the mark. A tiny
-   inline observer in Hero.astro toggles `.is-scrolled` on <html>; the
-   cross-fade is pure CSS. The lockup keeps its reserved slot the whole
-   time (visibility, not display) so the nav never reflows; `visibility` is
-   delayed on hide so it leaves the tab order / a11y tree only after the
-   fade. A <noscript> fallback reveals the lockup when the observer can't
-   run. The global prefers-reduced-motion rule collapses the transitions. */
-:root.is-handoff .site-header .brand {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 260ms ease, transform 260ms ease, visibility 0s linear 260ms;
-}
-:root.is-handoff.is-scrolled .site-header .brand {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  pointer-events: auto;
-  transition: opacity 260ms ease, transform 260ms ease, visibility 0s;
-}
-
-/* horizontal divide-y replacement (vertical 1px strokes) */
-.divider {
-  height: 1px;
-  background: var(--line);
-  width: 100%;
-}
-
-/* generic section header */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
 .eyebrow .num {
-  color: var(--ink-4);
-  margin-right: 8px;
+  color: var(--text-muted);
+  margin-right: var(--space-2);
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  letter-spacing: -0.022em;
-  line-height: 1.04;
-  margin: 0;
-  color: var(--text);
-}
-h1 {
-  font-size: clamp(34px, 6.2vw, 72px);
-  letter-spacing: -0.034em;
-  font-weight: 540;
-  font-stretch: 95%;
-  word-break: normal;
-  overflow-wrap: break-word;
-}
-h2 {
-  font-size: clamp(26px, 3.4vw, 40px);
-  font-weight: 540;
-  letter-spacing: -0.026em;
-  overflow-wrap: break-word;
-}
-h3 { font-size: 18px; font-weight: 500; }
-p  { margin: 0; color: var(--ink-2); }
-
-/* link-cta */
-.cta {
-  display: inline-flex;
+/* A block eyebrow is set into a rule, the way a TUI titles a border:
+   ── LABEL ──────. Two cells of rule lead in and the rest runs out to the
+   measure. Inline eyebrows (kickers, step indices) stay plain labels. */
+p.eyebrow {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--line-strong);
-  background: var(--panel-2);
-  color: var(--ink);
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 200ms ease,
-              background 200ms ease;
+  gap: var(--cell-w);
 }
-.cta:hover { border-color: var(--line-warm); background: var(--panel-2); }
-.cta:active { transform: translateY(1px); }
-.cta--primary {
-  background: var(--accent);
-  color: var(--on-accent);
-  border-color: transparent;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-}
-.cta--primary:hover { background: var(--accent-hover); }
-.cta .arrow {
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.cta:hover .arrow { transform: translateX(2px); }
 
-/* theme toggle (in SiteHeader) — shows the icon for the appearance the
-   click switches *to*: sun while dark, moon while light. */
-.theme-toggle {
+p.eyebrow::before,
+p.eyebrow::after {
+  content: "";
+  height: var(--border-width);
+  background: var(--border-default);
+}
+
+p.eyebrow::before {
+  flex: 0 0 calc(2 * var(--cell-w));
+}
+
+p.eyebrow::after {
+  flex: 1 0 calc(2 * var(--cell-w));
+}
+
+/* Centred heads balance the rule: three cells either side of the label. */
+.section-head--center p.eyebrow::before,
+.section-head--center p.eyebrow::after {
+  flex: 0 0 calc(3 * var(--cell-w));
+}
+
+strong,
+b {
+  font-weight: 700;
+  color: var(--text-high-contrast);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Inline links in running text. Buttons and cards never underline. */
+.prose a,
+.link {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--divider-accent);
+  transition: text-decoration-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover doubles the underline: a terminal's second underline attribute
+   (SGR 21), and the same ─ → ═ step a focused card's border takes. */
+.prose a:hover,
+.link:hover {
+  text-decoration-style: double;
+  text-decoration-color: currentColor;
+}
+
+.prose p + p {
+  margin-top: 1em;
+}
+
+.prose em {
+  color: var(--text-strong);
+}
+
+/* ── code ─────────────────────────────────────────────────────────────── */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+}
+
+:not(pre) > code {
+  padding: 0 0.3em;
+  border-radius: var(--radius-xs);
+  background: var(--btn-ghost-hover);
+  color: var(--text-strong);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+pre {
+  margin: 0;
+  padding: var(--space-4);
+  overflow: auto;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-strong);
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+pre code {
+  font-size: inherit;
+}
+
+/* The five syntax roles the pages hand-mark. One hue: types carry the
+   accent; keywords are the heading black; strings the strong grey. */
+.kw,
+.at {
+  color: var(--text-high-contrast);
+}
+
+.ty {
+  color: var(--text-accent);
+}
+
+.str {
+  color: var(--text-strong);
+}
+
+.num {
+  color: var(--text-muted);
+}
+
+.cm {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── the frame: two rails, one column ─────────────────────────────────── */
+.frame {
+  position: relative;
   display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border: 1px solid var(--line-strong);
-  border-radius: 7px;
-  background: var(--panel-2);
-  color: var(--ink-2);
-  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  grid-template-columns:
+    minmax(var(--space-4), 1fr)
+    minmax(0, var(--container-max-w))
+    minmax(var(--space-4), 1fr);
+  min-height: 100dvh;
 }
-.theme-toggle:hover { color: var(--ink); border-color: var(--line-warm); }
-.theme-toggle .icon { width: 16px; height: 16px; }
-.theme-toggle .icon-moon { display: none; }
-:root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
-:root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
-/* responsive */
-@media (max-width: 920px) {
-  :root { --gutter: 18px; }
+.frame__rail--l {
+  border-right: var(--border-width) solid var(--border-default);
+}
+
+.frame__rail--r {
+  border-left: var(--border-width) solid var(--border-default);
+}
+
+.frame__col {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.frame__col > main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+/* ── sections ─────────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  border-bottom: var(--border-width) solid var(--border-default);
+}
+
+.section--pad {
+  padding: var(--section-y) var(--section-x);
+}
+
+.section--tight {
+  padding: var(--space-4) var(--section-x);
+}
+
+.section--flush {
+  padding: 0;
+}
+
+/* The ┼ junction set where a section's bottom rail meets a column rail: one
+   cell of box drawing, arms half a cell long, so the rail appears to cross
+   the column rule and stop at the cell's edge. Sections carry no side
+   borders, so the column rail lies just outside the section box and the
+   token offsets centre the glyph's strokes on both rails. */
+.node {
+  position: absolute;
+  bottom: calc(-1 * var(--node-vertical-offset));
+  z-index: 2;
+  width: var(--node-w);
+  height: var(--node-h);
+  background:
+    linear-gradient(var(--node-stroke), var(--node-stroke)) center / 100%
+      var(--border-width) no-repeat,
+    linear-gradient(var(--node-stroke), var(--node-stroke)) center /
+      var(--border-width) 100% no-repeat;
+  pointer-events: none;
+}
+
+.node--l {
+  left: calc(-1 * var(--node-horizontal-offset));
+}
+
+.node--r {
+  right: calc(-1 * var(--node-horizontal-offset));
+}
+
+/* Section heads: centred over a card grid, left-aligned over a list. */
+.section-head {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 60ch;
+  margin-bottom: var(--space-6);
+}
+
+.section-head--center {
+  margin-inline: auto;
+  justify-items: center;
+  text-align: center;
+}
+
+.section-head .lead {
+  max-width: 60ch;
+}
+
+/* Grids of cards. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.card-grid--two {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+/* Screenshot cards keep the capture's aspect instead of the 150px mock. */
+.swifttui-card--shot .swifttui-card__media {
+  height: auto;
+  aspect-ratio: 16 / 10;
+}
+
+/* Cards without a link still read as cards. */
+.swifttui-card--static {
+  cursor: default;
+}
+
+.swifttui-card--static:hover {
+  border-color: var(--border-card);
+}
+
+/* Nor do they take the double line in any state: a static card is not a
+   control, so focus moving to a link inside it must not frame the card. */
+.swifttui-card--static:hover,
+.swifttui-card--static.is-hover,
+.swifttui-card--static:focus-within:not(:focus-visible) {
+  outline: 0;
+}
+
+/* A media frame with the offset mint slab behind it. */
+.media-frame {
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--sh-default);
+}
+
+/* Three-up strips stack with a horizontal divider on small screens. */
+@media (max-width: 719px) {
+  .swifttui-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .swifttui-strip > div {
+    padding: var(--space-4);
+    border-left: 0;
+    border-top: var(--border-width) solid var(--divider-accent);
+  }
+
+  .swifttui-strip > div:first-child {
+    border-top: 0;
+  }
+
+  .swifttui-strip > div + div::before,
+  .swifttui-strip > div + div::after {
+    display: none;
+  }
+}
+
+/* The news bar shares the header's bottom rule; no second rule on top. */
+.swifttui-newsbar {
+  border-top: 0;
+}
+
+@media (max-width: 719px) {
+  .swifttui-newsbar {
+    display: block;
+    padding-inline: var(--space-4);
+    text-align: center;
+  }
+
+  .swifttui-newsbar > span {
+    display: inline;
+  }
+
+  .swifttui-newsbar__label {
+    margin-right: var(--space-1-5);
+  }
+
+  .swifttui-newsbar__arrow {
+    margin-left: var(--space-1-5);
+  }
+}
+
+/* Buttons fill their row on phones. */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 479px) {
+  .button-row {
+    flex-direction: column;
+  }
+
+  .button-row .swifttui-btn {
+    width: 100%;
+  }
+}
+
+/* ── tables ───────────────────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2-5) var(--space-3);
+  border-bottom: var(--border-width) solid var(--border-default);
+  border-right: var(--border-width) solid var(--border-default);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th:last-child,
+.table td:last-child {
+  border-right: 0;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* The header row closes on a double rule (═), as a drawn table's does. */
+.table thead th {
+  border-bottom: var(--border-double-width) double var(--border-default);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.table tbody th {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--text-high-contrast);
+  white-space: nowrap;
+}
+
+/* ── skip link ────────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--space-4);
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--text-on-accent);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.025em;
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+/* ── theme toggle: shows the icon for the appearance a click switches TO ── */
+.theme-toggle .icon-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-moon {
+  display: block;
 }

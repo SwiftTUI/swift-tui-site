@@ -1,69 +1,38 @@
 ---
-import "../styles/site.css";
-import "../styles/marketing.css";
+import "../styles/docs.css";
 import "../styles/render-pipeline.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteIcons from "../components/SiteIcons.astro";
-import ThemeScript from "../components/ThemeScript.astro";
+import Site from "../layouts/Site.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
-const canonical = `${site}${base || ""}/pipeline/`;
-const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Render Pipeline — a developer walkthrough";
 const description =
   "A source-based guide to the SwiftTUI render pipeline: how an authored View is lowered, level by level, from a Swift value to terminal cells and host output.";
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta
-      name="theme-color"
-      content="#f5f7f3"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#101512"
-      media="(prefers-color-scheme: dark)"
-    />
-    <ThemeScript />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="SwiftTUI render pipeline walkthrough" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content={ogImage} />
-    <SiteIcons />
-    <script is:inline defer src={`${base}/render-pipeline/app.js`}></script>
-  </head>
-  <body class="marketing-subpage pipeline-page">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
-
-    <main class="rp" id="main">
+<Site
+  title={title}
+  description={description}
+  path="/pipeline/"
+  ogType="article"
+  ogImageAlt="SwiftTUI render pipeline walkthrough"
+  twitterCard="summary"
+  bodyClass="pipeline-page"
+>
+  <script slot="head" is:inline defer src={`${base}/render-pipeline/app.js`}></script>
+  <div class="doc rp">
       <div class="doc-shell" id="top">
         <aside class="toc" aria-label="On this page">
           <p class="toc-kicker">On this page</p>
-          <nav id="toc-nav"></nav>
+          <nav class="toc-nav" id="toc-nav"></nav>
           <p class="toc-note">
             Code references are repo-relative paths into the{" "}
             <code>swift-tui</code> package and open the cited source on GitHub.
           </p>
         </aside>
 
-        <div class="rp-main">
+        <div class="doc-main">
           <!-- ===================== INTRO ===================== -->
           <section class="lede" id="intro">
-            <p class="eyebrow">Under the hood</p>
+            <p class="eyebrow eyebrow--accent">Under the hood</p>
             <h1>What happens between your <code>View</code> and the terminal</h1>
             <p class="lede-copy">
               A SwiftTUI frame is not "draw the view." It is a compiler-style
@@ -466,8 +435,6 @@ const description =
           </section>
         </div>
       </div>
-    </main>
+    </div>
+</Site>
 
-    <SiteFooter />
-  </body>
-</html>

@@ -1,0 +1,79 @@
+/* SwiftTUI design system — component styles. Loaded after tokens.css; every value is a token. */
+
+/* Button */
+.swifttui-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-1-5);height:var(--space-9);padding:0 var(--space-3) 0 var(--space-2-5);border:var(--border-width) solid transparent;border-radius:var(--radius-sm);font-family:var(--font-writer);font-size:14px;line-height:20px;letter-spacing:-0.025em;white-space:nowrap;cursor:pointer;user-select:none;text-decoration:none;background:transparent;color:var(--text-high-contrast);transition:background-color .15s cubic-bezier(.4,0,.2,1)}
+.swifttui-btn svg{width:14px;height:14px;flex:none}
+.swifttui-btn--primary{background:var(--color-accent);color:var(--text-on-accent);box-shadow:var(--shadow-btn-primary)}
+.swifttui-btn--primary:hover,.swifttui-btn--primary.is-hover{background:var(--btn-primary-hover);box-shadow:none}
+.swifttui-btn--secondary{background:var(--btn-secondary-bg);border-color:var(--border-secondary-button);box-shadow:var(--shadow-btn-secondary)}
+.swifttui-btn--secondary:hover,.swifttui-btn--secondary.is-hover{background:var(--btn-secondary-hover);box-shadow:none}
+.swifttui-btn--ghost:hover,.swifttui-btn--ghost.is-hover{background:var(--btn-ghost-hover)}
+.swifttui-btn--ghost svg{color:var(--icon)}
+.swifttui-btn:active:not(:disabled){transform:translateY(1px) scale(.99);box-shadow:none}
+.swifttui-btn:disabled,.swifttui-btn.is-disabled{opacity:.5;cursor:not-allowed;box-shadow:none;pointer-events:none}
+.swifttui-btn:focus-visible{outline:var(--focus-outline-width) solid var(--focus-ring);outline-offset:var(--focus-outline-offset)}
+.swifttui-btn--sm{height:var(--space-8);padding:0 var(--space-2-5)}
+
+/* FeatureCard */
+.swifttui-card{display:flex;flex-direction:column;border:var(--border-width) solid var(--border-card);border-radius:var(--radius-sm);background:var(--surface-card);box-shadow:var(--shadow-card-inset);overflow:clip;text-decoration:none;color:var(--text-body);font-family:var(--font-writer)}
+.swifttui-card:hover,.swifttui-card.is-hover,.swifttui-card:focus-within{border-color:var(--border-hover);outline:var(--border-width) solid var(--border-hover);outline-offset:var(--border-width)}
+.swifttui-card:focus-visible{outline:var(--focus-outline-width) solid var(--focus-ring);outline-offset:var(--focus-outline-offset)}
+.swifttui-card__media{position:relative;height:150px;background:var(--surface);border-bottom:var(--border-width) solid var(--border-default);overflow:hidden}
+.swifttui-card__media>img{display:block;width:100%;height:100%;object-fit:cover}
+.swifttui-card__mock{position:absolute;inset:var(--space-4) var(--space-6) 0;border:var(--border-width) solid var(--border-default);border-radius:var(--radius-xs);background:var(--page)}
+.swifttui-card__mock i{display:block;height:6px;margin:10px 12px 0;border-radius:2px;background:var(--border-default)}
+.swifttui-card__mock i:nth-child(2){width:60%}.swifttui-card__mock i:nth-child(3){width:75%;background:var(--divider-accent)}
+.swifttui-card__info{position:absolute;left:0;right:0;bottom:0;transform:translateY(100%);display:flex;align-items:center;justify-content:center;gap:var(--space-1-5);padding:var(--space-2) var(--space-3);border-top:var(--border-width) solid var(--border-card);background:var(--info-bar-bg);color:var(--text-accent);font-size:12px;line-height:16px;box-shadow:var(--shadow-card-inset);transition:transform .1s}
+.swifttui-card:hover .swifttui-card__info,.swifttui-card.is-hover .swifttui-card__info,.swifttui-card:focus-within .swifttui-card__info{transform:none}
+.swifttui-card__body{padding:var(--space-4)}
+.swifttui-card__title{margin:0;font-family:var(--font-serif);font-size:15px;line-height:1.5;color:var(--text-high-contrast)}
+.swifttui-card__desc{margin:var(--space-1) 0 0;font-size:13px;line-height:1.5;text-wrap:balance}
+.swifttui-card--ext{padding:var(--space-2-5);gap:2px;box-shadow:var(--shadow-btn-secondary)}
+.swifttui-card--ext .swifttui-card__desc{margin:0}
+.swifttui-card__meta{display:flex;justify-content:space-between;font-size:13px}
+.swifttui-card__meta b{font-family:var(--font-serif);font-weight:400;color:var(--text-high-contrast)}
+.swifttui-card__by{font-size:12px;color:var(--text-muted)}
+
+/* Testimonial */
+.swifttui-quote{display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-4);border-radius:var(--radius-xs);font-family:var(--font-writer);color:var(--text-body)}
+.swifttui-quote--featured{position:relative;background:var(--surface);border:var(--border-width) solid var(--border-card)}
+.swifttui-quote--featured::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,var(--border-default) 0 1px,transparent 1px 4px);opacity:.3;pointer-events:none}
+.swifttui-quote>*{position:relative}
+.swifttui-quote blockquote{margin:0;padding:0 var(--space-3);font-size:16px;line-height:1.5;text-indent:-.5em;hanging-punctuation:first last}
+.swifttui-quote blockquote::before{content:"\201C"}.swifttui-quote blockquote::after{content:"\201D"}
+.swifttui-quote mark{background:var(--selection-bg);color:var(--selection-text)}
+.swifttui-quote__who{display:flex;align-items:center;gap:var(--space-3);margin-top:auto}
+.swifttui-quote__frame{width:var(--space-9);height:var(--space-9);padding:2px;box-sizing:border-box;border-radius:var(--radius-xs);background:var(--avatar-frame);outline:1px solid var(--avatar-outline)}
+.swifttui-quote__avatar{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-xs);background:var(--color-offgray-100);color:var(--color-offgray-600);font-size:12px;overflow:hidden}
+.swifttui-quote__avatar img{width:100%;height:100%;object-fit:cover}
+.swifttui-quote__name{font-size:14px;color:var(--text-high-contrast);letter-spacing:-0.025em}
+.swifttui-quote__role{font-size:12px;line-height:16px;color:var(--text-muted)}
+.swifttui-quote__mark{margin-left:auto;font-family:var(--font-serif);font-size:13px;letter-spacing:.05em;color:var(--text-high-contrast)}
+
+/* GridFrame */
+.swifttui-frame{position:relative;display:grid;grid-template-columns:var(--space-12) 1fr var(--space-12);font-family:var(--font-writer);color:var(--text-body)}
+.swifttui-frame__rail{border-left:var(--border-width) solid var(--border-default);border-right:var(--border-width) solid var(--border-default)}
+.swifttui-frame__rail--l{border-left:0}.swifttui-frame__rail--r{border-right:0}
+.swifttui-frame__col{display:flex;flex-direction:column}
+.swifttui-section{position:relative;border-bottom:var(--border-width) solid var(--border-default)}
+.swifttui-node{position:absolute;bottom:calc(-1 * var(--node-vertical-offset));width:var(--node-w);height:var(--node-h);background:linear-gradient(var(--node-stroke),var(--node-stroke)) center/100% var(--border-width) no-repeat,linear-gradient(var(--node-stroke),var(--node-stroke)) center/var(--border-width) 100% no-repeat;z-index:2;pointer-events:none}
+.swifttui-node--l{left:calc(-1 * var(--node-horizontal-offset))}
+.swifttui-node--r{right:calc(-1 * var(--node-horizontal-offset))}
+.swifttui-strip{display:grid;grid-template-columns:repeat(var(--swifttui-strip-cols,3),1fr)}
+.swifttui-strip>div{position:relative;padding:var(--space-4) var(--space-6);border-left:var(--border-width) solid var(--divider-accent)}
+.swifttui-strip>div:first-child{border-left:0}
+.swifttui-strip>div+div::before,.swifttui-strip>div+div::after{content:"";position:absolute;left:calc(-1 * var(--node-horizontal-offset));width:var(--node-w);height:calc(var(--cell-h) / 2 + var(--border-width));pointer-events:none}
+.swifttui-strip>div+div::before{top:calc(-1 * var(--border-width));background:linear-gradient(var(--node-stroke),var(--node-stroke)) top/100% var(--border-width) no-repeat,linear-gradient(var(--node-stroke),var(--node-stroke)) center/var(--border-width) 100% no-repeat}
+.swifttui-strip>div+div::after{bottom:calc(-1 * var(--border-width));background:linear-gradient(var(--node-stroke),var(--node-stroke)) bottom/100% var(--border-width) no-repeat,linear-gradient(var(--node-stroke),var(--node-stroke)) center/var(--border-width) 100% no-repeat}
+.swifttui-strip p{margin:0}
+.swifttui-strip__t{font-family:var(--font-serif);font-size:15px;line-height:1.5;color:var(--text-high-contrast)}
+.swifttui-strip__d{margin-top:var(--space-1)!important;font-size:13px;line-height:1.5;text-wrap:balance}
+
+/* Navigation */
+.swifttui-nav{height:var(--header-height);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:0 var(--space-3);background:var(--nav-background);border-top:var(--border-width) solid var(--border-default);border-bottom:var(--border-width) solid var(--border-default);font-family:var(--font-writer)}
+.swifttui-nav__side{display:flex;align-items:center;gap:var(--space-2-5)}
+.swifttui-nav ul{display:flex;list-style:none;margin:0;padding:0}
+.swifttui-nav__logo{display:flex;align-items:center;gap:var(--space-2);height:23px;border-radius:var(--radius-sm);text-decoration:none}
+.swifttui-nav__logo img,.swifttui-nav__logo svg{height:23px;width:auto;display:block}
+.swifttui-nav__wordmark{font-family:var(--font-mono);font-style:oblique;font-size:20px;line-height:23px;letter-spacing:-0.02em;color:var(--logo-text)}
+.swifttui-nav__search svg{width:12px;height:12px;color:var(--text-muted);margin-right:var(--space-1)}

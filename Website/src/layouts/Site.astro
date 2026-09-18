@@ -1,0 +1,67 @@
+---
+import "../styles/tokens.css";
+import "../styles/components.css";
+import "../styles/site.css";
+import SiteHead from "../components/SiteHead.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+// The page skeleton: the grid frame with its two column rails, the sticky
+// header, the one-line news bar, the page's sections, and the footer. Every
+// public page renders through this layout; only the sections differ.
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  ogType?: "website" | "article";
+  ogImageAlt?: string;
+  twitterCard?: "summary" | "summary_large_image";
+  keywords?: string;
+  bodyClass?: string;
+  mainClass?: string;
+  news?: boolean;
+}
+
+const {
+  title,
+  description,
+  path,
+  ogType,
+  ogImageAlt,
+  twitterCard,
+  keywords,
+  bodyClass,
+  mainClass,
+  news = true,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SiteHead
+      title={title}
+      description={description}
+      path={path}
+      ogType={ogType}
+      ogImageAlt={ogImageAlt}
+      twitterCard={twitterCard}
+      keywords={keywords}
+    />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="frame">
+      <div class="frame__rail frame__rail--l" aria-hidden="true"></div>
+      <div class="frame__col">
+        <SiteHeader />
+        <main id="main" class={mainClass}>
+          <slot />
+        </main>
+        <SiteFooter />
+      </div>
+      <div class="frame__rail frame__rail--r" aria-hidden="true"></div>
+    </div>
+  </body>
+</html>

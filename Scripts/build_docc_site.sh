@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # Builds every DocC archive listed in docs/docc-repos.yml and copies each into
-# Website/dist at its own mountPath. Each swiftRepos entry builds from either
+# Website/dist at its own mountPath, then applies the site-owned DocC theme
+# (Scripts/apply_docc_theme.sh: theme-settings.json + docs-theme.css). Each swiftRepos entry builds from either
 # a local checkout (the per-repo environment variable below, used by the
 # coordination overlay's pre-tag gates) or a fresh clone of its release ref.
 #
@@ -181,6 +182,7 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
 
   cp -R "${clone_dir}/${output_path}"/. "$output_root"/
   printf '[build_docc_site] copied %s DocC archive to %s\n' "$repo_name" "$output_root"
+  "${site_root}/Scripts/apply_docc_theme.sh" "$output_root" "$mount_path"
 done <<EOF
 $entries
 EOF

@@ -1,0 +1,63 @@
+---
+// A linked card: optional media on top, a serif title, one sentence of
+// description. The whole card is the link; the "Learn more →" bar slides up
+// over the media on hover or focus.
+interface Props {
+  title: string;
+  href?: string;
+  external?: boolean;
+  media?: { src: string; alt: string; width?: number; height?: number };
+  cta?: string;
+  compact?: boolean;
+  class?: string;
+}
+
+const {
+  title,
+  href,
+  external = false,
+  media,
+  cta = "Learn more",
+  compact = false,
+  class: className,
+} = Astro.props;
+
+const Tag = href ? "a" : "div";
+const linkAttrs = href ? { href, rel: external ? "noreferrer noopener" : undefined } : {};
+---
+
+<Tag
+  class:list={[
+    "swifttui-card",
+    compact && "swifttui-card--ext",
+    media && "swifttui-card--shot",
+    !href && "swifttui-card--static",
+    className,
+  ]}
+  {...linkAttrs}
+>
+  {
+    media && (
+      <div class="swifttui-card__media">
+        <img
+          src={media.src}
+          alt={media.alt}
+          width={media.width}
+          height={media.height}
+          loading="lazy"
+          decoding="async"
+        />
+        {href && (
+          <span class="swifttui-card__info" aria-hidden="true">
+            {cta} →
+          </span>
+        )}
+      </div>
+    )
+  }
+  <div class="swifttui-card__body">
+    <h3 class="swifttui-card__title">{title}</h3>
+    <p class="swifttui-card__desc"><slot /></p>
+    {Astro.slots.has("meta") && <slot name="meta" />}
+  </div>
+</Tag>

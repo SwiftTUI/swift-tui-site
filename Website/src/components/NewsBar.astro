@@ -1,0 +1,17 @@
+---
+import pkg from "../../package.json";
+
+// One current announcement, under the header: the latest release. The
+// version is the site's own package version, which the release process
+// bumps in lockstep with the framework.
+const version = pkg.version;
+const href = `https://github.com/SwiftTUI/swift-tui/releases/tag/${version}`;
+---
+
+<a class="swifttui-newsbar section" href={href} rel="noreferrer noopener">
+  <span class="swifttui-newsbar__label">News:</span>
+  <span class="swifttui-newsbar__msg">SwiftTUI {version} is out. Read the release notes.</span>
+  <span class="swifttui-newsbar__arrow" aria-hidden="true">→</span>
+  <i class="node node--l" aria-hidden="true"></i>
+  <i class="node node--r" aria-hidden="true"></i>
+</a>

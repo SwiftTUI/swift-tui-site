@@ -1,0 +1,21 @@
+---
+// Eyebrow, heading and lead for a section. Centred over a card grid,
+// left-aligned over a list. The heading text comes through the `title`
+// slot so it can carry inline code.
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  level?: 1 | 2 | 3;
+  align?: "left" | "center";
+  class?: string;
+}
+
+const { id, eyebrow, level = 2, align = "left", class: className } = Astro.props;
+const Heading = `h${level}` as "h1" | "h2" | "h3";
+---
+
+<header class:list={["section-head", align === "center" && "section-head--center", className]}>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <Heading id={id}><slot name="title" /></Heading>
+  {Astro.slots.has("default") && <p class="lead"><slot /></p>}
+</header>

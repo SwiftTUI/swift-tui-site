@@ -1,0 +1,44 @@
+---
+// One row of the grid frame: a block closed by a bottom rail, with a ┼
+// junction set where that rail meets each column rail. Every section of every
+// page is one of these, so the junctions always land on intersections.
+interface Props {
+  as?: "section" | "div" | "header" | "footer" | "article" | "nav";
+  id?: string;
+  class?: string;
+  pad?: boolean | "tight" | "flush";
+  nodes?: boolean;
+  [key: string]: unknown;
+}
+
+const {
+  as: Tag = "section",
+  id,
+  class: className,
+  pad = true,
+  nodes = true,
+  ...rest
+} = Astro.props;
+---
+
+<Tag
+  id={id}
+  class:list={[
+    "section",
+    pad === true && "section--pad",
+    pad === "tight" && "section--tight",
+    pad === "flush" && "section--flush",
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+  {
+    nodes && (
+      <>
+        <i class="node node--l" aria-hidden="true" />
+        <i class="node node--r" aria-hidden="true" />
+      </>
+    )
+  }
+</Tag>

@@ -1,411 +1,225 @@
 ---
+import Button from "./Button.astro";
+import Icon from "./Icon.astro";
 import Mark from "./Mark.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const home = `${base}/`;
 const repo = "https://github.com/SwiftTUI/swift-tui";
 
-// One source of truth for the primary nav. The two groups — on-page anchors,
-// then standalone pages — render as a single inline row separated by a dash on
-// wide viewports, and as stacked, rule-separated sections inside the collapsed
-// panel. Nothing is ever dropped: every destination is reachable at every width.
-// Each label names the destination the way that page names itself: the homepage
-// showcase section is a preview of /showcase/, so only the page gets a nav item.
-// The render-pipeline walkthrough is deliberately NOT in the primary row: it is
-// internals ("under the hood"), reached from Further reading, the docs hub's
-// Concepts group, and the footer — the primary row stays core (try · start ·
-// why · proof · from-SwiftUI · docs).
-const navGroups = [
-  [
-    { href: `${home}#demo`, label: "Demo" },
-    { href: `${home}#get-started`, label: "Get started" },
-    { href: `${home}#why`, label: "Why SwiftTUI" },
-  ],
-  [
-    { href: `${base}/capabilities/`, label: "Features" },
-    { href: `${base}/showcase/`, label: "Showcase" },
-    { href: `${base}/differences-from-swiftui/`, label: "From SwiftUI" },
-    { href: `${base}/guides/`, label: "Docs" },
-  ],
+// The primary row, in reading order: try it, understand it, browse it,
+// migrate to it, read the reference. Six items; GitHub joins the list only
+// inside the collapsed panel, where the icon button is hidden.
+const links = [
+  { href: `${home}#demo`, label: "Demo" },
+  { href: `${home}#why`, label: "Why SwiftTUI" },
+  { href: `${base}/capabilities/`, label: "Features" },
+  { href: `${base}/showcase/`, label: "Showcase" },
+  { href: `${base}/differences-from-swiftui/`, label: "From SwiftUI" },
+  { href: `${base}/guides/`, label: "Docs" },
 ];
-
-// Shared by the wide-viewport icon button and the in-panel GitHub row.
-const githubMark =
-  "M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-.99-.02-1.94-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.97 10.97 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.15 0 1.55-.01 2.81-.01 3.19 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z";
 ---
 
 {
-  /* Marks the document as script-capable *before* the header is parsed, so the
-     collapsed-panel styles below only ever apply when the disclosure button can
-     actually open them. Without JS the nav degrades to a plain stacked list —
-     visible, keyboard-reachable, no dead hamburger. Runs before first paint of
-     the header, so the enhanced layout never flashes the fallback. */
+  /* Marks the document as script-capable before the header is parsed, so the
+     collapsed-panel styles only apply when the disclosure button can open it.
+     Without JS the nav degrades to a plain stacked list. */
 }
 <script is:inline>
   document.documentElement.dataset.navEnhanced = "true";
 </script>
 
-<header class="site-header" data-nav-open="false">
-  <div class="shell header-row">
-    <a class="brand" href={home} aria-label="SwiftTUI home">
-      <Mark size={32} />
-      <span>SwiftTUI</span>
-    </a>
-
-    {
-      /* Sits before the nav in source order so Tab moves from the button
-         straight into the panel it opens; grid places it visually last. */
-    }
-    <button
-      class="nav-toggle"
-      id="nav-toggle"
-      type="button"
-      aria-controls="site-nav"
-      aria-expanded="false"
-      aria-label="Open menu"
-      title="Open menu"
-    >
-      <svg
-        class="icon icon-menu"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M4 7h16M4 12h16M4 17h16"></path>
-      </svg>
-      <svg
-        class="icon icon-close"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M6 6l12 12M18 6L6 18"></path>
-      </svg>
-    </button>
-
-    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-      {
-        navGroups.map((group, index) => (
-          <>
-            {index > 0 && <span class="nav-divider" aria-hidden="true" />}
-            <div class="nav-group">
-              {group.map((item) => <a href={item.href}>{item.label}</a>)}
-            </div>
-          </>
-        ))
-      }
-
-      {
-        /* Panel-only: on wide viewports the icon button in .header-actions
-           carries this destination instead. */
-      }
-      <span class="nav-divider nav-divider--meta" aria-hidden="true"></span>
-      <a class="nav-github" href={repo} rel="noreferrer noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d={githubMark}></path>
-        </svg>
-        GitHub
+<header class="site-header section" data-nav-open="false">
+  <div class="swifttui-nav">
+    <div class="swifttui-nav__side site-lead">
+      <a class="swifttui-nav__logo" href={home} aria-label="SwiftTUI home">
+        <Mark size={23} />
+        <span class="swifttui-nav__wordmark">SwiftTUI</span>
       </a>
-    </nav>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul>
+          {
+            links.map((link) => (
+              <li>
+                <Button href={link.href} size="sm" variant="ghost">
+                  {link.label}
+                </Button>
+              </li>
+            ))
+          }
+          <li >
+            <Button href={repo} size="sm" variant="ghost" external>
+              GitHub
+            </Button>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-    <div class="header-actions">
-      <a
-        class="github-link"
-        href={repo}
-        rel="noreferrer noopener"
-        aria-label="SwiftTUI on GitHub"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d={githubMark}></path>
-        </svg>
-      </a>
+    <div class="swifttui-nav__side site-actions">
       <button
-        class="theme-toggle"
+        class="swifttui-btn swifttui-btn--ghost swifttui-btn--sm theme-toggle"
         id="theme-toggle"
         type="button"
-        aria-label="Switch to light mode"
-        title="Switch to light mode"
+        aria-label="Switch to dark theme"
+        title="Switch to dark theme"
       >
-        <svg
-          class="icon icon-sun"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-        </svg>
-        <svg
-          class="icon icon-moon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
+        <Icon name="sun" />
+        <Icon name="moon" />
+      </button>
+      <button
+        class="swifttui-btn swifttui-btn--secondary swifttui-btn--sm nav-toggle"
+        id="nav-toggle"
+        type="button"
+        aria-controls="site-nav"
+        aria-expanded="false"
+        aria-label="Open menu"
+        title="Open menu"
+      >
+        <Icon name="menu" />
+        <Icon name="x" />
       </button>
     </div>
   </div>
+  <i class="node node--l" aria-hidden="true"></i>
+  <i class="node node--r" aria-hidden="true"></i>
 </header>
 
 <style>
   .site-header {
-    --header-h: 68px;
     position: sticky;
     top: 0;
     z-index: 40;
-    border-bottom: 1px solid var(--line-strong);
-    background: var(--topbar-bg);
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    background: var(--nav-background);
+    border-top: var(--border-width) solid var(--border-default);
   }
 
-  .header-row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 28px;
-    min-height: var(--header-h);
+  /* The header owns the rules; the nav block draws none of its own. */
+  .site-header .swifttui-nav {
+    border: 0;
+    background: transparent;
   }
 
-  .brand {
-    display: inline-flex;
-    grid-column: 1;
-    align-items: center;
-    gap: 10px;
-    color: var(--ink);
-    font-size: 24px;
-    font-weight: 650;
-    font-family: var(--font-mono);
-    letter-spacing: -0.025em;
-  }
-
-  .site-nav {
-    display: flex;
-    grid-column: 2;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(14px, 1.8vw, 26px);
+  .site-lead {
     min-width: 0;
-    color: var(--ink-2);
-    font-family: var(--font-mono);
-    font-size: 11.5px;
+    gap: var(--space-4);
   }
 
-  /* The groups only exist to structure the collapsed panel; inline they
-     dissolve so every link shares one flex row and one gap value. */
-  .nav-group {
-    display: contents;
+  .site-nav ul {
+    gap: var(--space-0-5);
   }
 
-  .site-nav a {
-    white-space: nowrap;
-    transition: color 140ms ease;
-  }
-
-  .site-nav a:hover {
-    color: var(--ink);
-  }
-
-  .nav-divider {
-    color: var(--ink-4);
-  }
-
-  .nav-divider::before {
-    content: "—";
-  }
-
-  /* Panel-only rows: the wide layout carries these in .header-actions. */
-  .nav-divider--meta,
-  .nav-github {
+  .site-nav__panel-only {
     display: none;
   }
 
-  .header-actions {
-    display: flex;
-    grid-column: 3;
-    align-items: center;
-    gap: 7px;
+  .site-actions {
+    gap: var(--space-1-5);
+    flex: none;
   }
 
-  .github-link,
-  .nav-toggle,
-  :global(.theme-toggle) {
-    display: grid;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border: 1px solid var(--line-strong);
-    border-radius: 3px;
-    background: transparent;
-    color: var(--ink-2);
-    transition:
-      border-color 140ms ease,
-      color 140ms ease,
-      background 140ms ease;
+  .theme-toggle,
+  .site-github {
+    width: var(--space-8);
+    padding: 0;
+    justify-content: center;
   }
 
-  .github-link:hover,
-  .nav-toggle:hover,
-  :global(.theme-toggle:hover) {
-    border-color: var(--accent);
-    color: var(--ink);
+  .theme-toggle :global(svg) {
+    color: var(--icon);
   }
 
-  /* Declared after the shared chrome rule above so it wins the display cascade:
-     the disclosure only exists once the nav collapses. */
   .nav-toggle {
     display: none;
-    grid-column: 4;
+    width: var(--space-8);
+    padding: 0;
+    justify-content: center;
   }
 
-  .nav-toggle .icon {
-    width: 17px;
-    height: 17px;
-  }
-
-  .nav-toggle .icon-close,
-  .nav-toggle[aria-expanded="true"] .icon-menu {
+  .nav-toggle :global(.icon-x),
+  .nav-toggle[aria-expanded="true"] :global(.icon-menu) {
     display: none;
   }
 
-  .nav-toggle[aria-expanded="true"] .icon-close {
+  .nav-toggle[aria-expanded="true"] :global(.icon-x) {
     display: block;
   }
 
   /* ── collapsed nav ────────────────────────────────────────────────
-     Below the width where the inline row still fits, the nav becomes a
-     disclosure panel anchored under the header bar. It holds *every*
-     destination — the three anchors, the three pages, and GitHub — so
-     nothing is hidden the way the old nth-child rules hid it.
-
-     Gated on [data-nav-enhanced]: with no JS the rules below never apply
-     and the nav stays a plain stacked list under the brand row. */
-  @media (max-width: 820px) {
-    .site-header {
-      --header-h: 62px;
+     Below the width where the row still fits, the nav becomes a
+     disclosure panel under the header: every destination, plus GitHub,
+     as full-width rows. Gated on [data-nav-enhanced] so that without JS
+     the list simply stays visible below the wordmark. */
+  @media (max-width: 1023px) {
+    .site-header .swifttui-nav {
+      flex-wrap: wrap;
+      height: auto;
+      min-height: var(--header-height);
+      padding-block: var(--space-2-5);
     }
 
-    .header-row {
-      grid-template-columns: auto minmax(0, 1fr) auto auto;
-      gap: 12px;
-    }
-
-    /* The disclosure precedes the nav in source order but trails it visually,
-       so every bar item is pinned to row 1 explicitly — sparse auto-placement
-       would otherwise push .header-actions onto a second row. */
-    .brand,
-    .header-actions,
-    .nav-toggle {
-      grid-row: 1;
-    }
-
-    .header-actions {
-      grid-column: 3;
-    }
-
-    :root[data-nav-enhanced="true"] .nav-toggle {
-      display: grid;
-    }
-
-    /* Moves into the panel so the bar keeps room for the disclosure. */
-    :root[data-nav-enhanced="true"] .github-link {
-      display: none;
+    .site-lead {
+      flex-wrap: wrap;
     }
 
     .site-nav {
-      display: grid;
-      grid-row: 2;
-      grid-column: 1 / -1;
-      grid-template-columns: minmax(0, 1fr);
+      flex-basis: 100%;
+    }
+
+    .site-nav ul {
+      flex-direction: column;
+      align-items: stretch;
       gap: 0;
-      padding-bottom: 10px;
-      font-size: 14px;
     }
 
-    .nav-group {
-      display: grid;
-    }
-
-    /* Full-width rows: 44px keeps the tap target at the accessibility floor
-       even though the label is short, and no side padding lines the labels up
-       with the brand mark above them. */
-    .site-nav a {
-      display: flex;
-      align-items: center;
+    .site-nav li :global(.swifttui-btn) {
+      width: 100%;
+      justify-content: flex-start;
       min-height: 44px;
-      padding: 4px 0;
     }
 
-    .nav-divider {
-      height: 1px;
-      margin: 7px 0;
-      background: var(--line);
-    }
-
-    .nav-divider::before {
-      content: none;
-    }
-
-    .nav-divider--meta,
-    .nav-github {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: var(--ink-3);
-    }
-
-    .nav-divider--meta {
+    .site-nav__panel-only {
       display: block;
+      margin-top: var(--space-2);
+      padding-top: var(--space-2);
+      border-top: var(--border-width) solid var(--border-default);
     }
 
-    /* Enhanced: lift the list out of flow into an overlay panel. Bleeds to
-       the viewport edges off .shell's padding box, and caps its own height so
-       a short (landscape) viewport scrolls the menu instead of the page. */
+    :root[data-nav-enhanced="true"] .nav-toggle {
+      display: inline-flex;
+    }
+
+    :root[data-nav-enhanced="true"] .site-github {
+      display: none;
+    }
+
+    :root[data-nav-enhanced="true"] .site-header .swifttui-nav {
+      height: var(--header-height);
+      padding-block: 0;
+      flex-wrap: nowrap;
+    }
+
     :root[data-nav-enhanced="true"] .site-nav {
       position: absolute;
-      /* auto placement keeps .shell's *padding* box as the containing block, so
-         left/right: 0 reach the viewport edges rather than the gutter inset. */
-      grid-column: auto;
-      grid-row: auto;
-      top: calc(100% + 1px);
+      top: 100%;
       right: 0;
       left: 0;
-      max-height: calc(100vh - var(--header-h) - 12px);
-      max-height: calc(100dvh - var(--header-h) - 12px);
-      padding: 6px var(--gutter) 16px;
+      z-index: 41;
+      max-height: calc(100dvh - var(--header-height) - var(--space-4));
+      padding: var(--space-2) var(--space-3) var(--space-4);
       overflow-y: auto;
       overscroll-behavior: contain;
-      border-bottom: 1px solid var(--line-strong);
-      background: var(--bg);
-      box-shadow: 0 18px 36px rgb(0 0 0 / 14%);
+      border-bottom: var(--border-width) solid var(--border-default);
+      background: var(--nav-background);
+      box-shadow: var(--shadow-demo-pill);
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-8px);
+      transform: translateY(-4px);
       pointer-events: none;
-      /* visibility is delayed on hide so the panel leaves the tab order and
-         the a11y tree only once the fade has finished — same handshake the
-         brand hand-off uses in site.css. */
       transition:
-        opacity 180ms ease,
-        transform 180ms ease,
-        visibility 0s linear 180ms;
+        opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0s linear 150ms;
     }
 
     :root[data-nav-enhanced="true"] .site-header[data-nav-open="true"] .site-nav {
@@ -414,29 +228,19 @@ const githubMark =
       transform: none;
       pointer-events: auto;
       transition:
-        opacity 180ms ease,
-        transform 180ms ease,
+        opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
         visibility 0s;
     }
   }
 
-  @media (max-width: 380px) {
-    .brand {
-      font-size: 20px;
+  @media (max-width: 479px) {
+    .swifttui-nav__wordmark {
+      display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .site-nav a,
-    .github-link,
-    .nav-toggle,
-    :global(.theme-toggle) {
-      transition: none;
-    }
-
-    /* Matches the panel rules' specificity so the delayed-visibility handshake
-       is dropped too: with no fade to wait on, the panel should leave the tab
-       order the instant it closes rather than 180ms later. */
     :root[data-nav-enhanced="true"] .site-nav,
     :root[data-nav-enhanced="true"] .site-header[data-nav-open="true"] .site-nav {
       transition: none;
@@ -445,9 +249,9 @@ const githubMark =
 </style>
 
 <script>
-  // Disclosure wiring for the collapsed nav. The panel's open/closed styling is
-  // CSS-only (keyed off [data-nav-open]); this just owns the state, the ARIA
-  // that mirrors it, and the dismissals a menu is expected to honour.
+  // Disclosure wiring for the collapsed nav. Open/closed styling is CSS-only
+  // (keyed off [data-nav-open]); this owns the state, the ARIA that mirrors
+  // it, and the dismissals a menu is expected to honour.
   (function () {
     "use strict";
     const header = document.querySelector<HTMLElement>(".site-header");
@@ -456,10 +260,6 @@ const githubMark =
     if (!header || !toggle || !nav) return;
 
     const isOpen = () => header.dataset.navOpen === "true";
-
-    // True only while the collapsed layout is active. Read from the button's
-    // own computed style rather than a duplicated breakpoint, so the media
-    // query in the stylesheet stays the single source of truth.
     const isCollapsed = () => getComputedStyle(toggle).display !== "none";
 
     const setOpen = (open: boolean) => {
@@ -471,26 +271,17 @@ const githubMark =
     };
 
     toggle.addEventListener("click", () => setOpen(!isOpen()));
-
-    // Following a link — including a same-page anchor, which fires no
-    // navigation — should always leave the menu behind.
     nav.addEventListener("click", (event) => {
       if ((event.target as Element | null)?.closest("a")) setOpen(false);
     });
-
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !isOpen()) return;
       setOpen(false);
       toggle.focus();
     });
-
     document.addEventListener("click", (event) => {
-      if (!isOpen()) return;
-      if (!header.contains(event.target as Node)) setOpen(false);
+      if (isOpen() && !header.contains(event.target as Node)) setOpen(false);
     });
-
-    // Growing past the breakpoint restores the inline row; an open panel would
-    // strand aria-expanded="true" on a button that is no longer rendered.
     window.addEventListener("resize", () => {
       if (isOpen() && !isCollapsed()) setOpen(false);
     });

@@ -1,62 +1,54 @@
 ---
+import FeatureCard from "./FeatureCard.astro";
+import Section from "./Section.astro";
+import SectionHead from "./SectionHead.astro";
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // Audience: people choosing a TUI framework, in any language. The pitch is
-// the track record and shape of the declarative model itself — never "you
-// already know SwiftUI". Four cards, each one concrete claim; the same four
-// (state in / screen out · components + focus · terminal negotiated · one
-// binary) anchor the swift-tui README and the org profile.
+// the shape of the declarative model itself, never "you already know
+// SwiftUI". Four cards, each one concrete claim; the same four anchor the
+// swift-tui README and the org profile.
 const cards = [
   {
-    n: "01",
     title: "State in, screen out",
     body:
       "Change tracked state and the runtime updates the views that depend on it, validates retained work, and emits changed terminal cells. No app-owned draw loop or repaint bookkeeping.",
     sym: "View · @State · @Observable · body",
   },
   {
-    n: "02",
-    title: "Real components, real focus, open styles",
+    title: "Real components, real focus",
     body:
-      "Buttons, text fields, pickers, sliders, lists, tables, and scroll views, with focus traversal, keyboard chords, tap · drag · hover gestures, and animation built in. Every control family is an open style protocol: restyle one control or the whole app with a modifier.",
+      "Buttons, text fields, pickers, sliders, lists, tables and scroll views, with focus traversal, keyboard chords, tap, drag and hover gestures, and animation built in. Every control family is an open style protocol.",
     sym: "@FocusState · TapGesture · withAnimation · ButtonStyle",
   },
   {
-    n: "03",
-    title: "The terminal, negotiated for you",
+    title: "The terminal, negotiated",
     body:
-      "Truecolor, Kitty and Sixel images, OSC 8 links, and mouse reporting are probed per session and degrade gracefully, so one binary is right in kitty, over SSH, or in CI. --accessible, --reduce-motion, --no-color, and --ascii come free.",
+      "Truecolor, Kitty and Sixel images, OSC 8 links and mouse reporting are probed per session and degrade gracefully, so one binary is right in kitty, over SSH, or in CI. --accessible, --reduce-motion, --no-color and --ascii come free.",
     sym: "TerminalCapabilityProfile · Kitty · Sixel · OSC 8",
   },
   {
-    n: "04",
-    title: "One binary, testable without a TTY",
+    title: "One binary, testable",
     body:
-      "Compile a native executable for each supported platform with Swift's checked concurrency. Render deterministic snapshots at a chosen size and test layout without a terminal attached.",
+      "Compile a native executable for each platform with Swift's checked concurrency. Render deterministic snapshots at a chosen size and test layout without a terminal attached.",
     sym: "SwiftPM · Swift 6 · RenderOnce",
   },
 ];
 
-// Cells carry an explicit state (yes | partial | no | plain) decoupled from
-// their label, so a "—" can still carry a qualifier (e.g. "— immediate-mode")
-// and an informational cell (Language) carries no verdict at all.
 // Verdicts fact-checked August 2026 against each framework's current release
-// (see the legend below for versions); the Terminal OS, Animations, and Web
-// embed columns were researched 2026-08-24. When re-stamping, re-check the
-// releases — and the ratatui org, which now hosts both Ratzilla (moved from
-// orhun/) and tachyonfx (moved from junkdog/). Verdict notes:
-//   · Terminal OS — Textual and Ratatui run Windows in CI; Bubble Tea ships
+// (see the legend below for versions); the Terminal OS, Animations and Web
+// embed columns were researched 2026-08-24. Verdict notes:
+//   · Terminal OS: Textual and Ratatui run Windows in CI; Bubble Tea ships
 //     tty/termios/signals_windows.go; Ink states no OS support and tests on
 //     Linux only, scored ✓ on the strength of Node and its Windows-shipping
 //     consumers. SwiftTUI: macOS 15+, Linux, Windows 10 1809+.
-//   · Animations — Textual's animate() interpolates with easing (first-party);
-//     Harmonica is Charm's separate spring package, recommended by the Bubble
-//     Tea README; tachyonfx is a post-render effects crate in the ratatui org;
-//     Ink 7.1's useAnimation is a shared frame clock (frame · time · delta)
-//     with no value interpolation — partial.
-//   · Web embed — `textual serve` launches the app as a subprocess per visitor
-//     and streams a terminal over a websocket (textual-web is the same, via a
-//     public tunnel from your machine): nothing static to host, hence
+//   · Animations: Textual's animate() interpolates with easing (first-party);
+//     Harmonica is Charm's separate spring package; tachyonfx is a
+//     post-render effects crate in the ratatui org; Ink 7.1's useAnimation is
+//     a shared frame clock with no value interpolation: partial.
+//   · Web embed: `textual serve` launches the app as a subprocess per visitor
+//     and streams a terminal over a websocket: nothing static to host, hence
 //     "local only". Ratzilla compiles to a static WASM bundle (DOM or WebGL2).
 const headers = [
   "Language",
@@ -67,7 +59,8 @@ const headers = [
   "Web embed",
   "Native embed",
 ];
-const rows = [
+type Cell = { s: "plain" | "yes" | "partial" | "no"; t: string };
+const rows: { name: string; accent?: boolean; cells: Cell[] }[] = [
   {
     name: "SwiftTUI",
     accent: true,
@@ -75,7 +68,7 @@ const rows = [
       { s: "plain", t: "Swift" },
       { s: "yes", t: "✓ macOS · Linux · Windows" },
       { s: "yes", t: "✓ SwiftUI-shaped" },
-      { s: "yes", t: "✓ tap·drag·hover" },
+      { s: "yes", t: "✓ tap · drag · hover" },
       { s: "yes", t: "✓ withAnimation · PhaseAnimator" },
       { s: "yes", t: "✓ static WASI · WebHost" },
       { s: "yes", t: "✓ macOS · iOS · Android preview" },
@@ -132,294 +125,136 @@ const rows = [
 ];
 ---
 
-<section class="why" id="why" aria-labelledby="why-title">
-  <div class="shell">
-    <header class="why-head">
-      <p class="home-kicker">Why SwiftTUI</p>
-      <h2 id="why-title">A proven UI model, pointed at the terminal.</h2>
-      <p>
-        Most TUI toolkits offer a low-level draw loop or a widget set with its
-        own state story. SwiftTUI takes the declarative model SwiftUI has
-        proven at platform scale and aims it at terminal cells: you declare
-        views; the framework owns layout, focus, redraw, and the terminal.
-      </p>
-    </header>
+<Section id="why" aria-labelledby="why-title">
+  <SectionHead id="why-title" eyebrow="Why SwiftTUI" align="center">
+    <Fragment slot="title">A proven UI model, pointed at the terminal.</Fragment>
+    Most TUI toolkits offer a low-level draw loop or a widget set with its own
+    state story. SwiftTUI takes the declarative model SwiftUI has proven at
+    platform scale and aims it at terminal cells: you declare views; the
+    framework owns layout, focus, redraw and the terminal.
+  </SectionHead>
 
-    <ol class="why-cards" aria-label="What that model buys you">
-      {
-        cards.map((card) => (
-          <li>
-            <div class="card-head">
-              <span class="ix mono">{card.n}</span>
-              <h3>{card.title}</h3>
-            </div>
-            <p>{card.body}</p>
-            <span class="sym mono">{card.sym}</span>
-          </li>
-        ))
-      }
-    </ol>
+  <div class="card-grid card-grid--two why-cards">
+    {
+      cards.map((card) => (
+        <FeatureCard title={card.title}>
+          {card.body}
+          <span slot="meta" class="why-sym mono">
+            {card.sym}
+          </span>
+        </FeatureCard>
+      ))
+    }
+  </div>
+</Section>
 
-    <div class="compare-head">
-      <h3>How it compares</h3>
-      <p>
-        The first five columns are the day-one terminal experience; the last
-        two are where the same source can go later.
-      </p>
-    </div>
+<Section id="compare" aria-labelledby="compare-title">
+  <SectionHead id="compare-title" level={3} eyebrow="How it compares">
+    <Fragment slot="title">Notably powerful.</Fragment>
+  </SectionHead>
 
-    <div class="compare-scroll">
-      <div class="compare mono" role="table" aria-label="TUI framework comparison">
-        <div class="row head-row" role="row">
-          <span class="cell name" role="columnheader">framework</span>
-          {headers.map((h) => <span class="cell" role="columnheader">{h}</span>)}
-        </div>
+  <div class="table-scroll">
+    <table class="table compare">
+      <thead>
+        <tr>
+          <th scope="col">Framework</th>
+          {headers.map((h) => <th scope="col">{h}</th>)}
+        </tr>
+      </thead>
+      <tbody>
         {
-          rows.map((r) => (
-            <div class={`row ${r.accent ? "accent" : ""}`} role="row">
-              <span class="cell name" role="rowheader">{r.name}</span>
-              {r.cells.map((c) => (
-                <span class="cell" role="cell" data-state={c.s}>{c.t}</span>
+          rows.map((row) => (
+            <tr class:list={[row.accent && "is-accent"]}>
+              <th scope="row">{row.name}</th>
+              {row.cells.map((cell) => (
+                <td data-state={cell.s}>{cell.t}</td>
               ))}
-            </div>
+            </tr>
           ))
         }
-      </div>
-    </div>
-
-    <p class="compare-foot mono">
-      Verified August 2026 against current releases: Bubble Tea 2.0 ·
-      Textual 8.2 · Ratatui 0.30 · Ink 7.1. <span class="lk">✓</span>&nbsp;first-party
-      · <span class="lk">~</span>&nbsp;partial, separate package, or raw mouse events
-      · <span class="lk">—</span>&nbsp;none · <span class="lk">local only</span>&nbsp;the
-      app runs as a process you host and streams a terminal to the browser;
-      there is no static build to deploy. SwiftTUI's browser paths render
-      through Canvas or DOM with a semantic accessibility tree, not through a terminal emulator.
-    </p>
-
-    <p class="why-from-swiftui">
-      Coming from SwiftUI? The shape is the same; the terminal-native
-      differences are deliberate and recorded in the open.{" "}
-      <a href={`${base}/differences-from-swiftui/`}>Read the primer</a>.
-    </p>
+      </tbody>
+    </table>
   </div>
-</section>
+
+  <p class="caption compare-foot">
+    Verified against current releases: Bubble Tea 2.0, Textual 8.2,
+    Ratatui 0.30, Ink 7.1.
+  </p>
+
+  <p class="lead prose why-primer">
+    Coming from SwiftUI?{" "}
+    <a href={`${base}/differences-from-swiftui/`}>Read the terminal-native primer</a>.
+  </p>
+</Section>
 
 <style>
-  .why {
-    padding: clamp(57.333px, 7.333vw, 100px) 0 clamp(64px, 8vw, 110px);
-    border-top: 1px solid var(--home-ink);
-  }
-
-  .why-head {
-    display: grid;
-    gap: 17px;
-    max-width: 820px;
-    margin-bottom: 46px;
-  }
-
-  .why-head h2 {
-    font-size: clamp(42px, 6vw, 76px);
-    font-weight: 520;
-    line-height: 0.96;
-    letter-spacing: -0.058em;
-    text-wrap: balance;
-  }
-
-  .why-head > p:last-child {
-    max-width: 62ch;
-    color: var(--home-muted);
-    font-size: 17px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
   .why-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0 0 56px;
-    padding: 0;
-    border-top: 1px solid var(--home-ink);
-    border-left: 1px solid var(--home-ink);
-    list-style: none;
+    max-width: 920px;
+    margin: 0 auto;
   }
 
-  .why-cards li {
-    display: flex;
-    min-width: 0;
-    min-height: 210px;
-    flex-direction: column;
-    padding: 20px 21px 18px;
-    border-right: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-    background: var(--home-paper);
-  }
-
-  .card-head {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-  }
-
-  .ix {
-    flex: 0 0 auto;
-    color: var(--home-quiet);
-    font-size: 10.5px;
-    letter-spacing: 0.06em;
-  }
-
-  .why-cards h3 {
-    font-size: 17px;
-    font-weight: 650;
-    letter-spacing: -0.02em;
-    line-height: 1.25;
-  }
-
-  .why-cards li > p {
-    margin-top: 11px;
-    max-width: 62ch;
-    color: var(--home-muted);
-    font-size: 13.5px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .sym {
-    margin-top: auto;
-    padding-top: 16px;
-    color: var(--home-quiet);
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-    word-break: break-word;
-  }
-
-  .compare-head {
-    display: grid;
-    gap: 10px;
-    max-width: 780px;
-    margin-bottom: 22px;
-  }
-
-  .compare-head h3 {
-    font-size: clamp(26px, 3vw, 38px);
-    font-weight: 520;
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
-
-  .compare-head p {
-    max-width: 60ch;
-    color: var(--home-muted);
-    font-size: 14.5px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .compare-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--home-ink);
-    background: var(--home-paper);
+  .why-sym {
+    display: block;
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    overflow-wrap: anywhere;
   }
 
   .compare {
-    min-width: 1080px;
+    min-width: 1040px;
+    font-family: var(--font-mono);
     font-size: 12px;
   }
 
-  .row {
-    display: grid;
-    grid-template-columns: 1.1fr 0.6fr repeat(6, minmax(0, 1fr));
-    border-bottom: 1px solid var(--home-line);
+  .compare tbody th {
+    font-family: var(--font-serif);
+    font-size: 14px;
   }
 
-  .row:last-child {
-    border-bottom: 0;
+  .compare .is-accent {
+    background: var(--news-bar-tint);
   }
 
-  .row.head-row {
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-quiet);
-    font-size: 10px;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
+  .compare .is-accent th {
+    color: var(--text-accent);
   }
 
-  .row.accent {
-    background: var(--home-paper-soft);
+  .compare td {
+    color: var(--text-body);
   }
 
-  .row.accent .name {
-    color: var(--home-accent-ink);
-    font-weight: 650;
+  .compare td[data-state="plain"] {
+    color: var(--text-strong);
   }
 
-  .cell {
-    padding: 12px 14px;
-    border-right: 1px solid var(--home-line);
-    color: var(--home-muted);
+  .compare td[data-state="yes"] {
+    color: var(--text-accent);
   }
 
-  .cell:last-child {
-    border-right: 0;
+  .compare td[data-state="partial"] {
+    color: var(--text-strong);
   }
 
-  .cell.name,
-  .cell[data-state="plain"] {
-    color: var(--home-ink);
-  }
-
-  .cell[data-state="yes"] {
-    color: var(--home-accent-ink);
-  }
-
-  .cell[data-state="partial"] {
-    color: var(--home-code-string);
-  }
-
-  .cell[data-state="no"] {
-    color: var(--home-quiet);
+  .compare td[data-state="no"] {
+    color: var(--text-muted);
   }
 
   .compare-foot {
-    margin-top: 14px;
     max-width: 100ch;
-    color: var(--home-quiet);
-    font-size: 11px;
-    line-height: 1.7;
+    margin-top: var(--space-3);
+    color: var(--text-muted);
   }
 
   .compare-foot .lk {
-    color: var(--home-ink);
+    color: var(--text-strong);
+    font-family: var(--font-mono);
   }
 
-  .why-from-swiftui {
-    margin-top: 34px;
-    max-width: 74ch;
-    color: var(--home-muted);
-    font-size: 14.5px;
-    line-height: 1.65;
-    text-wrap: pretty;
-  }
-
-  .why-from-swiftui a {
-    padding-bottom: 1px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-ink);
-    white-space: nowrap;
-  }
-
-  .why-from-swiftui a:hover {
-    border-color: var(--home-accent);
-  }
-
-  @media (max-width: 880px) {
-    .why-cards {
-      grid-template-columns: 1fr;
-    }
-
-    .why-cards li {
-      min-height: 0;
-    }
+  .why-primer {
+    max-width: 72ch;
+    margin-top: var(--space-8);
   }
 </style>

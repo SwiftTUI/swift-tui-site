@@ -1,15 +1,10 @@
 ---
-import "../styles/site.css";
-import "../styles/marketing.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteIcons from "../components/SiteIcons.astro";
-import ThemeScript from "../components/ThemeScript.astro";
+import Site from "../layouts/Site.astro";
+import Button from "../components/Button.astro";
+import Section from "../components/Section.astro";
+import SectionHead from "../components/SectionHead.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
-const canonical = `${site}${base || ""}/guides/`;
-const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI documentation";
 const description =
   "SwiftTUI's documentation, organized by task: the first-hour path, the reference guides for views, state, and focus, charts, what lies beyond the terminal, and the module-by-module API reference.";
@@ -306,423 +301,277 @@ const hostModules = [
 
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta
-      name="theme-color"
-      content="#f5f7f3"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#101512"
-      media="(prefers-color-scheme: dark)"
-    />
-    <ThemeScript />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="SwiftTUI documentation" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content={ogImage} />
-    <SiteIcons />
-  </head>
-  <body class="marketing-subpage guides-page">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
+<Site
+  title={title}
+  description={description}
+  path="/guides/"
+  ogImageAlt="SwiftTUI documentation"
+  twitterCard="summary"
+  bodyClass="guides-page"
+>
+  <Section id="docs-top" aria-labelledby="docs-title">
+    <SectionHead id="docs-title" level={1} eyebrow="Documentation">
+      <Fragment slot="title">SwiftTUI documentation</Fragment>
+      Organized by what you're doing: your first hour, then the reference
+      guides for views, state, and focus, charts, and what lies beyond the
+      terminal. The module-by-module API reference is at the end.
+    </SectionHead>
+    <div class="button-row">
+      <Button href={`${base}/#get-started`} variant="primary">Get started</Button>
+      <Button href={`${docs}/`} variant="secondary" trailingIcon="chevronRight">
+        Open the API reference
+      </Button>
+    </div>
+  </Section>
 
-    <main class="guides" id="main">
-      <div class="shell">
-        <header class="lede">
-          <p class="eyebrow">Documentation</p>
-          <h1>SwiftTUI documentation</h1>
-          <p class="lede-copy">
-            Organized by what you're doing: your first hour, then the reference
-            guides for views, state, and focus, charts, and what lies beyond the
-            terminal. The module-by-module API reference is at the end.
-          </p>
-          <div class="lede-ctas">
-            <a class="cta cta--primary" href={`${base}/#get-started`}>
-              Get started
+  <Section id="first-hour" aria-labelledby="first-hour-title">
+    <SectionHead id="first-hour-title">
+      <Fragment slot="title">Your first hour</Fragment>
+      Read these in order. Each one picks up where the last left off, from an
+      empty package to an app that handles state, focus, and the terminal's
+      own rules.
+    </SectionHead>
+    <ol class="step-grid">
+      {
+        firstHour.map((card, index) => (
+          <li>
+            <a class="swifttui-card doc-card doc-card--step" href={card.href}>
+              <div class="swifttui-card__body">
+                <span class="step-index eyebrow eyebrow--accent">{String(index + 1).padStart(2, "0")}</span>
+                <h3 class="swifttui-card__title">{card.title}</h3>
+                <p class="swifttui-card__desc">{card.copy}</p>
+              </div>
             </a>
-            <a class="cta" href={`${docs}/`}>Open the API reference</a>
-          </div>
-        </header>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
 
-        <section class="guides-section" id="first-hour" aria-labelledby="first-hour-title">
-          <div class="section-head">
-            <h2 id="first-hour-title">Your first hour</h2>
-            <p>
-              Read these in order. Each one picks up where the last left off,
-              from an empty package to an app that handles state, focus, and
-              the terminal's own rules.
-            </p>
-          </div>
-          <ol class="step-grid">
-            {
-              firstHour.map((card, index) => (
-                <li>
-                  <a class="doc-card doc-card--step" href={card.href}>
-                    <span class="step-index mono">{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{card.title}</strong>
-                    <span>{card.copy}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ol>
-        </section>
-
-        <section class="guides-section" id="build" aria-labelledby="build-title">
-          <div class="section-head">
-            <h2 id="build-title">Build your interface</h2>
-            <p>
-              Views, controls, drawing, and animated images. Read the guides
-              as you need them.
-            </p>
-          </div>
-          <div class="card-grid">
-            {
-              buildGuides.map((guide) => (
-                <a class="doc-card" href={guide.href}>
-                  <strong>{guide.title}</strong>
-                  <span>{guide.copy}</span>
-                </a>
-              ))
-            }
-          </div>
-        </section>
-
-        <section class="guides-section" id="charts" aria-labelledby="charts-title">
-          <div class="section-head">
-            <h2 id="charts-title">Charts</h2>
-            <p>
-              Sparklines, bar and line charts, heatmaps, meters, and calendar
-              views ship separately as{" "}
-              <a href="https://github.com/SwiftTUI/swift-tui-charts" rel="noreferrer noopener">
-                <code>swift-tui-charts</code></a>, composed on the same view surface.
-            </p>
-          </div>
-          <div class="card-grid card-grid--three">
-            <a class="doc-card" href={`${charts}/building-dashboards`}>
-              <strong>Building Dashboards</strong>
-              <span>The charts guide: layout, scales, live data, and thresholds.</span>
-            </a>
-            <a class="doc-card" href={charts}>
-              <strong>SwiftTUICharts reference</strong>
-              <span>Every chart view and support type, in its own DocC archive.</span>
-            </a>
-            <a class="doc-card" href={`${base}/showcase/`}>
-              <strong>Charts in the showcase</strong>
-              <span>Every charting primitive exercised against a real repository.</span>
-            </a>
-          </div>
-        </section>
-
-        <section class="guides-section" id="run" aria-labelledby="run-title">
-          <div class="section-head">
-            <h2 id="run-title">At run time</h2>
-            <p>
-              What a running terminal app reads and can do, from the{" "}
-              <code>SwiftTUIRuntime</code> catalog.
-            </p>
-          </div>
-          <div class="card-grid card-grid--three">
-            {
-              runtimeGuides.map((guide) => (
-                <a class="doc-card" href={guide.href}>
-                  <strong>{guide.title}</strong>
-                  <span>{guide.copy}</span>
-                </a>
-              ))
-            }
-          </div>
-        </section>
-
-        <section class="guides-section" id="beyond" aria-labelledby="beyond-title">
-          <div class="section-head">
-            <h2 id="beyond-title">Beyond the terminal</h2>
-            <p>
-              Terminal first, not terminal only. The same app runs in a
-              browser, inside native SwiftUI windows, and on Android; these
-              guides own that path and its platform notes.
-            </p>
-          </div>
-          <div class="card-grid card-grid--three">
-            {
-              hostGuides.map((guide) => (
-                <a class="doc-card" href={guide.href}>
-                  <strong>{guide.title}</strong>
-                  <span>{guide.copy}</span>
-                </a>
-              ))
-            }
-          </div>
-        </section>
-
-        <section
-          class="guides-section"
-          id="concepts"
-          aria-labelledby="concepts-title"
-        >
-          <div class="section-head">
-            <h2 id="concepts-title">Concepts and background</h2>
-          </div>
-          <div class="card-grid">
-            {
-              conceptLinks.map((link) => (
-                <a class="doc-card" href={link.href}>
-                  <strong>{link.title}</strong>
-                  <span>{link.copy}</span>
-                </a>
-              ))
-            }
-          </div>
-        </section>
-
-        <section
-          class="guides-section"
-          id="reference"
-          aria-labelledby="reference-title"
-        >
-          <div class="section-head">
-            <h2 id="reference-title">API reference by module</h2>
-            <p>
-              The <a href={`${docs}/`}>combined DocC archive</a> documents each
-              module. Most app code touches only the first row.
-            </p>
-          </div>
-          <div class="module-tiers">
-            <div class="module-tier">
-              <h3>What you import</h3>
-              <ul>
-                {
-                  everydayModules.map((m) => (
-                    <li>
-                      <a href={m.href} class="mono">{m.name}</a>
-                      <span> — {m.copy}</span>
-                    </li>
-                  ))
-                }
-              </ul>
+  <Section id="build" aria-labelledby="build-title">
+    <SectionHead id="build-title">
+      <Fragment slot="title">Build your interface</Fragment>
+      Views, controls, drawing, and animated images. Read the guides as you
+      need them.
+    </SectionHead>
+    <div class="card-grid">
+      {
+        buildGuides.map((guide) => (
+          <a class="swifttui-card doc-card" href={guide.href}>
+            <div class="swifttui-card__body">
+              <h3 class="swifttui-card__title">{guide.title}</h3>
+              <p class="swifttui-card__desc">{guide.copy}</p>
             </div>
-            <div class="module-tier">
-              <h3>Hosts and opt-in products</h3>
-              <ul>
-                {
-                  hostModules.map((m) => (
-                    <li>
-                      <a
-                        href={m.href}
-                        class="mono"
-                        rel={m.external ? "noreferrer noopener" : undefined}
-                      >{m.name}</a>
-                      <span> — {m.copy}</span>
-                    </li>
-                  ))
-                }
-              </ul>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="charts" aria-labelledby="charts-title">
+    <SectionHead id="charts-title">
+      <Fragment slot="title">Charts</Fragment>
+      Sparklines, bar and line charts, heatmaps, meters, and calendar views
+      ship separately as{" "}
+      <a class="link" href="https://github.com/SwiftTUI/swift-tui-charts" rel="noreferrer noopener">
+        <code>swift-tui-charts</code></a>, composed on the same view surface.
+    </SectionHead>
+    <div class="card-grid">
+      <a class="swifttui-card doc-card" href={`${charts}/building-dashboards`}>
+        <div class="swifttui-card__body">
+          <h3 class="swifttui-card__title">Building Dashboards</h3>
+          <p class="swifttui-card__desc">The charts guide: layout, scales, live data, and thresholds.</p>
+        </div>
+      </a>
+      <a class="swifttui-card doc-card" href={charts}>
+        <div class="swifttui-card__body">
+          <h3 class="swifttui-card__title">SwiftTUICharts reference</h3>
+          <p class="swifttui-card__desc">Every chart view and support type, in its own DocC archive.</p>
+        </div>
+      </a>
+      <a class="swifttui-card doc-card" href={`${base}/showcase/`}>
+        <div class="swifttui-card__body">
+          <h3 class="swifttui-card__title">Charts in the showcase</h3>
+          <p class="swifttui-card__desc">Every charting primitive exercised against a real repository.</p>
+        </div>
+      </a>
+    </div>
+  </Section>
+
+  <Section id="run" aria-labelledby="run-title">
+    <SectionHead id="run-title">
+      <Fragment slot="title">At run time</Fragment>
+      What a running terminal app reads and can do, from the{" "}
+      <code>SwiftTUIRuntime</code> catalog.
+    </SectionHead>
+    <div class="card-grid">
+      {
+        runtimeGuides.map((guide) => (
+          <a class="swifttui-card doc-card" href={guide.href}>
+            <div class="swifttui-card__body">
+              <h3 class="swifttui-card__title">{guide.title}</h3>
+              <p class="swifttui-card__desc">{guide.copy}</p>
             </div>
-          </div>
-          <p class="reference-note">
-            The last group declares types that reach app code through
-            re-export — <code>CellSize</code>, <code>Alignment</code>,
-            <code>PreferenceKey</code>, <code>SwiftTUIOptions</code> — so
-            their pages document symbols you use, behind imports you never
-            write.
-          </p>
-        </section>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="beyond" aria-labelledby="beyond-title">
+    <SectionHead id="beyond-title">
+      <Fragment slot="title">Beyond the terminal</Fragment>
+      Terminal first, not terminal only. The same app runs in a browser, inside
+      native SwiftUI windows, and on Android; these guides own that path and
+      its platform notes.
+    </SectionHead>
+    <div class="card-grid">
+      {
+        hostGuides.map((guide) => (
+          <a class="swifttui-card doc-card" href={guide.href}>
+            <div class="swifttui-card__body">
+              <h3 class="swifttui-card__title">{guide.title}</h3>
+              <p class="swifttui-card__desc">{guide.copy}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="concepts" aria-labelledby="concepts-title">
+    <SectionHead id="concepts-title">
+      <Fragment slot="title">Concepts and background</Fragment>
+    </SectionHead>
+    <div class="card-grid">
+      {
+        conceptLinks.map((link) => (
+          <a class="swifttui-card doc-card" href={link.href}>
+            <div class="swifttui-card__body">
+              <h3 class="swifttui-card__title">{link.title}</h3>
+              <p class="swifttui-card__desc">{link.copy}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="reference" aria-labelledby="reference-title">
+    <SectionHead id="reference-title">
+      <Fragment slot="title">API reference by module</Fragment>
+      The <a class="link" href={`${docs}/`}>combined DocC archive</a> documents
+      each module. Most app code touches only the first row.
+    </SectionHead>
+    <div class="module-tiers">
+      <div class="module-tier">
+        <h3 class="eyebrow">What you import</h3>
+        <ul>
+          {
+            everydayModules.map((m) => (
+              <li>
+                <a href={m.href} class="mono">{m.name}</a>
+                <span> — {m.copy}</span>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-    </main>
-
-    <SiteFooter />
-  </body>
-</html>
+      <div class="module-tier">
+        <h3 class="eyebrow">Hosts and opt-in products</h3>
+        <ul>
+          {
+            hostModules.map((m) => (
+              <li>
+                <a href={m.href} class="mono" rel={m.external ? "noreferrer noopener" : undefined}>{m.name}</a>
+                <span> — {m.copy}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+    <p class="caption reference-note">
+      The last group declares types that reach app code through re-export:{" "}
+      <code>CellSize</code>, <code>Alignment</code>, <code>PreferenceKey</code>,{" "}
+      <code>SwiftTUIOptions</code>. Their pages document symbols you use, behind
+      imports you never write.
+    </p>
+  </Section>
+</Site>
 
 <style>
-  .guides {
-    padding: clamp(48px, 7vw, 96px) 0 clamp(64px, 8vw, 110px);
-  }
-
-  .lede {
-    display: grid;
-    gap: 18px;
-    max-width: 760px;
-    margin-bottom: clamp(40px, 6vw, 72px);
-  }
-
-  .lede-copy {
-    color: var(--muted);
-    font-size: 16px;
-    line-height: 1.65;
-    max-width: 62ch;
-  }
-
-  .lede-ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 6px;
-  }
-
-  .guides-section {
-    margin-top: clamp(44px, 6vw, 76px);
-    padding-top: clamp(28px, 4vw, 44px);
-    border-top: 1px solid var(--line);
-  }
-
-  .section-head {
-    display: grid;
-    gap: 10px;
-    max-width: 720px;
-    margin-bottom: 26px;
-  }
-
-  .section-head p {
-    color: var(--muted);
-    font-size: 14.5px;
-    line-height: 1.6;
-  }
-
-  .section-head a {
-    color: var(--accent-ink, var(--accent));
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .section-head code,
-  .reference-note code {
-    font-family: var(--font-mono);
-    font-size: 0.92em;
-  }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-  }
-
-  .card-grid--three {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-
   .step-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    margin: 0;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-4);
     padding: 0;
     list-style: none;
-    counter-reset: step;
   }
 
   .step-grid li {
     min-width: 0;
   }
 
-  .doc-card--step {
+  .doc-card {
     height: 100%;
-    border-color: var(--line-strong);
+  }
+
+  .doc-card .swifttui-card__body {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+  }
+
+  .doc-card .swifttui-card__desc {
+    margin: 0;
   }
 
   .step-index {
-    color: var(--accent-ink, var(--accent));
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 0.08em;
-  }
-
-  .doc-card {
-    display: grid;
-    align-content: start;
-    gap: 8px;
-    padding: 18px 18px 20px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--panel);
-    transition: border-color 160ms ease, background 160ms ease;
-  }
-
-  .doc-card:hover {
-    border-color: var(--line-strong);
-    background: var(--panel-2);
-  }
-
-  .doc-card strong {
-    color: var(--text);
-    font-size: 14.5px;
-    font-weight: 560;
-    letter-spacing: -0.01em;
-  }
-
-  .doc-card span {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.55;
+    margin-bottom: var(--space-1);
   }
 
   .module-tiers {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 26px;
+    gap: var(--space-6);
   }
 
   .module-tier h3 {
-    margin-bottom: 12px;
-    color: var(--quiet);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    margin-bottom: var(--space-3);
   }
 
   .module-tier ul {
     display: grid;
-    gap: 9px;
-    margin: 0;
+    gap: var(--space-2);
     padding: 0;
     list-style: none;
   }
 
   .module-tier li {
-    color: var(--muted);
-    font-size: 13.5px;
-    line-height: 1.55;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: -0.025em;
+    color: var(--text-body);
   }
 
   .module-tier a {
-    color: var(--text);
+    color: var(--text-high-contrast);
     font-size: 13px;
+    letter-spacing: 0;
     text-decoration: underline;
-    text-decoration-color: var(--line-strong);
     text-underline-offset: 3px;
+    text-decoration-color: var(--divider-accent);
   }
 
   .module-tier a:hover {
-    text-decoration-color: var(--accent);
+    text-decoration-style: double;
+    text-decoration-color: var(--text-accent);
   }
 
   .reference-note {
     max-width: 68ch;
-    margin-top: 26px;
-    color: var(--quiet);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  @media (max-width: 640px) {
-    .card-grid,
-    .card-grid--three {
-      grid-template-columns: 1fr;
-    }
+    margin-top: var(--space-6);
+    color: var(--text-muted);
   }
 </style>

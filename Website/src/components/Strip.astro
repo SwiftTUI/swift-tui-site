@@ -1,0 +1,21 @@
+---
+// A three-up strip of two-word titles with one sentence each, divided by the
+// mint hairline. Stacks with a horizontal divider on phones (site.css).
+interface Props {
+  items: { title: string; text: string }[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+<div class:list={["swifttui-strip", className]} style={`--swifttui-strip-cols:${items.length}`}>
+  {
+    items.map((item) => (
+      <div>
+        <p class="swifttui-strip__t">{item.title}</p>
+        <p class="swifttui-strip__d">{item.text}</p>
+      </div>
+    ))
+  }
+</div>

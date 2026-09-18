@@ -1,15 +1,8 @@
 ---
-import "../styles/site.css";
-import "../styles/marketing.css";
-import "../styles/from-swiftui.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteIcons from "../components/SiteIcons.astro";
-import ThemeScript from "../components/ThemeScript.astro";
+import "../styles/docs.css";
+import Site from "../layouts/Site.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
-const canonical = `${site}${base}/capabilities/`;
 const title = "What you can build with SwiftTUI";
 const description = "Draw shapes and layered images, animate state, compose scrolling workspaces, and adapt one SwiftTUI interface to keyboard and touch.";
 const docs = `${base}/docs/documentation`;
@@ -39,33 +32,13 @@ const lazyExample = String.raw`ScrollView {
 .frame(height: 12)`;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={`${site}${base}/og.png`} />
-    <meta property="og:image:alt" content="SwiftTUI: build terminal interfaces in Swift" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${site}${base}/og.png`} />
-    <meta name="theme-color" content="#f5f7f3" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)" />
-    <ThemeScript />
-    <SiteIcons />
-  </head>
-  <body class="marketing-subpage">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
-    <main class="fsw" id="main">
+<Site
+  title={title}
+  description={description}
+  path="/capabilities/"
+  bodyClass="capabilities-page"
+>
+  <div class="doc">
       <div class="doc-shell">
         <aside class="toc" aria-label="On this page">
           <p class="toc-kicker">Building blocks</p>
@@ -76,9 +49,9 @@ const lazyExample = String.raw`ScrollView {
             <a href="#interaction">Keyboard and touch</a>
           </nav>
         </aside>
-        <div class="fsw-main">
+        <div class="doc-main">
           <header class="lede">
-            <p class="eyebrow">What you can build</p>
+            <p class="eyebrow eyebrow--accent">What you can build</p>
             <h1>A terminal interface can be a whole workspace.</h1>
             <p class="lede-copy">Compose drawing, animation, editable collections, and focused controls. The same SwiftTUI tree can run in a terminal, a browser, or a native app, with interaction suited to its host.</p>
           </header>
@@ -124,20 +97,9 @@ const lazyExample = String.raw`ScrollView {
           </section>
         </div>
       </div>
-    </main>
-    <SiteFooter />
-  </body>
-</html>
+    </div>
+</Site>
 
 <style>
-  .doc-section h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 520; line-height: 1.12; letter-spacing: -0.035em; margin-bottom: 22px; }
-  .doc-section > p { max-width: 76ch; color: var(--home-muted); font-size: 16px; line-height: 1.7; margin: 18px 0; }
-  pre { max-width: 100%; overflow-x: auto; padding: 24px; margin: 26px 0; background: var(--home-paper-soft); border: 1px solid var(--home-line); color: var(--home-code); font-size: 13px; line-height: 1.7; }
-  p code { color: var(--home-ink); font-size: 0.9em; overflow-wrap: anywhere; }
-  .guide-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
-  .guide-links a, figcaption a { color: var(--home-accent-ink); text-decoration: underline; text-underline-offset: 4px; }
-  figure { margin: 30px 0 0; }
-  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--home-line-strong); }
-  figcaption { margin-top: 12px; color: var(--home-muted); font-size: 13px; line-height: 1.6; }
-  @media (max-width: 620px) { pre { padding: 16px; font-size: 12px; } }
+  /* Everything this page needs is in docs.css; nothing page-specific remains. */
 </style>

@@ -1,0 +1,587 @@
+/* ── docs.css ───────────────────────────────────────────────────────────
+   The long-form pages (capabilities, the SwiftUI primer, the pipeline
+   walkthrough): a sticky on-page contents rail beside a measured column of
+   numbered sections. Scoped under `.doc`; a page adds its own namespace
+   (`.fsw`, `.rp`) beside it for anything page-specific.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.doc .doc-shell {
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr);
+  gap: var(--space-8);
+  padding: 0 var(--section-x) var(--section-y);
+}
+
+/* ── contents rail ────────────────────────────────────────────────────── */
+.doc .toc {
+  position: sticky;
+  top: var(--toc-top);
+  align-self: start;
+  max-height: calc(100dvh - var(--toc-top));
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-4) var(--space-6) 0;
+  border-right: var(--border-width) solid var(--border-default);
+}
+
+.doc .toc-kicker {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-2-5);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* The contents list is drawn as a tree (├─ … └─): a trunk down the middle of
+   the first cell and a branch out to each entry, the way `tree` prints one.
+   Entries wrap to different heights, so trunk and branch are painted per
+   link as background layers and no gap is left between links to break the
+   trunk. The trunk drops from the kicker's left edge and the branch is one
+   cell, which keeps the entries' measure in the fixed column close to what
+   it was. The active entry's branch takes the accent. */
+.doc .toc-nav {
+  --tree-branch-y: calc(var(--space-1-5) + var(--cell-h) / 2 + var(--border-width));
+  display: flex;
+  flex-direction: column;
+  margin-left: calc(var(--space-2-5) - var(--cell-w) / 2);
+}
+
+.doc .toc-nav a {
+  --tree: var(--border-default);
+  padding: var(--space-1-5) var(--space-1) var(--space-1-5)
+    calc(2 * var(--cell-w));
+  background:
+    linear-gradient(var(--tree), var(--tree)) calc(var(--cell-w) / 2) 0 /
+      var(--border-width) 100% no-repeat,
+    linear-gradient(var(--tree), var(--tree)) calc(var(--cell-w) / 2)
+      var(--tree-branch-y) / var(--cell-w) var(--border-width) no-repeat;
+  color: var(--text-body);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: -0.025em;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* └─ : the trunk stops at the last entry's branch. */
+.doc .toc-nav a:last-child {
+  background-size:
+    var(--border-width) calc(var(--tree-branch-y) + var(--border-width)),
+    var(--cell-w) var(--border-width);
+}
+
+.doc .toc-nav a:hover {
+  background-color: var(--btn-ghost-hover);
+  color: var(--text-high-contrast);
+}
+
+.doc .toc-nav a.is-active {
+  --tree: var(--text-accent);
+  color: var(--text-high-contrast);
+}
+
+.doc .toc-note {
+  margin-top: var(--space-4);
+  padding: 0 var(--space-2-5);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.doc .toc-note a {
+  color: var(--text-accent);
+}
+
+.doc .doc-main {
+  min-width: 0;
+}
+
+/* ── lede ─────────────────────────────────────────────────────────────── */
+.doc .lede {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 64ch;
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.doc .lede h1 {
+  max-width: 22ch;
+}
+
+.doc .lede-copy {
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  color: var(--text-body);
+  text-wrap: pretty;
+}
+
+.doc .lede-copy code,
+.doc .section-lead code,
+.doc .callout code,
+.doc .why code,
+.doc p code {
+  color: var(--text-strong);
+}
+
+.doc .lede-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: none;
+  margin-top: var(--space-3);
+  border: var(--border-width) solid var(--border-card);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card-inset);
+}
+
+.doc .lede-facts div {
+  padding: var(--space-4);
+  border-right: var(--border-width) solid var(--divider-accent);
+}
+
+.doc .lede-facts div:last-child {
+  border-right: 0;
+}
+
+.doc .lede-facts dt {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-high-contrast);
+}
+
+.doc .lede-facts dd {
+  margin: var(--space-1) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+/* ── sections ─────────────────────────────────────────────────────────── */
+.doc .doc-section {
+  padding: var(--space-8) 0;
+  border-top: var(--border-width) solid var(--border-default);
+}
+
+.doc .section-head {
+  display: grid;
+  grid-template-columns: var(--space-9) 1fr;
+  gap: var(--space-4);
+  align-items: start;
+  max-width: none;
+  margin-bottom: var(--space-6);
+}
+
+.doc .section-head > div {
+  min-width: 0;
+}
+
+.doc .section-no {
+  display: grid;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border: var(--border-width) solid var(--border-secondary-button);
+  border-radius: var(--radius-sm);
+  background: var(--btn-secondary-bg);
+  box-shadow: var(--shadow-btn-secondary);
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.doc .section-head h2 {
+  max-width: 32ch;
+}
+
+.doc .section-lead {
+  max-width: 72ch;
+  margin-top: var(--space-2);
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.doc .section-lead em {
+  color: var(--text-strong);
+}
+
+.doc .section-lead a,
+.doc .doc-section > p a,
+.doc .why a,
+.doc .callout a,
+.doc figcaption a,
+.doc .guide-links a {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--divider-accent);
+}
+
+.doc .section-lead a:hover,
+.doc .doc-section > p a:hover,
+.doc .why a:hover,
+.doc .callout a:hover,
+.doc figcaption a:hover,
+.doc .guide-links a:hover {
+  text-decoration-style: double;
+  text-decoration-color: currentColor;
+}
+
+.doc .doc-section > p {
+  max-width: 72ch;
+  margin: var(--space-4) 0;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.doc .doc-section > pre {
+  max-width: 100%;
+  margin: var(--space-6) 0;
+}
+
+.doc .guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  font-size: 14px;
+  letter-spacing: -0.025em;
+}
+
+.doc figure {
+  margin: var(--space-6) 0 0;
+}
+
+.doc figure img {
+  width: 100%;
+  height: auto;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--sh-alt);
+}
+
+.doc figcaption {
+  margin-top: var(--space-3);
+  color: var(--text-body);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.doc .sub-h {
+  margin: var(--space-8) 0 var(--space-3);
+}
+
+/* The one-line "why the terminal wants this" close of each section. */
+.doc .why {
+  max-width: 72ch;
+  margin-top: var(--space-4);
+  padding: var(--space-2-5) var(--space-4);
+  border-left: var(--border-double-width) double var(--border-hover);
+  background: var(--surface-card);
+  color: var(--text-body);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.doc .why strong {
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── callouts ─────────────────────────────────────────────────────────── */
+/* A titled box, the way a TUI labels a pane: ╓─ TITLE ──────┐. The box has
+   no top border of its own; the tag's two rules draw it, so the title sits
+   in the line rather than on a patch over it. The rules hang from the first
+   line, so a title that wraps still starts on the box's edge. With no top
+   border or padding the tag's negative margin would collapse through the
+   box; flow-root keeps it inside, so the tag really moves up half a cell. */
+.doc .callout {
+  display: flow-root;
+  margin-top: calc(var(--space-4) + var(--cell-h) / 2);
+  padding: 0 var(--space-4) var(--space-4);
+  border: var(--border-width) solid var(--border-card);
+  border-top: 0;
+  border-left: var(--border-double-width) double var(--border-hover);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card-inset);
+}
+
+.doc .callout-tag {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cell-w);
+  margin: calc(-1 * var(--cell-h) / 2) calc(-1 * var(--space-4))
+    var(--space-2);
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: var(--node-h);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.doc .callout-tag::before,
+.doc .callout-tag::after {
+  content: "";
+  height: var(--border-width);
+  margin-top: calc(var(--cell-h) / 2);
+  background: var(--border-card);
+}
+
+.doc .callout-tag::before {
+  flex: 0 0 calc(2 * var(--cell-w));
+}
+
+.doc .callout-tag::after {
+  flex: 1 0 calc(2 * var(--cell-w));
+}
+
+.doc .callout p:last-child {
+  color: var(--text-body);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ── two-column prose cards ───────────────────────────────────────────── */
+.doc .twocol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.doc .prose-card {
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--border-card);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card-inset);
+}
+
+.doc .prose-card h3 {
+  font-size: 16.8px;
+  line-height: 1.3;
+}
+
+.doc .prose-card p {
+  margin-top: var(--space-2);
+  color: var(--text-body);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.doc .mono-flow {
+  margin: var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-default);
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* ── side-by-side code ────────────────────────────────────────────────── */
+.doc .code-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: var(--space-4);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.doc .code-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  margin: 0;
+}
+
+.doc .code-card + .code-card {
+  border-left: var(--border-width) solid var(--divider-accent);
+}
+
+.doc .code-card figcaption {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--border-default);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.doc .code-card--tui figcaption {
+  color: var(--text-accent);
+}
+
+.doc .code-card .code {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.doc .code-card .code code {
+  display: block;
+  min-width: max-content;
+  white-space: pre;
+}
+
+/* ── additions grid ───────────────────────────────────────────────────── */
+.doc .adds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.doc .add-card {
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--border-card);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card-inset);
+}
+
+.doc .add-card h3 {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.doc .add-card p {
+  margin-top: var(--space-1);
+  color: var(--text-body);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.doc .add-card a {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--divider-accent);
+}
+
+/* ── register close ───────────────────────────────────────────────────── */
+.doc .register-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.doc .register-tag {
+  padding: var(--space-1) var(--space-2-5);
+  border: var(--border-width) solid var(--border-secondary-button);
+  border-radius: var(--radius-sm);
+  background: var(--btn-secondary-bg);
+  color: var(--text-body);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.doc .register-tag strong {
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.doc .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+/* ── responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .doc .doc-shell {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .doc .toc {
+    position: static;
+    max-height: none;
+    padding: var(--space-4) 0 0;
+    border-right: 0;
+  }
+
+  .doc .toc-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-left: 0;
+  }
+
+  /* A wrapped row of chips is no tree: the shorthand drops the trunk and
+     branch layers along with the fill. */
+  .doc .toc-nav a,
+  .doc .toc-nav a:last-child {
+    padding: var(--space-1-5) var(--space-2-5);
+    border: var(--border-width) solid var(--border-secondary-button);
+    background: var(--btn-secondary-bg);
+  }
+
+  .doc .toc-nav a.is-active {
+    border-color: var(--border-hover);
+  }
+
+  .doc .toc-note {
+    display: none;
+  }
+
+  .doc .adds {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719px) {
+  .doc .lede-facts,
+  .doc .code-pair,
+  .doc .adds,
+  .doc .twocol {
+    grid-template-columns: 1fr;
+  }
+
+  .doc .lede-facts div {
+    border-right: 0;
+    border-bottom: var(--border-width) solid var(--divider-accent);
+  }
+
+  .doc .lede-facts div:last-child {
+    border-bottom: 0;
+  }
+
+  .doc .code-card + .code-card {
+    border-top: var(--border-width) solid var(--divider-accent);
+    border-left: 0;
+  }
+
+  .doc .section-head {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}

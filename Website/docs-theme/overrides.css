@@ -1,0 +1,82 @@
+/* Site-owned DocC overrides, loaded after the renderer's own stylesheets.
+   Colours come from theme-settings.json through DocC's --color-* properties;
+   this sheet only sets what theme-settings cannot: the serif headings at the
+   design system's light weights, the rail-style hairlines, and the square
+   corners. Selectors are kept broad so they survive renderer upgrades. */
+
+:root {
+  --docs-font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --docs-radius: 0;
+}
+
+/* Headings are serif and light; never bold. */
+#app h1,
+#app h2,
+#app h3,
+#app h4,
+#app .title,
+#app .topic-title,
+#app .section-title {
+  font-family: var(--docs-font-serif) !important;
+  font-weight: 390 !important;
+  letter-spacing: 0 !important;
+}
+
+#app .documentation-hero .title,
+#app h1.title {
+  font-weight: 340 !important;
+}
+
+#app .documentation-hero .eyebrow,
+#app .eyebrow {
+  font-family: var(--typography-html-font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+/* Hairline rules and near-square corners everywhere the renderer rounds. */
+#app .documentation-hero,
+#app .card,
+#app .link-block,
+#app .declaration-source,
+#app pre,
+#app .code-listing,
+#app .aside,
+#app .tabnav,
+#app .filter,
+#app .tag {
+  border-radius: var(--docs-radius) !important;
+}
+
+#app .documentation-hero {
+  border-bottom: 1px solid var(--color-grid);
+}
+
+#app .card,
+#app .link-block.card {
+  box-shadow: none !important;
+  border: 1px solid var(--color-link-block-card-border) !important;
+}
+
+/* Primary actions on the mint fill take the logo's ink, never white. */
+#app .button-cta {
+  color: var(--color-button-text) !important;
+  border-radius: var(--docs-radius) !important;
+  box-shadow: inset 0 -2px 0 0 rgba(0, 0, 0, 0.16) !important;
+}
+
+#app .button-cta:hover {
+  box-shadow: none !important;
+}
+
+/* Focus is the 3px mint ring the site uses. */
+#app :focus-visible {
+  outline: 3px solid var(--color-focus-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Body copy at the writer face's comfortable measure. */
+#app .content {
+  line-height: 1.55;
+}

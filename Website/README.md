@@ -50,3 +50,38 @@ documentation builds also default to `main`. Set `DOCC_SOURCE_REF` to a shared
 tag to build that snapshot, or to an empty string to use the manifest refs.
 The guides describe current behavior without a release
 history; package installation examples remain concrete and reproducible.
+
+## Design system
+
+The site is styled from the SwiftTUI design system. `src/styles/tokens.css`
+is the only file that names a colour, font, radius or spacing value; every
+other stylesheet composes those custom properties, and both themes (light is
+primary; `data-theme="dark"` on `<html>`) come from that one file.
+
+- `src/styles/components.css` — the system's Button, Kbd, NewsBar,
+  FeatureCard, Testimonial, GridFrame and Navigation rules, verbatim.
+- `src/styles/site.css` — the page skeleton (two column rails with a `┼`
+  junction at every intersection), the type scale, code, and the legacy-name
+  aliases the pipeline walkthrough still reads.
+- `src/styles/docs.css` — the long-form pages (contents rail, numbered
+  sections, callouts, side-by-side code).
+- `src/layouts/Site.astro` — every public page: head, header, news bar,
+  sections, footer. Sections are `Section.astro` so the nodes land on the
+  rails; actions are `Button.astro`.
+- `public/fonts/` — self-hosted IBM Plex Serif (headings), iA Writer Quattro S
+  (text) and Geist Mono (code). The origin is cross-origin isolated, so nothing
+  is fetched from a font CDN. Every family is SIL OFL 1.1, which requires the
+  copyright notice and licence to travel with the files: each family's upstream
+  licence text sits beside them as `LICENSE-*` and is served from `/fonts/`.
+  Geist Mono (v1.7.2) and iA Writer Quattro S are the unmodified upstream
+  webfonts; the Plex files are the Google Fonts latin subsets. Add the licence
+  file with any new family, and keep a Reserved Font Name in mind before
+  subsetting one (Plex and iA Writer declare one; Geist does not).
+
+The DocC archives get the same system through `docs-theme/`: `bun run
+docc-theme` generates `theme-settings.json` (Swift-DocC-Render's theme file,
+resolved from the tokens) and `docs-theme.css` (the font faces plus
+`overrides.css`), and `Scripts/apply_docc_theme.sh` copies both into every
+mount during `build:docc`. `scripts/docc-theme.test.ts` fails when the
+committed output is stale.
+

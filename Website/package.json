@@ -14,6 +14,7 @@
     "build:wasm": "bun run prepare:webexample && bun run --cwd \"${WEBEXAMPLE_DIR:-../.build/public-inputs/swift-tui-counter-demo/WebExample}\" build && bun run compress:wasm",
     "build:wasm:dev": "bun run prepare:webexample && bun run --cwd \"${WEBEXAMPLE_DIR:-../.build/public-inputs/swift-tui-counter-demo/WebExample}\" build:dev && bun run compress:wasm:dev",
     "build:docc": "../Scripts/build_docc_site.sh",
+    "docc-theme": "bun run scripts/docc-theme.ts",
     "build:full": "bun run build:wasm && bun run build && bun run compose:webexample && bun run build:docc",
     "build:dev": "bun run build:wasm:dev && bun run build && bun run compose:webexample && bun run build:docc",
     "build": "astro build",
@@ -25,7 +26,7 @@
   "dependencies": {
     "@astrojs/check": "0.9.10",
     "@swifttui/web": "https://github.com/SwiftTUI/swift-tui-web/releases/download/0.13.5/swifttui-web-0.13.5.tgz",
-    "astro": "7.2.2",
+    "astro": "7.3.3",
     "typescript": "^6.0.3"
   },
   "devDependencies": {

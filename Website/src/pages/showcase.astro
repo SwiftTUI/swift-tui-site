@@ -1,17 +1,13 @@
 ---
-import "../styles/site.css";
-import "../styles/marketing.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteIcons from "../components/SiteIcons.astro";
-import ThemeScript from "../components/ThemeScript.astro";
+import Site from "../layouts/Site.astro";
+import Button from "../components/Button.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import Section from "../components/Section.astro";
+import SectionHead from "../components/SectionHead.astro";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
-const canonical = `${site}${base || ""}/showcase/`;
-const ogImage = `${site}${base || ""}/og.png`;
 const title = "SwiftTUI Showcase";
 const description =
   "Real terminal apps built with SwiftTUI, every one a maintained example in swift-tui-examples you can clone and run, plus the same component gallery rendered by every host.";
@@ -153,500 +149,221 @@ const tiles: Tile[] = [
   },
 ];
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="SwiftTUI logo over a dark marketing card" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content={ogImage} />
-    <meta
-      name="theme-color"
-      content="#f5f7f3"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#101512"
-      media="(prefers-color-scheme: dark)"
-    />
-    <ThemeScript />
-    <SiteIcons />
-  </head>
-  <body class="marketing-subpage showcase-page">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
-    <main id="main">
-      <section class="showcase">
-        <div class="shell">
-          <header class="head">
-            <span class="eyebrow mono"><span class="num">/00</span>Showcase</span>
-            <h1>Built with SwiftTUI.</h1>
-            <p class="lede">
-              Real, non-trivial terminal apps, every one a maintained example in{" "}
-              <span class="mono">swift-tui-examples</span> you can clone and run
-              with a single command. Then the encore: one component gallery,
-              rendered by every host the same views can travel to.
-            </p>
-          </header>
+<Site
+  title={title}
+  description={description}
+  path="/showcase/"
+  ogType="article"
+  ogImageAlt="SwiftTUI showcase"
+  twitterCard="summary"
+  bodyClass="showcase-page"
+>
+  <Section id="showcase-top" aria-labelledby="showcase-title">
+    <SectionHead id="showcase-title" level={1} eyebrow="Showcase">
+      <Fragment slot="title">Built with SwiftTUI.</Fragment>
+      Real, non-trivial terminal apps, every one a maintained example in{" "}
+      <code>swift-tui-examples</code> you can clone and run with a single
+      command. Then the encore: one component gallery, rendered by every host
+      the same views can travel to.
+    </SectionHead>
+  </Section>
 
-          <!-- ── /01 · maintained example apps ───────────────────────────── -->
-          <section class="examples" aria-labelledby="examples-title">
-            <header class="sub-head">
-              <span class="eyebrow mono"><span class="num">/01</span>Example apps</span>
-              <h2 id="examples-title">Built in the open.</h2>
-              <p class="sub-lede">
-                Maintained example apps from{" "}
-                <span class="mono">swift-tui-examples</span>. Each builds from a
-                fresh clone with one command.
+  <Section id="examples" aria-labelledby="examples-title">
+    <SectionHead id="examples-title" eyebrow="Example apps">
+      <Fragment slot="title">Built in the open.</Fragment>
+      Maintained example apps from <code>swift-tui-examples</code>. Each builds
+      from a fresh clone with one command.
+    </SectionHead>
+    <div class="card-grid card-grid--two">
+      {
+        tiles.map((tile) => (
+          <FeatureCard
+            title={tile.title}
+            href={tile.repo}
+            external
+            cta="View source"
+            media={{ src: tile.img, alt: `${tile.title} screenshot`, width: 1200, height: 750 }}
+          >
+            <span class="tile-sub">{tile.subtitle}</span>
+            {tile.body}
+          </FeatureCard>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="hosts" aria-labelledby="hosts-title">
+    <SectionHead id="hosts-title" eyebrow="Beyond the terminal">
+      <Fragment slot="title">One gallery. Every host.</Fragment>
+      The same <code>gallery-demo</code> view, drawn by the terminal and by
+      each host it can travel to. Terminal first, not terminal only.
+    </SectionHead>
+    <div class="card-grid devices">
+      {
+        hosts.map((host) => (
+          <FeatureCard
+            title={host.platform}
+            href={host.href}
+            external
+            cta="View example"
+            class="device"
+            media={{ src: host.img, alt: `SwiftTUI gallery running on ${host.platform}`, width: 1000, height: 1000 }}
+          >
+            <span class="host-badge mono">{host.host}</span>
+            {host.body}
+          </FeatureCard>
+        ))
+      }
+    </div>
+
+    <div class="web-feature media-frame">
+      <div class="web-bar">
+        <span class="web-bar__id">
+          <span class="platform">Browser</span>
+          <span class="host-badge mono">SwiftTUIWASI · @swifttui/web</span>
+        </span>
+        <span class="web-bar__url mono">swifttui.sh/webexample</span>
+        <span class="web-bar__live mono"><span class="live-dot" aria-hidden="true"></span>live</span>
+      </div>
+      <div class="web-surface">
+        {
+          showWebStub ? (
+            <div class="web-stub">
+              <img class="web-poster" src={`${base}/showcase/host-web.png`} alt="" aria-hidden="true" />
+              <p class="web-stub-note">
+                The live wasm demo composes in production. Run
+                <code>bun run build:wasm:dev</code> in <code>Website/</code> to mount it locally.
               </p>
-            </header>
-
-            <ol class="grid">
-              {tiles.map((t) => (
-                <li class="tile">
-                  <a class="link" href={t.repo} rel="noreferrer noopener">
-                    <div class="shot">
-                      <img
-                        src={t.img}
-                        alt={`${t.title} screenshot`}
-                        loading="lazy"
-                        width="1200"
-                        height="750"
-                      />
-                    </div>
-                    <div class="meta">
-                      <h3>{t.title}</h3>
-                      <p class="sub">{t.subtitle}</p>
-                      <p class="body">{t.body}</p>
-                      <span class="cta mono">view source →</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          <!-- ── /02 · the same gallery, every host ──────────────────────── -->
-          <section class="hosts" aria-labelledby="hosts-title">
-            <header class="sub-head">
-              <span class="eyebrow mono"><span class="num">/02</span>Beyond the terminal</span>
-              <h2 id="hosts-title">One gallery. Every host.</h2>
-              <p class="sub-lede">
-                The same <span class="mono">gallery-demo</span> view, drawn by
-                the terminal and by each host it can travel to. Terminal first,
-                not terminal only.
-              </p>
-            </header>
-
-            <ul class="devices">
-              {hosts.map((h) => (
-                <li class="device">
-                  <a class="device-link" href={h.href} rel="noreferrer noopener">
-                    <div class="device-shot">
-                      <img
-                        src={h.img}
-                        alt={`SwiftTUI gallery running on ${h.platform}`}
-                        loading="lazy"
-                        width="1000"
-                        height="1000"
-                      />
-                      {h.preview && <span class="ribbon mono">preview</span>}
-                    </div>
-                    <div class="device-meta">
-                      <div class="device-id">
-                        <span class="platform">{h.platform}</span>
-                        <span class="host-badge mono">{h.host}</span>
-                      </div>
-                      <p class="device-body">{h.body}</p>
-                      <span class="cta mono">view example →</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <!-- the browser host, running live on this page -->
-            <div class="web-feature">
-              <div class="web-id">
-                <span class="platform">Browser</span>
-                <span class="host-badge mono">SwiftTUIWASI · @swifttui/web</span>
-              </div>
-              <div class="web-frame">
-                <div class="web-bar">
-                  <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                  <span class="url mono">swifttui.sh/webexample</span>
-                  <span class="live mono"><span class="live-dot"></span>live</span>
-                </div>
-                <div class="web-surface">
-                  {showWebStub ? (
-                    <div class="web-stub">
-                      <img class="web-poster" src={`${base}/showcase/host-web.png`} alt="" aria-hidden="true" />
-                      <p class="web-stub-note mono">
-                        Live wasm demo composes in production. Run
-                        <span class="mark"> bun run build:wasm:dev </span> in
-                        <span class="mark"> Website/ </span> to mount it locally.
-                      </p>
-                    </div>
-                  ) : (
-                    <div class="web-stage">
-                      <iframe
-                        src={webIframeSrc}
-                        title="SwiftTUI counter running as a WASI browser app"
-                        loading="lazy"
-                        referrerpolicy="same-origin"
-                      ></iframe>
-                      <img
-                        class="web-poster"
-                        src={`${base}/showcase/host-web.png`}
-                        alt=""
-                        aria-hidden="true"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div class="web-meta">
-                <p class="device-body">
-                  The counter from the home page, built to
-                  <span class="mono"> wasm32-wasi</span> and mounted through{" "}
-                  <span class="mono">@swifttui/web</span>: a canvas plus a real
-                  accessibility tree, no terminal emulator.
-                </p>
-                <div class="web-actions mono">
-                  <a class="solid" href={webDemoHref}>open full demo →</a>
-                  <a class="ghost" href={webSourceHref} rel="noreferrer noopener">view source →</a>
-                </div>
-              </div>
             </div>
-          </section>
+          ) : (
+            <div class="web-stage">
+              <iframe
+                src={webIframeSrc}
+                title="SwiftTUI counter running as a WASI browser app"
+                loading="lazy"
+                referrerpolicy="same-origin"
+              />
+              <img
+                class="web-poster"
+                src={`${base}/showcase/host-web.png`}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          )
+        }
+      </div>
+      <div class="web-meta">
+        <p class="caption">
+          The counter from the home page, built to <code>wasm32-wasi</code> and
+          mounted through <code>@swifttui/web</code>: a canvas plus a real
+          accessibility tree, no terminal emulator.
+        </p>
+        <div class="button-row web-actions">
+          <Button href={webDemoHref} variant="primary" size="sm" trailingIcon="chevronRight">
+            Open full demo
+          </Button>
+          <Button href={webSourceHref} variant="secondary" size="sm" icon="github" external>
+            View source
+          </Button>
         </div>
-      </section>
-    </main>
-    <SiteFooter />
+      </div>
+    </div>
+  </Section>
 
-    <script>
-      // Fade each web poster out once its iframe paints, so the live demo
-      // hands off cleanly from the static screenshot (same idiom as DemoTerminal).
-      document.querySelectorAll(".web-stage iframe").forEach((frame) => {
-        frame.addEventListener("load", () => frame.setAttribute("data-loaded", "true"));
-      });
-    </script>
-  </body>
-</html>
+  <script>
+    // Fade each web poster out once its iframe paints, so the live demo
+    // hands off cleanly from the static screenshot.
+    document.querySelectorAll(".web-stage iframe").forEach((frame) => {
+      frame.addEventListener("load", () => frame.setAttribute("data-loaded", "true"));
+    });
+  </script>
+</Site>
 
 <style>
-  .showcase {
-    padding: 48px 0 96px;
-  }
-
-  .shell {
-    max-width: var(--shell-max);
-    margin: 0 auto;
-    padding: 0 var(--gutter);
-  }
-
-  .head,
-  .sub-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
-    column-gap: clamp(36px, 6vw, 88px);
-    align-items: end;
-  }
-
-  .head {
-    row-gap: 20px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--home-ink);
-  }
-
-  .eyebrow {
-    display: inline-flex;
-    grid-column: 1 / -1;
-    align-items: center;
-    gap: 8px;
-    color: var(--home-accent-ink);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .eyebrow .num {
-    color: var(--home-quiet);
-  }
-
-  .head h1 {
-    max-width: 12ch;
-    margin: 0;
-    color: var(--home-ink);
-    font-size: clamp(42px, 5.3vw, 60px);
-    font-weight: 520;
-    line-height: 0.96;
-    letter-spacing: -0.055em;
-    text-wrap: balance;
-  }
-
-  .head .lede {
-    max-width: 56ch;
-    margin: 0;
-    color: var(--home-muted);
-    font-size: 16px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .head .lede .mono,
-  .sub-lede .mono {
-    color: var(--home-ink);
-  }
-
-  /* ── section sub-headers ──────────────────────────────────────── */
-  .sub-head {
-    row-gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .sub-head h2 {
-    max-width: 17ch;
-    margin: 0;
-    color: var(--home-ink);
-    font-size: clamp(30px, 3.5vw, 44px);
-    font-weight: 520;
-    line-height: 0.98;
-    letter-spacing: -0.045em;
-    text-wrap: balance;
-  }
-
-  .sub-lede {
-    max-width: 58ch;
-    margin: 0;
-    color: var(--home-muted);
-    font-size: 15px;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .examples {
-    padding: 32px 0 64px;
-    border-bottom: 1px solid var(--home-ink);
-  }
-
-  .hosts {
-    padding-top: 32px;
-  }
-
-  /* ── host device band ─────────────────────────────────────────── */
-  .devices {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--home-ink);
-    border-left: 1px solid var(--home-ink);
-    list-style: none;
-  }
-
-  .device {
-    min-width: 0;
-    border-right: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-    background: var(--home-paper);
-    overflow: hidden;
-  }
-
-  .device-link {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    height: 100%;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .device-shot {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    border-bottom: 1px solid var(--home-line);
-    background: var(--home-paper-soft);
-  }
-
-  .device-shot img {
+  .tile-sub {
     display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    margin-bottom: var(--space-1);
+    color: var(--text-strong);
   }
 
-  .ribbon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 4px 8px;
-    border: 1px solid #536158;
-    border-radius: 3px;
-    background: rgb(16 21 18 / 88%);
-    color: #d5ddd7;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    backdrop-filter: blur(4px);
+  .devices {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .device-meta {
-    display: flex;
-    min-height: 192px;
-    flex-direction: column;
-    padding: 18px;
-    transition: background 140ms ease;
-  }
-
-  .device-id {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .platform {
-    color: var(--home-ink);
-    font-size: 17px;
-    font-weight: 650;
-    letter-spacing: -0.025em;
+  .devices :global(.swifttui-card__media) {
+    aspect-ratio: 1 / 1;
   }
 
   .host-badge {
-    color: var(--home-quiet);
-    font-size: 10.5px;
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.05em;
   }
 
-  .device-body {
-    margin: 9px 0 0;
-    color: var(--home-muted);
-    font-size: 12.5px;
-    line-height: 1.55;
-  }
-
-  .cta {
-    display: inline-block;
-    align-self: flex-start;
-    margin-top: auto;
-    padding-top: 16px;
-    border-bottom: 1px solid var(--home-line-strong);
-    color: var(--home-accent-ink);
-    font-size: 12px;
-  }
-
-  .device:hover .device-meta,
-  .tile:hover .meta {
-    background: var(--home-paper-soft);
-  }
-
-  .device:hover .cta,
-  .tile:hover .cta {
-    border-color: var(--home-accent);
-  }
-
-  /* ── live web feature ─────────────────────────────────────────── */
+  /* ── the browser host, running live on this page ───────────────── */
   .web-feature {
-    margin-top: 20px;
-    border: 1px solid var(--home-ink);
-    background: var(--home-paper);
-  }
-
-  .web-id {
-    display: flex;
-    min-height: 54px;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    background: var(--home-accent);
-    color: var(--home-accent-on);
-  }
-
-  .web-id .platform,
-  .web-id .host-badge {
-    color: inherit;
-  }
-
-  .web-id .host-badge {
-    opacity: 0.78;
-  }
-
-  .web-frame {
-    border-top: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-    background: var(--term-bg);
-    overflow: hidden;
+    margin-top: var(--space-6);
   }
 
   .web-bar {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 12px;
-    min-height: 38px;
-    padding: 6px 14px;
-    border-bottom: 1px solid #2a342d;
-    background: #101512;
+    gap: var(--space-3);
+    min-height: var(--space-12);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--border-width) solid var(--border-default);
   }
 
-  .web-bar .dots {
-    display: inline-flex;
-    gap: 7px;
+  .web-bar__id {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    flex-wrap: wrap;
   }
 
-  .web-bar .dots span {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #536158;
+  .web-bar .platform {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--text-high-contrast);
   }
 
-  .web-bar .dots span:nth-child(1) { background: var(--term-red); }
-  .web-bar .dots span:nth-child(2) { background: var(--term-yellow); }
-  .web-bar .dots span:nth-child(3) { background: var(--term-green); }
+  .web-bar .host-badge {
+    margin: 0;
+  }
 
-  .web-bar .url {
+  .web-bar__url {
     justify-self: center;
-    color: #a0aca3;
+    color: var(--text-muted);
     font-size: 12px;
   }
 
-  .web-bar .live {
+  .web-bar__live {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--home-terminal-accent);
-    font-size: 10.5px;
-    letter-spacing: 0.06em;
+    gap: var(--space-1-5);
+    color: var(--text-accent);
+    font-size: 11px;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
-  .web-bar .live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--home-terminal-accent);
-    box-shadow: 0 0 0 3px rgb(98 214 191 / 16%);
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
   }
 
   .web-surface {
     position: relative;
     height: 460px;
-    background: var(--home-paper);
+    background: var(--color-offgray-1000);
   }
 
   .web-stage {
@@ -662,7 +379,7 @@ const tiles: Tile[] = [
     width: 100%;
     height: 100%;
     border: 0;
-    background: var(--home-paper);
+    background: var(--color-offgray-1000);
   }
 
   .web-poster {
@@ -672,19 +389,22 @@ const tiles: Tile[] = [
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 1;
     pointer-events: none;
-    transition: opacity 220ms ease 140ms;
+    transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 150ms;
   }
 
-  .web-stage iframe[data-loaded="true"] + .web-poster { opacity: 0; }
+  .web-stage iframe[data-loaded="true"] + .web-poster {
+    opacity: 0;
+  }
 
   .web-stub {
     position: absolute;
     inset: 0;
   }
 
-  .web-stub .web-poster { z-index: 0; opacity: 0.5; }
+  .web-stub .web-poster {
+    opacity: 0.5;
+  }
 
   .web-stub-note {
     position: absolute;
@@ -692,193 +412,49 @@ const tiles: Tile[] = [
     bottom: 0;
     left: 0;
     z-index: 1;
-    margin: 0;
-    padding: 14px 18px;
-    background: linear-gradient(180deg, transparent, rgb(16 21 18 / 94%));
-    color: #d5ddd7;
-    font-size: 12px;
-  }
-
-  .web-stub-note .mark {
-    padding: 1px 4px;
-    border: 1px solid #536158;
-    border-radius: 3px;
-    background: #151c17;
-    color: #e8eee9;
+    padding: var(--space-4);
+    background: var(--info-bar-bg);
+    color: var(--text-body);
+    font-size: 13px;
   }
 
   .web-meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
-    padding: 18px;
-    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-top: var(--border-width) solid var(--border-default);
   }
 
-  .web-meta .device-body { max-width: 62ch; margin: 0; font-size: 13.5px; }
+  .web-meta .caption {
+    max-width: 62ch;
+  }
 
   .web-actions {
-    display: inline-flex;
-    flex-shrink: 0;
-    gap: 8px;
+    flex: none;
   }
 
-  .web-actions a {
-    padding: 8px 13px;
-    border-radius: 3px;
-    font-size: 12px;
-    transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  @media (max-width: 979px) {
+    .devices {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
-  .web-actions .solid {
-    border: 1px solid var(--home-ink);
-    background: var(--home-ink);
-    color: var(--home-paper);
-  }
-
-  .web-actions .solid:hover {
-    border-color: var(--home-accent);
-    background: var(--home-accent);
-    color: var(--home-accent-on);
-  }
-
-  .web-actions .ghost {
-    border: 1px solid var(--home-line-strong);
-    color: var(--home-muted);
-  }
-
-  .web-actions .ghost:hover {
-    border-color: var(--home-accent);
-    background: var(--home-paper-soft);
-    color: var(--home-ink);
-  }
-
-  /* ── example app grid ─────────────────────────────────────────── */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--home-ink);
-    border-left: 1px solid var(--home-ink);
-    list-style: none;
-  }
-
-  .tile {
-    min-width: 0;
-    border-right: 1px solid var(--home-ink);
-    border-bottom: 1px solid var(--home-ink);
-    background: var(--home-paper);
-    overflow: hidden;
-  }
-
-  .tile .link {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    height: 100%;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .shot {
-    aspect-ratio: 1200 / 750;
-    overflow: hidden;
-    border-bottom: 1px solid var(--home-line);
-    background: var(--home-paper-soft);
-  }
-
-  .shot img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .meta {
-    display: flex;
-    min-height: 264px;
-    flex-direction: column;
-    padding: 22px;
-    transition: background 140ms ease;
-  }
-
-  .meta h3 {
-    margin: 0;
-    color: var(--home-ink);
-    font-size: 20px;
-    font-weight: 650;
-    letter-spacing: -0.025em;
-  }
-
-  .meta .sub {
-    margin: 6px 0 0;
-    color: var(--home-muted);
-    font-size: 14px;
-  }
-
-  .meta .body {
-    margin: 12px 0 0;
-    color: var(--home-muted);
-    font-size: 13.5px;
-    line-height: 1.6;
-  }
-
-  @media (max-width: 980px) {
-    .devices { grid-template-columns: 1fr 1fr; }
-  }
-
-  @media (max-width: 920px) {
-    .head,
-    .sub-head {
-      grid-template-columns: 1fr;
-      row-gap: 16px;
+  @media (max-width: 719px) {
+    .web-surface {
+      height: 360px;
     }
 
-    .head h1,
-    .sub-head h2 {
-      max-width: 18ch;
-    }
-
-    .head .lede,
-    .sub-lede {
-      max-width: 66ch;
-    }
-
-    .grid { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 720px) {
-    .web-surface { height: 360px; }
-    .web-meta { flex-direction: column; align-items: stretch; }
-    .web-actions { justify-content: flex-start; }
-  }
-
-  @media (max-width: 520px) {
-    .devices { grid-template-columns: 1fr; }
-
-    .device-meta,
-    .meta {
-      min-height: 0;
-    }
-
-    .web-id {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .web-bar .url {
+    .web-bar__url {
       display: none;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .device-meta,
-    .meta,
-    .web-actions a,
-    .web-poster {
-      transition: none;
+  @media (max-width: 519px) {
+    .devices {
+      grid-template-columns: 1fr;
     }
   }
 </style>

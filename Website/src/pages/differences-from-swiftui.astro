@@ -1,16 +1,8 @@
 ---
-import "../styles/site.css";
-import "../styles/marketing.css";
-import "../styles/from-swiftui.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteIcons from "../components/SiteIcons.astro";
-import ThemeScript from "../components/ThemeScript.astro";
+import "../styles/docs.css";
+import Site from "../layouts/Site.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
-const canonical = `${site}${base || ""}/differences-from-swiftui/`;
-const ogImage = `${site}${base || ""}/og.png`;
 const title = "Differences from SwiftUI — the SwiftTUI primer";
 const description =
   "How SwiftTUI reads SwiftUI for the terminal: what transfers unchanged, the seven deliberate differences, what the framework adds, and the public register where every divergence is recorded.";
@@ -23,40 +15,16 @@ const comingFromSwiftUIHref = `${base}/docs/documentation/swifttuiviews/coming-f
 const registerHref = `${base}/docs/documentation/swifttuiviews/divergences-and-gaps`;
 const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta
-      name="theme-color"
-      content="#f5f7f3"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#101512"
-      media="(prefers-color-scheme: dark)"
-    />
-    <ThemeScript />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="SwiftTUI: differences from SwiftUI" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content={ogImage} />
-    <SiteIcons />
-  </head>
-  <body class="marketing-subpage from-swiftui-page">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
-
-    <main class="fsw" id="main">
+<Site
+  title={title}
+  description={description}
+  path="/differences-from-swiftui/"
+  ogType="article"
+  ogImageAlt="SwiftTUI: differences from SwiftUI"
+  twitterCard="summary"
+  bodyClass="from-swiftui-page"
+>
+  <div class="doc fsw">
       <div class="doc-shell" id="top">
         <aside class="toc" aria-label="On this page">
           <p class="toc-kicker">On this page</p>
@@ -78,10 +46,10 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
           </p>
         </aside>
 
-        <div class="fsw-main">
+        <div class="doc-main">
           <!-- ===================== INTRO ===================== -->
           <section class="lede" id="intro">
-            <p class="eyebrow">For SwiftUI developers</p>
+            <p class="eyebrow eyebrow--accent">For SwiftUI developers</p>
             <h1>SwiftUI's shape. The terminal's rules.</h1>
             <p class="lede-copy">
               If you write SwiftUI, you already write SwiftTUI: <code>var body: some View</code>,
@@ -428,16 +396,14 @@ struct Dashboard: View {
               <span class="register-tag"><strong>Gap</strong>: a recorded shortfall, not a roadmap</span>
             </div>
             <div class="cta-row">
-              <a class="cta cta--primary" href={`${base}/#get-started`}>Get started</a>
-              <a class="cta" href={comingFromSwiftUIHref}>Read the Coming-From-SwiftUI guide</a>
-              <a class="cta" href={registerHref}>Read the divergence register</a>
-              <a class="cta" href={visionHref}>About SwiftTUI</a>
+              <a class="swifttui-btn swifttui-btn--primary" href={`${base}/#get-started`}>Get started</a>
+              <a class="swifttui-btn swifttui-btn--secondary" href={comingFromSwiftUIHref}>Read the Coming-From-SwiftUI guide</a>
+              <a class="swifttui-btn swifttui-btn--secondary" href={registerHref}>Read the divergence register</a>
+              <a class="swifttui-btn swifttui-btn--secondary" href={visionHref}>About SwiftTUI</a>
             </div>
           </section>
         </div>
       </div>
-    </main>
+    </div>
+</Site>
 
-    <SiteFooter />
-  </body>
-</html>

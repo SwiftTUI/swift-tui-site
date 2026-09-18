@@ -22,6 +22,10 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Self-hosted design-system fonts (design system tokens.css and the DocC theme sheet).
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # DocC archive assets are content-addressed at build time.
 /docs/css/*
   Cache-Control: public, max-age=31536000, immutable
@@ -33,6 +37,20 @@
   Cache-Control: public, max-age=31536000, immutable
 
 /docs/data/*
+  Cache-Control: public, max-age=3600
+
+# Site-owned DocC theme (theme-settings.json + docs-theme.css), injected by
+# Scripts/build_docc_site.sh into every DocC mount.
+/docs/theme-settings.json
+  Cache-Control: public, max-age=3600
+
+/docs/docs-theme.css
+  Cache-Control: public, max-age=3600
+
+/docs/*/theme-settings.json
+  Cache-Control: public, max-age=3600
+
+/docs/*/docs-theme.css
   Cache-Control: public, max-age=3600
 
 # WebExample wasm bundle is Brotli-compressed by `bun run build:wasm`

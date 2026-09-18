@@ -1,0 +1,60 @@
+---
+import SiteIcons from "./SiteIcons.astro";
+import ThemeScript from "./ThemeScript.astro";
+import { pageDark, pageLight } from "../lib/theme";
+
+// Everything every page puts in <head>: the document title and description,
+// the canonical URL, the social card, the theme colours, the pre-paint theme
+// script and the icons. Pages add page-specific tags through the `head` slot
+// of the Site layout.
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  ogType?: "website" | "article";
+  ogImageAlt?: string;
+  twitterCard?: "summary" | "summary_large_image";
+  keywords?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  path,
+  ogType = "website",
+  ogImageAlt = "SwiftTUI: build terminal interfaces in Swift",
+  twitterCard = "summary_large_image",
+  keywords,
+  noindex = false,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
+const canonical = `${site}${base}${path}`;
+const ogImage = `${site}${base}/og.png`;
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+{keywords && <meta name="keywords" content={keywords} />}
+<meta name="author" content="OPTIONAL.DEV" />
+{noindex && <meta name="robots" content="noindex" />}
+<meta name="theme-color" content={pageLight} media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content={pageDark} media="(prefers-color-scheme: dark)" />
+<ThemeScript />
+<link rel="canonical" href={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:site_name" content="SwiftTUI" />
+<meta name="twitter:card" content={twitterCard} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<SiteIcons />

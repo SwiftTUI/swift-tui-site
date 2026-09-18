@@ -1,0 +1,505 @@
+{
+  "theme": {
+    "typography": {
+      "html-font": "\"iA Writer Quattro S\", ui-monospace, SFMono-Regular, Menlo, monospace",
+      "html-font-mono": "\"Geist Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    },
+    "color": {
+      "fill": {
+        "light": "#fffffe",
+        "dark": "#111216"
+      },
+      "fill-secondary": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "fill-tertiary": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "fill-quaternary": {
+        "light": "#e3e4e7cc",
+        "dark": "#727a891a"
+      },
+      "text": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "text-background": {
+        "light": "#fffffe",
+        "dark": "#111216"
+      },
+      "figure-gray": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "figure-gray-secondary": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "figure-gray-secondary-alt": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "figure-gray-tertiary": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "figure-blue": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "figure-green": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "fill-blue": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "standard-blue": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "link": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "header-text": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "grid": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "eyebrow": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "hero-eyebrow": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "secondary-label": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "svg-icon": {
+        "light": "#008860",
+        "dark": "#00e3ac"
+      },
+      "focus-color": {
+        "light": "#008860b3",
+        "dark": "#00e3ac99"
+      },
+      "focus-border-color": {
+        "light": "#008860b3",
+        "dark": "#00e3ac99"
+      },
+      "nav-background": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-solid-background": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-expanded": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-stuck": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-uiblur-expanded": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-uiblur-stuck": {
+        "light": "#ffffffee",
+        "dark": "#121316ee"
+      },
+      "nav-keyline": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-rule": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-outlines": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-sticking-expanded-keyline": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-hierarchy-item-borders": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-hierarchy-collapse-borders": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "nav-hierarchy-collapse-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "nav-color": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "nav-link-color": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "nav-link-color-hover": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "nav-current-link": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "nav-root-subhead": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "nav-root-title": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "navigator-item-hover": {
+        "light": "#e3e4e7cc",
+        "dark": "#727a891a"
+      },
+      "button-background": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "button-background-hover": {
+        "light": "#00cf9b",
+        "dark": "#00cf9b"
+      },
+      "button-background-active": {
+        "light": "#00cf9b",
+        "dark": "#00cf9b"
+      },
+      "button-text": {
+        "light": "#000a2e",
+        "dark": "#000a2e"
+      },
+      "button-border": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "call-to-action-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "documentation-intro-fill": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "documentation-intro-title": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "documentation-intro-eyebrow": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "documentation-intro-accent": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "documentation-intro-figure": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "article-background": {
+        "light": "#fffffe",
+        "dark": "#111216"
+      },
+      "article-body-background": {
+        "light": "#fffffe",
+        "dark": "#111216"
+      },
+      "card-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "card-content-text": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "card-eyebrow": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "card-shadow": {
+        "light": "#ced1d6b3",
+        "dark": "#62697640"
+      },
+      "link-block-card-border": {
+        "light": "#ced1d6b3",
+        "dark": "#62697640"
+      },
+      "overviewcard-border": {
+        "light": "#ced1d6b3",
+        "dark": "#62697640"
+      },
+      "overviewcard-fill": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "overviewcard-fill-secondary": {
+        "light": "#fffffe",
+        "dark": "#111216"
+      },
+      "tabnav-item-border-color": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "dropdown-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "dropdown-border": {
+        "light": "#dadde2",
+        "dark": "#62697624"
+      },
+      "dropdown-text": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "dropdown-option-text": {
+        "light": "#626976",
+        "dark": "#abafb8"
+      },
+      "loading-placeholder-background": {
+        "light": "#e3e4e7cc",
+        "dark": "#727a891a"
+      },
+      "generic-modal-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "code-background": {
+        "light": "#ffffff",
+        "dark": "#111216"
+      },
+      "code-plain": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "code-line-highlight": {
+        "light": "#d5f0e466",
+        "dark": "#00a27414"
+      },
+      "code-line-highlight-border": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "code-collapsible-background": {
+        "light": "#e3e4e7cc",
+        "dark": "#727a891a"
+      },
+      "code-collapsible-text": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "inline-code-background": {
+        "light": "#e3e4e7cc",
+        "dark": "#727a891a"
+      },
+      "aside-note": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "aside-note-background": {
+        "light": "#ffffff99",
+        "dark": "#474c5514"
+      },
+      "aside-note-border": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "aside-tip": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "aside-tip-background": {
+        "light": "#ffffff99",
+        "dark": "#474c5514"
+      },
+      "aside-tip-border": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "aside-experiment": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "aside-experiment-background": {
+        "light": "#ffffff99",
+        "dark": "#474c5514"
+      },
+      "aside-experiment-border": {
+        "light": "#00e3ac",
+        "dark": "#00e3ac"
+      },
+      "badge-default": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "badge-beta": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "changes-added": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "changes-added-hover": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "changes-modified": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "changes-modified-hover": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-plain-text": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-keywords": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "syntax-type-declarations": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-other-type-names": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-project-type-names": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-other-class-names": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-project-class-names": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-strings": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-characters": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-numbers": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-comments": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-documentation-markup": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-documentation-markup-keywords": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-attributes": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-param-internal-name": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-other-declarations": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "syntax-other-function-and-method-names": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-project-function-and-method-names": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-other-instance-variables-and-globals": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-project-instance-variables-and-globals": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-other-constants": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-project-constants": {
+        "light": "#474c55",
+        "dark": "#ced1d6"
+      },
+      "syntax-other-preprocessor-macros": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-project-preprocessor-macros": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-preprocessor-statements": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-heading": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "syntax-marks": {
+        "light": "#535964",
+        "dark": "#878e9b"
+      },
+      "syntax-urls": {
+        "light": "#007954",
+        "dark": "#00e3ac"
+      },
+      "syntax-highlighted": {
+        "light": "#d5f0e466",
+        "dark": "#00a27414"
+      }
+    }
+  },
+  "features": {
+    "docs": {
+      "quickNavigation": {
+        "enable": true
+      }
+    }
+  }
+}

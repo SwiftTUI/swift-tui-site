@@ -1,0 +1,48 @@
+---
+import Icon from "./Icon.astro";
+import type { IconName } from "../lib/icons";
+
+// The one action control: primary once per view, secondary for the
+// alternative, ghost for navigation.
+interface Props {
+  href?: string;
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm";
+  icon?: IconName;
+  trailingIcon?: IconName;
+  external?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = "ghost",
+  size,
+  icon,
+  trailingIcon,
+  external = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+const attrs = href
+  ? { href, rel: external ? "noreferrer noopener" : undefined }
+  : { type: "button" as const };
+---
+
+<Tag
+  class:list={[
+    "swifttui-btn",
+    `swifttui-btn--${variant}`,
+    size && `swifttui-btn--${size}`,
+    className,
+  ]}
+  {...attrs}
+  {...rest}
+>
+  {icon && <Icon name={icon} />}
+  <slot />
+  {trailingIcon && <Icon name={trailingIcon} />}
+</Tag>

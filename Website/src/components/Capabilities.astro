@@ -1,43 +1,83 @@
 ---
+import Button from "./Button.astro";
+import FeatureCard from "./FeatureCard.astro";
+import Section from "./Section.astro";
+import SectionHead from "./SectionHead.astro";
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const features = [
-  { title: "Draw and compose", copy: "Arcs, custom paths, shape clips, gradients, and layered images. Play a GIF once, a few times, or continuously.", detail: "Path · clipShape · AnimatedImage", anchor: "drawing" },
-  { title: "Give state a sense of motion", copy: "Roll changing numbers, morph compatible paths, and move shared elements between layouts. Built-in motion respects reduced-motion preferences.", detail: "withAnimation · matchedGeometryEffect", anchor: "motion" },
-  { title: "Build a full workspace", copy: "Compose lazy sections, scroll nested panes, and keep models alive across tab switches. Lists and tables provide selection and tall rows.", detail: "LazyVStack · List · Table · TabView", anchor: "collections" },
-  { title: "Meet the input device", copy: "Focus-scoped commands for a keyboard. Visible controls and scroll panning for touch. Open styles keep the control's behavior attached to its presentation.", detail: "onMoveCommand · ButtonStyle · FocusState", anchor: "interaction" },
+  {
+    title: "Draw and compose",
+    copy: "Arcs, custom paths, shape clips, gradients and layered images. Play a GIF once, a few times, or continuously.",
+    detail: "Path · clipShape · AnimatedImage",
+    anchor: "drawing",
+  },
+  {
+    title: "Give state motion",
+    copy: "Roll changing numbers, morph compatible paths, and move shared elements between layouts. Built-in motion respects reduced-motion preferences.",
+    detail: "withAnimation · matchedGeometryEffect",
+    anchor: "motion",
+  },
+  {
+    title: "Build a workspace",
+    copy: "Compose lazy sections, scroll nested panes, and keep models alive across tab switches. Lists and tables provide selection and tall rows.",
+    detail: "LazyVStack · List · Table · TabView",
+    anchor: "collections",
+  },
+  {
+    title: "Meet the input device",
+    copy: "Focus-scoped commands for a keyboard. Visible controls and scroll panning for touch. Open styles keep a control's behavior attached to its presentation.",
+    detail: "onMoveCommand · ButtonStyle · FocusState",
+    anchor: "interaction",
+  },
 ];
 ---
 
-<section class="capabilities" aria-labelledby="capabilities-title">
-  <div class="shell">
-    <header>
-      <p class="home-kicker">What you can build</p>
-      <h2 id="capabilities-title">Beyond a screen of text.</h2>
-      <p>Build an editor, a live dashboard, or a workspace with the same views, state, and layout model.</p>
-    </header>
-    <div class="capability-grid">
-      {features.map((feature) => (
-        <a href={`${base}/capabilities/#${feature.anchor}`}>
-          <h3>{feature.title}</h3>
-          <p>{feature.copy}</p>
-          <span class="mono">{feature.detail}</span>
-        </a>
-      ))}
-    </div>
-    <a class="home-button" href={`${base}/capabilities/`}>Explore the building blocks</a>
+<Section id="capabilities" aria-labelledby="capabilities-title">
+  <SectionHead id="capabilities-title" eyebrow="What you can build" align="center">
+    <Fragment slot="title">Beyond a screen of text.</Fragment>
+    Build an editor, a live dashboard, or a workspace with the same views,
+    state and layout model.
+  </SectionHead>
+
+  <div class="card-grid card-grid--two capability-grid">
+    {
+      features.map((feature) => (
+        <FeatureCard title={feature.title} href={`${base}/capabilities/#${feature.anchor}`}>
+          {feature.copy}
+          <span slot="meta" class="capability-sym mono">
+            {feature.detail}
+          </span>
+        </FeatureCard>
+      ))
+    }
   </div>
-</section>
+
+  <div class="button-row capability-more">
+    <Button href={`${base}/capabilities/`} variant="secondary" trailingIcon="chevronRight">
+      Explore the building blocks
+    </Button>
+  </div>
+</Section>
 
 <style>
-  .capabilities { padding: clamp(56px, 7vw, 100px) 0; border-top: 1px solid var(--home-ink); }
-  header { display: grid; gap: 18px; max-width: 820px; margin-bottom: 36px; }
-  h2 { font-size: clamp(40px, 5.8vw, 72px); font-weight: 520; line-height: 1; letter-spacing: -0.05em; text-wrap: balance; }
-  header > p:last-child { max-width: 62ch; color: var(--home-muted); font-size: 17px; line-height: 1.6; }
-  .capability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--home-line-strong); border-left: 1px solid var(--home-line-strong); margin-bottom: 28px; }
-  .capability-grid a { display: grid; gap: 14px; padding: 26px; min-width: 0; border-right: 1px solid var(--home-line-strong); border-bottom: 1px solid var(--home-line-strong); }
-  .capability-grid a:hover { background: var(--home-paper-soft); }
-  h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.025em; }
-  .capability-grid p { color: var(--home-muted); font-size: 15px; line-height: 1.6; }
-  .capability-grid span { color: var(--home-accent-ink); font-size: 12px; overflow-wrap: anywhere; }
-  @media (max-width: 620px) { .capability-grid { grid-template-columns: 1fr; } .capability-grid a { padding: 22px 18px; } }
+  .capability-grid {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  .capability-sym {
+    display: block;
+    margin-top: var(--space-3);
+    color: var(--text-accent);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    overflow-wrap: anywhere;
+  }
+
+  .capability-more {
+    justify-content: center;
+    margin-top: var(--space-6);
+  }
 </style>
