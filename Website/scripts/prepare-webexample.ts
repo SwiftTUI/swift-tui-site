@@ -9,7 +9,7 @@ const defaultCounterDemoRoot = resolve(siteRoot, ".build/public-inputs/swift-tui
 const counterDemoRepository = "https://github.com/SwiftTUI/swift-tui-counter-demo.git";
 
 const webExampleOverride = process.env.WEBEXAMPLE_DIR;
-const counterDemoRef = process.env.SWIFTTUI_COUNTER_DEMO_REF ?? await readCounterDemoRef();
+const counterDemoRef = process.env.SWIFTTUI_COUNTER_DEMO_REF || await readCounterDemoRef();
 
 if (webExampleOverride) {
   const webExampleDir = resolve(process.cwd(), webExampleOverride);

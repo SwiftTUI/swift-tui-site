@@ -54,8 +54,10 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current organization release (`0.14.0`) in lockstep. Update them only
-as part of an organization release.
+track the current package release (`0.14.0`). The `current.counterDemoRef`
+source tag is selected separately so a demo packaging repair can ship without
+republishing the framework. Local builds and deployments use that pin by
+default; the optional `counter_demo_ref` workflow input overrides it.
 
 The public documentation describes current source. Website deployment defaults
 its `docs_ref` input to `main` for the framework, Charts, and TerminalView; the

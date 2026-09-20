@@ -56,7 +56,7 @@ test("plain WebExample overrides keep frozen lockfile installs", async () => {
   expect(log).toContain("args=install --frozen-lockfile");
 });
 
-test("cache-restored default input directory is recloned instead of treated as the parent site checkout", async () => {
+test.each([undefined, "", "1.2.3+site.1"])("default checkout is recloned and frozen with ref override %j", async (refOverride) => {
   const root = await realpath(
     await mkdtemp(join(tmpdir(), "prepare-webexample-default-")),
   );
@@ -102,14 +102,17 @@ printf 'bun cwd=%s args=%s\\n' "$PWD" "$*" >> "$FAKE_COMMAND_LOG"
     env: {
       PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
       FAKE_COMMAND_LOG: logPath,
-      SWIFTTUI_COUNTER_DEMO_REF: "0.14.0",
+      ...(refOverride === undefined ? {} : { SWIFTTUI_COUNTER_DEMO_REF: refOverride }),
     },
   });
 
   expect(result.exitCode).toBe(0);
   const log = await readFile(logPath, "utf8");
+  const releases = await readFile(join(siteRoot, "docs/releases.yml"), "utf8");
+  const selectedRef = refOverride || releases.match(/^\s*counterDemoRef:\s*(\S+)\s*$/m)?.[1];
+  expect(selectedRef).toBeDefined();
   expect(log).toContain(
-    "git clone --depth 1 --branch 0.14.0 https://github.com/SwiftTUI/swift-tui-counter-demo.git",
+    `git clone --depth 1 --branch ${selectedRef} https://github.com/SwiftTUI/swift-tui-counter-demo.git`,
   );
   expect(log).not.toContain(`git -C ${defaultCounterDemoRoot} fetch`);
   expect(log).toContain(

@@ -4,7 +4,7 @@ current:
   terminalView: 0.14.0
   web: 0.14.0
   examplesRef: 0.14.0
-  counterDemoRef: 0.14.0
+  counterDemoRef: 0.14.0+site.1
 repos:
   swift-tui:
     url: https://github.com/SwiftTUI/swift-tui

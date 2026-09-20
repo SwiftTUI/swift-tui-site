@@ -18,9 +18,8 @@ on:
   workflow_dispatch:
     inputs:
       counter_demo_ref:
-        description: Public swift-tui-counter-demo branch or tag to build
-        required: true
-        default: "0.14.0"
+        description: Counter-demo ref override (blank uses docs/releases.yml)
+        required: false
         type: string
       docs_ref:
         description: Public branch or tag to document across framework, Charts, and TerminalView
@@ -188,7 +187,7 @@ jobs:
             swift-tui-site/Website/node_modules
             swift-tui-site/.build/public-inputs/swift-tui-counter-demo/node_modules
             swift-tui-site/.build/public-inputs/swift-tui-counter-demo/WebExample/node_modules
-          key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}
+          key: ${{ runner.os }}-bun-cfpages-${{ hashFiles('swift-tui-site/Website/bun.lock', 'swift-tui-site/docs/releases.yml') }}-${{ inputs.counter_demo_ref }}
           restore-keys: |
             ${{ runner.os }}-bun-cfpages-
             ${{ runner.os }}-bun-site-
