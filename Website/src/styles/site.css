@@ -230,7 +230,7 @@ h1,
 
 h2,
 .h2 {
-  font-size: 25.6px;
+  font-size: var(--section-title-size);
   line-height: 1.25;
   font-weight: var(--h2-weight);
   letter-spacing: 0;

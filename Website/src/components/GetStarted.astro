@@ -1,142 +1,31 @@
 ---
+import Button from "./Button.astro";
+import CodeSnippet from "./CodeSnippet.astro";
 import Section from "./Section.astro";
 import SectionHead from "./SectionHead.astro";
-
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const demoRepo = "https://github.com/SwiftTUI/swift-tui-counter-demo";
+const commands = `git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
+cd swift-tui-counter-demo
+swift run --package-path counter counter`;
 ---
 
-<Section id="get-started" aria-labelledby="start-title">
-  <SectionHead id="start-title" eyebrow="Get started">
-    <Fragment slot="title">A terminal and a toolchain.</Fragment>
-    SwiftTUI apps are plain SwiftPM packages. Any Swift 6.4 toolchain builds
-    and runs them from the command line on macOS, Linux or Windows: no Xcode
-    project, no simulator, no app store.
-  </SectionHead>
-
-  <div class="start-grid">
-    <article class="swifttui-card swifttui-card--static start-run" aria-labelledby="start-run-title">
-      <header class="pane-head">
-        <div>
-          <strong id="start-run-title">Run the counter</strong>
-          <span>swift-tui-counter-demo</span>
-        </div>
-        <a class="link" href={demoRepo} rel="noreferrer noopener">Open repo</a>
-      </header>
-      <pre tabindex="0"><code><span class="cm"># macOS, Linux, or Windows: any Swift 6.4 toolchain</span>
-git clone https://github.com/SwiftTUI/swift-tui-counter-demo.git
-cd swift-tui-counter-demo
-swift run --package-path counter counter</code></pre>
-      <p class="caption start-note">
-        The counter from the demo above, drawn in your own terminal.{" "}
-        <kbd class="swifttui-kbd">Space</kbd> or a click increments;{" "}
-        <kbd class="swifttui-kbd">Ctrl-C</kbd> quits and restores your shell.
-      </p>
-    </article>
-
-    <div class="start-side">
-      <article class="swifttui-card swifttui-card--static" aria-labelledby="start-toolchain-title">
-        <div class="swifttui-card__body">
-          <h3 class="swifttui-card__title" id="start-toolchain-title">Pick a toolchain</h3>
-          <p class="swifttui-card__desc prose">
-            <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a>{" "}
-            on macOS and Linux, a current Xcode on a Mac, or the{" "}
-            <a href="https://www.swift.org/install/windows/" rel="noreferrer noopener">
-              swift.org installer</a> on Windows.
-          </p>
-        </div>
-      </article>
-
-      <article class="swifttui-card swifttui-card--static" aria-labelledby="start-package-title">
-        <div class="swifttui-card__body">
-          <h3 class="swifttui-card__title" id="start-package-title">Start your own app</h3>
-          <pre class="start-package" tabindex="0"><code><span class="cm">// Package.swift</span>
-.package(
-  url: <span class="str">"https://github.com/SwiftTUI/swift-tui"</span>,
-  .upToNextMinor(from: <span class="str">"0.14.0"</span>)
-),
-<span class="cm">// in your executable target:</span>
-.product(name: <span class="str">"SwiftTUI"</span>, package: <span class="str">"swift-tui"</span>)</code></pre>
-          <p class="swifttui-card__desc prose">
-            Paste the counter above into <code>main.swift</code> and{" "}
-            <code>swift run</code>. Then the{" "}
-            <a href={`${base}/guides/#first-hour`}>first-hour guides</a>.
-          </p>
-        </div>
-      </article>
+<Section id="get-started" class="get-started" aria-labelledby="start-title">
+  <div class="quick-start-grid">
+    <div>
+      <SectionHead id="start-title" eyebrow="03 / Get started">
+        <Fragment slot="title">Your terminal. Your first app.</Fragment>
+        Run the same counter locally with Swift 6.4 on macOS, Linux, or Windows.
+      </SectionHead>
+      <a class="link" href={`${base}/guides/#toolchain`}>Need a Swift toolchain? <span aria-hidden="true">→</span></a>
+    </div>
+    <div>
+      <CodeSnippet id="run-counter" label="Run the counter" lang="bash" code={commands} />
+      <p class="quick-start-note"><kbd class="swifttui-kbd">Space</kbd> or a click increments.
+        <kbd class="swifttui-kbd">Ctrl-C</kbd> restores your shell.</p>
     </div>
   </div>
+  <div class="section-tail">
+    <span>Ready to make it your own?</span>
+    <Button href={`${base}/guides/#first-hour`} variant="secondary" trailingIcon="chevronRight">Build your first app</Button>
+  </div>
 </Section>
-
-<style>
-  .start-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-    gap: var(--space-4);
-    align-items: start;
-  }
-
-  .start-run {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-  }
-
-  .pane-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    min-height: var(--space-12);
-    padding: var(--space-2) var(--space-4);
-    border-bottom: var(--border-width) solid var(--border-default);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .pane-head > div {
-    display: grid;
-  }
-
-  .pane-head strong {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    font-size: 15px;
-  }
-
-  .pane-head span {
-    color: var(--text-muted);
-    font-size: 12px;
-    font-family: var(--font-mono);
-  }
-
-  .start-run pre {
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    padding: var(--space-4);
-    font-size: clamp(11px, 0.95vw, 12.5px);
-    line-height: 1.75;
-  }
-
-  .start-note {
-    padding: var(--space-3) var(--space-4) var(--space-4);
-    border-top: var(--border-width) solid var(--border-default);
-  }
-
-  .start-side {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  .start-package {
-    margin: var(--space-3) 0;
-    padding: var(--space-3);
-    font-size: 12px;
-  }
-
-  @media (max-width: 899px) {
-    .start-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

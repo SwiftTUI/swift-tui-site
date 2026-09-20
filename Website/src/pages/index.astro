@@ -3,9 +3,9 @@ import Site from "../layouts/Site.astro";
 import Hero from "../components/Hero.astro";
 import GetStarted from "../components/GetStarted.astro";
 import WhySwiftTUI from "../components/WhySwiftTUI.astro";
-import Capabilities from "../components/Capabilities.astro";
 import Proof from "../components/Proof.astro";
 import Next from "../components/Next.astro";
+import "../styles/home.css";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = (import.meta.env.SITE ?? "https://swifttui.sh").replace(/\/$/, "");
@@ -61,9 +61,8 @@ const softwareSourceCodeJsonLd = {
     set:html={JSON.stringify(softwareSourceCodeJsonLd)}
   />
   <Hero />
-  <GetStarted />
-  <WhySwiftTUI />
-  <Capabilities />
   <Proof />
+  <WhySwiftTUI />
+  <GetStarted />
   <Next />
 </Site>

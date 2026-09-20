@@ -211,6 +211,16 @@
   --border-width: 1px; /* Every rail, border and divider: the light box-drawing stroke (─ │), Geist Mono's 0.084em at 13.33px snapped to the pixel. */
   --border-double-width: 3px; /* A double rule (═ ║): stroke, gap, stroke at 1:1:1, which is exactly how `border-style: double` paints 3px. */
   --header-height: 57px; /* Sticky header height. */
+  --control-height: 44px; /* Minimum height for site actions and touch targets. */
+  --home-hero-size: clamp(2rem, 4vw, 3rem);
+  --section-title-size: clamp(1.6rem, 2.4vw, 2rem);
+  --feature-title-size: 1.5rem;
+  --card-title-size: 1.125rem;
+  --body-copy-size: 0.9375rem;
+  --code-size: 0.8125rem;
+  --meta-size: 0.75rem;
+  --demo-canvas-height: 240px;
+  --source-max-height: 30rem;
   --focus-outline-width: 3px; /* focus-visible outline width. */
   --focus-outline-offset: 2px; /* focus-visible outline offset. */
   --font-writer: "iA Writer Quattro S", ui-monospace, SFMono-Regular, Menlo, monospace;

@@ -1,8 +1,10 @@
 ---
 import Site from "../layouts/Site.astro";
+import CodeSnippet from "../components/CodeSnippet.astro";
 import Button from "../components/Button.astro";
 import Section from "../components/Section.astro";
 import SectionHead from "../components/SectionHead.astro";
+import pkg from "../../package.json";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const title = "SwiftTUI documentation";
@@ -16,12 +18,10 @@ const docs = `${base}/docs/documentation`;
 const charts = `${base}/docs/charts/documentation/swifttuicharts`;
 const terminalView = `${base}/docs/terminal-view/documentation/swifttuiterminalview`;
 
-// The first hour, in reading order: the page-one sequence a new user should
-// not have to guess. "Add it to your app" lands on the home page's Get started
-// block, which sits directly under the counter's source.
+// The first hour starts with the toolchain and package setup on this page.
 const firstHour = [
   {
-    href: `${base}/#get-started`,
+    href: `${base}/guides/#toolchain`,
     title: "Add it to your app",
     copy: "Pick a toolchain, add the package, paste the counter, swift run.",
   },
@@ -46,6 +46,28 @@ const firstHour = [
     copy: "What transfers unchanged, which reflexes need retraining, and what is not here yet.",
   },
 ];
+
+const packageSource = `// swift-tools-version: 6.4
+import PackageDescription
+
+let package = Package(
+  name: "MyTerminalApp",
+  platforms: [.macOS(.v15)],
+  dependencies: [
+    .package(
+      url: "https://github.com/SwiftTUI/swift-tui",
+      .upToNextMinor(from: "${pkg.version}")
+    ),
+  ],
+  targets: [
+    .executableTarget(
+      name: "MyTerminalApp",
+      dependencies: [
+        .product(name: "SwiftTUI", package: "swift-tui"),
+      ]
+    ),
+  ]
+)`;
 
 const buildGuides = [
   {
@@ -348,6 +370,26 @@ const hostModules = [
     </ol>
   </Section>
 
+  <Section id="toolchain" aria-labelledby="toolchain-title">
+    <SectionHead id="toolchain-title" eyebrow="Setup / Swift 6.4">
+      <Fragment slot="title">A toolchain and an executable package.</Fragment>
+      You can build from the command line on macOS, Linux, or Windows. Choose a Swift 6.4 toolchain before you begin.
+    </SectionHead>
+    <div class="toolchain-grid prose">
+      <div><h3>macOS or Linux</h3><p>Install Swift with <a href="https://www.swift.org/swiftly/" rel="noreferrer noopener">swiftly</a>. On macOS, an Xcode installation with Swift 6.4 also works.</p></div>
+      <div><h3>Windows</h3><p>Follow the <a href="https://www.swift.org/install/windows/" rel="noreferrer noopener">Swift installation guide</a> for the toolchain and its required build tools.</p></div>
+    </div>
+    <ol class="setup-steps prose">
+      <li>Run <code>swift --version</code> to check your active toolchain.</li>
+      <li>In a new <code>MyTerminalApp</code> directory, run <code>swift package init --type executable</code>.</li>
+      <li>Replace <code>Package.swift</code> with the manifest below.</li>
+      <li>Replace the generated executable source with the <a href={`${base}/#demo`}>complete counter example</a>. Save it as <code>Sources/MyTerminalApp/CounterApp.swift</code> and remove the generated entry-point file, so only the counter’s <code>@main</code> remains.</li>
+      <li>Run <code>swift run</code>. Your app is ready for the next guide.</li>
+    </ol>
+    <CodeSnippet id="starter-package" label="Package.swift" code={packageSource} />
+    <p class="setup-next prose">Then read <a href={`${docs}/swifttuiviews/authoring-views`}>Authoring Views</a>, or <a href={`${base}/#get-started`}>run the maintained counter directly</a>.</p>
+  </Section>
+
   <Section id="build" aria-labelledby="build-title">
     <SectionHead id="build-title">
       <Fragment slot="title">Build your interface</Fragment>
@@ -501,6 +543,11 @@ const hostModules = [
 </Site>
 
 <style>
+  .toolchain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+  .toolchain-grid h3 { font-size: var(--card-title-size); margin-bottom: var(--space-2); }
+  .setup-steps { margin-block: var(--space-6); padding-left: var(--space-6); display: grid; gap: var(--space-3); }
+  .setup-next { margin-top: var(--space-4); }
+  @media (max-width: 639px) { .toolchain-grid { grid-template-columns: minmax(0, 1fr); } }
   .step-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

@@ -3,6 +3,7 @@
 // description. The whole card is the link; the "Learn more →" bar slides up
 // over the media on hover or focus.
 interface Props {
+  id?: string;
   title: string;
   href?: string;
   external?: boolean;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const {
+  id,
   title,
   href,
   external = false,
@@ -27,6 +29,7 @@ const linkAttrs = href ? { href, rel: external ? "noreferrer noopener" : undefin
 ---
 
 <Tag
+  id={id}
   class:list={[
     "swifttui-card",
     compact && "swifttui-card--ext",

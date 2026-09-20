@@ -7,15 +7,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const home = `${base}/`;
 const repo = "https://github.com/SwiftTUI/swift-tui";
 
-// The primary row, in reading order: try it, understand it, browse it,
-// migrate to it, read the reference. Six items; GitHub joins the list only
-// inside the collapsed panel, where the icon button is hidden.
+// The primary row keeps demo, product, examples, docs, and source close.
+// The SwiftUI migration guide remains in the reading paths and footer.
 const links = [
   { href: `${home}#demo`, label: "Demo" },
   { href: `${home}#why`, label: "Why SwiftTUI" },
   { href: `${base}/capabilities/`, label: "Features" },
   { href: `${base}/showcase/`, label: "Showcase" },
-  { href: `${base}/differences-from-swiftui/`, label: "From SwiftUI" },
   { href: `${base}/guides/`, label: "Docs" },
 ];
 ---
@@ -120,7 +118,8 @@ const links = [
 
   .theme-toggle,
   .site-github {
-    width: var(--space-8);
+    width: var(--control-height);
+    height: var(--control-height);
     padding: 0;
     justify-content: center;
   }
@@ -131,7 +130,8 @@ const links = [
 
   .nav-toggle {
     display: none;
-    width: var(--space-8);
+    width: var(--control-height);
+    height: var(--control-height);
     padding: 0;
     justify-content: center;
   }
@@ -234,11 +234,6 @@ const links = [
     }
   }
 
-  @media (max-width: 479px) {
-    .swifttui-nav__wordmark {
-      display: none;
-    }
-  }
 
   @media (prefers-reduced-motion: reduce) {
     :root[data-nav-enhanced="true"] .site-nav,

@@ -1,0 +1,145 @@
+---
+import Site from "../layouts/Site.astro";
+import Section from "../components/Section.astro";
+import SectionHead from "../components/SectionHead.astro";
+import Button from "../components/Button.astro";
+import pkg from "../../package.json";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const frameworks = [
+  {
+    id: "swifttui", name: "SwiftTUI", language: "Swift",
+    fit: "A fit for apps that benefit from SwiftUI-style view composition, tracked state, and shared views across hosts.",
+    details: [
+      ["UI model", "Declarative views, state and observation; the runtime owns layout and redraw."],
+      ["Terminal platforms", "macOS 15+, Linux, and Windows 10 1809+ / Server 2019+. Swift 6.4 toolchain."],
+      ["Input", "Focus traversal, keyboard commands, and tap, drag, and hover gestures. Terminal mouse support is negotiated."],
+      ["Motion", "Built-in state animation, withAnimation, and phase animation. Terminal rendering remains cell-based."],
+      ["Browser", "Compile with SwiftTUIWASI and serve a static bundle with @swifttui/web. The browser runs the app."],
+      ["Native apps", "SwiftUIHost embeds views in macOS and iOS. Android arm64 is a preview with documented limitations."],
+    ],
+    sources: [
+      { name: `SwiftTUI ${pkg.version}`, href: `https://github.com/SwiftTUI/swift-tui/tree/${pkg.version}` },
+      { name: "Hosts and platforms", href: `${base}/docs/documentation/swifttuiruntime/hosts-and-platforms` },
+      { name: "Android preview", href: "https://github.com/SwiftTUI/swift-tui-android" },
+    ],
+  },
+  {
+    id: "bubble-tea", name: "Bubble Tea", language: "Go",
+    fit: "A fit for Go applications organized around messages, an update function, and a view of the model.",
+    details: [
+      ["UI model", "The Elm Architecture: a model, Update for incoming messages, and View for output. Bubble Tea handles redraw."],
+      ["Terminal platforms", "Cross-platform terminal applications; check the project’s platform-specific implementation and your target terminal."],
+      ["Input", "Keyboard and mouse messages. Bubbles supplies reusable controls; gesture behavior can be composed by the application."],
+      ["Motion", "Timed updates in the app; the companion Harmonica package supplies spring animation."],
+      ["Browser", "The linked core documentation describes a terminal renderer, not a bundled static browser host."],
+      ["Native apps", "No SwiftUI-style native embedding host is documented in the linked core sources. Integration requires additional work."],
+    ],
+    sources: [
+      { name: "Bubble Tea model and input", href: "https://github.com/charmbracelet/bubbletea" },
+      { name: "Bubbles controls", href: "https://github.com/charmbracelet/bubbles" },
+      { name: "Harmonica", href: "https://github.com/charmbracelet/harmonica" },
+    ],
+  },
+  {
+    id: "textual", name: "Textual", language: "Python",
+    fit: "A fit for Python applications with a widget tree, CSS layout and styling, and reactive properties.",
+    details: [
+      ["UI model", "Composed widgets, reactive attributes, events, and CSS for layout and presentation."],
+      ["Terminal platforms", "Linux, macOS, and Windows, using a supported Python environment."],
+      ["Input", "Keyboard focus, bindings, and mouse events including movement and clicks."],
+      ["Motion", "Built-in animation of numeric values, colors, and styles, with easing."],
+      ["Browser", "textual-serve runs the Python application on a server and connects a browser over WebSockets. It is not a static WASM bundle."],
+      ["Native apps", "The linked project documents terminal and browser delivery; a native app wrapper is a separate integration."],
+    ],
+    sources: [
+      { name: "Textual documentation", href: "https://textual.textualize.io/" },
+      { name: "Animation", href: "https://textual.textualize.io/guide/animation/" },
+      { name: "textual-serve", href: "https://github.com/Textualize/textual-serve" },
+    ],
+  },
+  {
+    id: "ratatui", name: "Ratatui", language: "Rust",
+    fit: "A fit for Rust applications that want direct control over rendering, state management, and event handling.",
+    details: [
+      ["UI model", "Immediate-mode rendering with widgets and constraint-based layout. The application chooses its state and event architecture."],
+      ["Terminal platforms", "Platform support depends on the chosen terminal backend; Crossterm is the common cross-platform choice."],
+      ["Input", "Events come from the backend or an input library. The app routes them to its state and controls."],
+      ["Motion", "Application-driven frame updates; the companion tachyonfx crate provides effects and animation."],
+      ["Browser", "The separate Ratzilla project provides web backends for Rust/WASM applications built with Ratatui."],
+      ["Native apps", "Alternate backends and embedding are possible; native integration is not the same contract as SwiftUIHost."],
+    ],
+    sources: [
+      { name: "Ratatui", href: "https://ratatui.rs/" },
+      { name: "Backends and events", href: "https://ratatui.rs/concepts/backends/" },
+      { name: "tachyonfx", href: "https://github.com/ratatui/tachyonfx" },
+      { name: "Ratzilla", href: "https://github.com/ratatui/ratzilla" },
+    ],
+  },
+  {
+    id: "ink", name: "Ink", language: "JavaScript / TypeScript",
+    fit: "A fit for command-line tools that use React components, hooks, and the Node.js ecosystem.",
+    details: [
+      ["UI model", "A React renderer for terminal output, with Yoga-based flexbox layout."],
+      ["Terminal platforms", "Runs in Node.js. Verify the supported Node version and terminal behavior for your deployment targets."],
+      ["Input", "Keyboard input and focus hooks. Mouse gestures are not presented as a core API in the linked documentation."],
+      ["Motion", "useAnimation provides a shared timer, frame count, elapsed time, and delta. The application defines interpolation or frame content."],
+      ["Browser", "React familiarity does not make the Ink renderer a browser renderer; no static browser host is documented in the core README."],
+      ["Native apps", "Ink targets terminal output. React Native is a different renderer and is not an Ink embedding host."],
+    ],
+    sources: [{ name: "Ink API and requirements", href: "https://github.com/vadimdemedes/ink" }],
+  },
+];
+---
+
+<Site title="Compare terminal UI frameworks · SwiftTUI" description="Compare SwiftTUI, Bubble Tea, Textual, Ratatui, and Ink by programming model, input, animation, and deployment, with links to primary sources." path="/compare/">
+  <Section aria-labelledby="compare-title">
+    <SectionHead id="compare-title" level={1} eyebrow="Choosing a TUI framework">
+      <Fragment slot="title">Choose the model you want to build with.</Fragment>
+      Language, state ownership, and deployment shape a project more than a row of checkmarks. Here is how five frameworks approach them.
+    </SectionHead>
+    <p class="caption review-date">Sources reviewed <time datetime="2026-09-20">20 September 2026</time>.
+      SwiftTUI examples use {pkg.version}; other entries describe the linked project documentation at review time.</p>
+    <nav class="compare-nav" aria-label="Frameworks">
+      {frameworks.map((framework) => <a class="swifttui-btn swifttui-btn--secondary" href={`#${framework.id}`}>{framework.name}</a>)}
+    </nav>
+  </Section>
+  {frameworks.map((framework) => (
+    <Section id={framework.id} aria-labelledby={`${framework.id}-title`}>
+      <SectionHead id={`${framework.id}-title`} eyebrow={framework.language}>
+        <Fragment slot="title">{framework.name}</Fragment>
+        {framework.fit}
+      </SectionHead>
+      <dl class="comparison-details">
+        {framework.details.map(([label, detail]) => <div><dt>{label}</dt><dd>{detail}</dd></div>)}
+      </dl>
+      <div class="comparison-sources"><span>Primary sources</span>
+        {framework.sources.map((source) => <a class="link" href={source.href} rel={source.href.startsWith("https:") ? "noreferrer noopener" : undefined}>{source.name}</a>)}
+      </div>
+    </Section>
+  ))}
+  <Section aria-labelledby="comparison-notes">
+    <SectionHead id="comparison-notes" eyebrow="Reading the comparison">
+      <Fragment slot="title">Built-in, companion, and custom are different choices.</Fragment>
+      A companion package can be the right tool. A capability not documented in the linked core sources may still be available elsewhere in its ecosystem.
+    </SectionHead>
+    <p class="prose">Browser hosting also has different meanings: serving a process over a connection and running a static WebAssembly bundle have different deployment requirements. Platform support does not imply identical behavior in every terminal. Check the linked requirements against your application.</p>
+    <div class="button-row comparison-actions">
+      <Button href={`${base}/#get-started`} variant="primary" icon="terminal">Try SwiftTUI</Button>
+      <Button href={`${base}/differences-from-swiftui/`} variant="secondary">Coming from SwiftUI</Button>
+    </div>
+  </Section>
+</Site>
+
+<style>
+  .review-date { max-width: 72ch; }
+  .compare-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-6); }
+  .comparison-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-8); }
+  .comparison-details > div { border-top: var(--border-width) solid var(--border-default); padding-top: var(--space-3); }
+  .comparison-details dt { color: var(--text-accent); font-family: var(--font-mono); font-size: var(--meta-size); margin-bottom: var(--space-2); }
+  .comparison-details dd { margin: 0; font-size: var(--body-copy-size); }
+  .comparison-sources { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-4); margin-top: var(--space-6); font-size: var(--code-size); }
+  .comparison-sources > span { color: var(--text-muted); }
+  .comparison-actions { margin-top: var(--space-6); }
+  @media (max-width: 639px) { .comparison-details { grid-template-columns: minmax(0, 1fr); } }
+</style>

@@ -178,6 +178,7 @@ const tiles: Tile[] = [
       {
         tiles.map((tile) => (
           <FeatureCard
+            id={tile.slug}
             title={tile.title}
             href={tile.repo}
             external

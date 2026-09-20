@@ -25,7 +25,7 @@ const { id = "demo-terminal" } = Astro.props;
   <header class="demo-head">
     <div>
       <strong>Live demo</strong>
-      <span>The counter, compiled to WebAssembly</span>
+      <span>A real SwiftTUI app in your browser</span>
     </div>
     <a href={webExampleHref}>Open separately</a>
   </header>
@@ -85,9 +85,7 @@ const { id = "demo-terminal" } = Astro.props;
   }
 
   <footer class="demo-foot">
-    <span>Real SwiftTUI view</span>
-    <span>Static WASI bundle</span>
-    <span>Canvas with a semantic accessibility tree</span>
+    <span>Click <strong>Increment</strong>, or focus the demo and press <kbd>Space</kbd>.</span>
   </footer>
 </section>
 
@@ -228,7 +226,7 @@ const { id = "demo-terminal" } = Astro.props;
   swift-tui-demo {
     position: relative;
     display: block;
-    min-height: 350px;
+    min-height: var(--demo-canvas-height);
     overflow: hidden;
     background: var(--color-offgray-1000);
   }
@@ -304,7 +302,7 @@ const { id = "demo-terminal" } = Astro.props;
     align-content: center;
     justify-items: start;
     gap: var(--space-3);
-    min-height: 350px;
+    min-height: var(--demo-canvas-height);
     padding: var(--space-6);
   }
 
@@ -342,17 +340,19 @@ const { id = "demo-terminal" } = Astro.props;
     gap: var(--space-1-5) var(--space-4);
     padding: var(--space-2) var(--space-4);
     border-top: var(--border-width) solid var(--color-offgray-900);
-    color: var(--color-offgray-400);
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-size: var(--meta-size);
+    color: var(--color-offgray-300);
+    min-height: var(--control-height);
+    align-items: center;
   }
+
+  .demo-foot strong { color: inherit; }
 
   @media (max-width: 599px) {
     swift-tui-demo,
     .demo-fallback {
-      min-height: 300px;
+      min-height: var(--demo-canvas-height);
     }
 
     .demo-foot {

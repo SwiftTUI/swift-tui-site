@@ -1,86 +1,37 @@
 ---
 import Button from "./Button.astro";
-import FeatureCard from "./FeatureCard.astro";
 import Section from "./Section.astro";
 import SectionHead from "./SectionHead.astro";
-
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Four flagship terminal apps, the same 2×2 the swift-tui README carries:
-// two interaction-heavy (gifeditor, terminal-workspace), two data-heavy
-// (csvui, mrkdwn). The full roster lives on /showcase/. Each caption
-// describes what its screenshot actually shows.
-const items = [
-  {
-    slug: "gifeditor",
-    title: "GIF Editor",
-    body: "Canvas, layers, a scrubbable timeline, pointer tools, undo, export.",
-    alt: "SwiftTUI GIF Editor with canvas, layers, tools, and a timeline",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/gifeditor",
-  },
-  {
-    slug: "csvui",
-    title: "csvui",
-    body: "A 34,000-row table browsed and edited in place.",
-    alt: "csvui displaying a large tab-separated table of world cities",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/csvui",
-  },
-  {
-    slug: "terminal-workspace",
-    title: "Terminal Workspace",
-    body: "Tabs, splits, and a command palette over embedded terminals.",
-    alt: "Terminal Workspace showing tabs and split panes of live shells",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/terminal-workspace",
-  },
-  {
-    slug: "mrkdwn",
-    title: "mrkdwn",
-    body: "A responsive Markdown reader, shown reading the SwiftTUI README.",
-    alt: "mrkdwn rendering the SwiftTUI README as a navigable document",
-    repo: "https://github.com/SwiftTUI/swift-tui-examples/tree/main/mrkdwn",
-  },
+const examples = [
+  { slug: "gifeditor", title: "A canvas. A timeline. A terminal.", name: "GIF Editor", copy: "Paint frames, compose layers, scrub the timeline, and undo your edits.", alt: "GIF Editor with a pixel-art canvas, layer controls and frame timeline", detail: "Drawing · pointer input · animation" },
+  { slug: "terminal-workspace", title: "Build a workspace", name: "Terminal Workspace", copy: "Tabs and split panes around live shells, with a command palette to move between them.", alt: "Terminal Workspace showing tabs and multiple live shell panes", detail: "Tabs · focus · embedded terminals" },
+  { slug: "csvui", title: "Work with real data", name: "csvui", copy: "Browse and edit a 34,000-row table, with search, filtering, and sorting.", alt: "csvui displaying rows of a world cities dataset", detail: "Tables · selection · scrolling" },
 ];
 ---
-
-<Section id="proof" aria-labelledby="proof-title">
-  <SectionHead id="proof-title" eyebrow="Showcase" align="center">
-    <Fragment slot="title">Built with SwiftTUI.</Fragment>
-    The counter above fits on one screen. These do not. All four are maintained
-    examples in <code>swift-tui-examples</code>: clone the repo and each one
-    builds and runs with one command.
+<Section id="proof" class="proof" aria-labelledby="proof-title">
+  <SectionHead id="proof-title" eyebrow="01 / Built with SwiftTUI">
+    <Fragment slot="title">Small beginnings. Whole applications.</Fragment>
+    These are maintained example apps. Explore the source, clone a repo, and run them yourself.
   </SectionHead>
-
-  <div class="card-grid card-grid--two proof-grid">
-    {
-      items.map((item) => (
-        <FeatureCard
-          title={item.title}
-          href={item.repo}
-          external
-          cta="View source"
-          media={{ src: `${base}/showcase/${item.slug}.png`, alt: item.alt, width: 1600, height: 1000 }}
-        >
-          {item.body}
-        </FeatureCard>
-      ))
-    }
+  <div class="showcase-grid">
+    {examples.map((item, index) => (
+      <article class:list={["showcase-example", index === 0 && "showcase-example--lead"]}>
+        <a class="example-image" href={`${base}/showcase/#${item.slug}`} aria-label={`Explore ${item.name}`}>
+          <img src={`${base}/showcase/${item.slug}.png`} alt={item.alt} width="1600" height="1000" loading="lazy" decoding="async" />
+        </a>
+        <div class="example-copy">
+          <p class="pane-label">{item.name}</p>
+          <h3>{item.title}</h3>
+          <p>{item.copy}</p>
+          <p class="example-detail">{item.detail}</p>
+          <a class="link example-source" href={`https://github.com/SwiftTUI/swift-tui-examples/tree/main/${item.slug}`} rel="noreferrer noopener">View source <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+    ))}
   </div>
-
-  <div class="button-row proof-more">
-    <Button href={`${base}/showcase/`} variant="secondary" trailingIcon="chevronRight">
-      Browse every example
-    </Button>
+  <div class="section-tail">
+    <span>Editors, dashboards, file browsers, and more.</span>
+    <Button href={`${base}/showcase/`} variant="secondary" trailingIcon="chevronRight">Browse every example</Button>
   </div>
 </Section>
-
-<style>
-  .proof-grid {
-    max-width: 920px;
-    margin: 0 auto;
-  }
-
-  .proof-more {
-    justify-content: center;
-    margin-top: var(--space-6);
-  }
-</style>

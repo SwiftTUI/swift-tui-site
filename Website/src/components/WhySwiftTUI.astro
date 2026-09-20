@@ -1,260 +1,70 @@
 ---
-import FeatureCard from "./FeatureCard.astro";
 import Section from "./Section.astro";
 import SectionHead from "./SectionHead.astro";
-
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Audience: people choosing a TUI framework, in any language. The pitch is
-// the shape of the declarative model itself, never "you already know
-// SwiftUI". Four cards, each one concrete claim; the same four anchor the
-// swift-tui README and the org profile.
-const cards = [
-  {
-    title: "State in, screen out",
-    body:
-      "Change tracked state and the runtime updates the views that depend on it, validates retained work, and emits changed terminal cells. No app-owned draw loop or repaint bookkeeping.",
-    sym: "View · @State · @Observable · body",
-  },
-  {
-    title: "Real components, real focus",
-    body:
-      "Buttons, text fields, pickers, sliders, lists, tables and scroll views, with focus traversal, keyboard chords, tap, drag and hover gestures, and animation built in. Every control family is an open style protocol.",
-    sym: "@FocusState · TapGesture · withAnimation · ButtonStyle",
-  },
-  {
-    title: "The terminal, negotiated",
-    body:
-      "Truecolor, Kitty and Sixel images, OSC 8 links and mouse reporting are probed per session and degrade gracefully, so one binary is right in kitty, over SSH, or in CI. --accessible, --reduce-motion, --no-color and --ascii come free.",
-    sym: "TerminalCapabilityProfile · Kitty · Sixel · OSC 8",
-  },
-  {
-    title: "One binary, testable",
-    body:
-      "Compile a native executable for each platform with Swift's checked concurrency. Render deterministic snapshots at a chosen size and test layout without a terminal attached.",
-    sym: "SwiftPM · Swift 6 · RenderOnce",
-  },
-];
-
-// Verdicts fact-checked August 2026 against each framework's current release
-// (see the legend below for versions); the Terminal OS, Animations and Web
-// embed columns were researched 2026-08-24. Verdict notes:
-//   · Terminal OS: Textual and Ratatui run Windows in CI; Bubble Tea ships
-//     tty/termios/signals_windows.go; Ink states no OS support and tests on
-//     Linux only, scored ✓ on the strength of Node and its Windows-shipping
-//     consumers. SwiftTUI: macOS 15+, Linux, Windows 10 1809+.
-//   · Animations: Textual's animate() interpolates with easing (first-party);
-//     Harmonica is Charm's separate spring package; tachyonfx is a
-//     post-render effects crate in the ratatui org; Ink 7.1's useAnimation is
-//     a shared frame clock with no value interpolation: partial.
-//   · Web embed: `textual serve` launches the app as a subprocess per visitor
-//     and streams a terminal over a websocket: nothing static to host, hence
-//     "local only". Ratzilla compiles to a static WASM bundle (DOM or WebGL2).
-const headers = [
-  "Language",
-  "Terminal OS",
-  "Declarative UI",
-  "Gestures",
-  "Animations",
-  "Web embed",
-  "Native embed",
-];
-type Cell = { s: "plain" | "yes" | "partial" | "no"; t: string };
-const rows: { name: string; accent?: boolean; cells: Cell[] }[] = [
-  {
-    name: "SwiftTUI",
-    accent: true,
-    cells: [
-      { s: "plain", t: "Swift" },
-      { s: "yes", t: "✓ macOS · Linux · Windows" },
-      { s: "yes", t: "✓ SwiftUI-shaped" },
-      { s: "yes", t: "✓ tap · drag · hover" },
-      { s: "yes", t: "✓ withAnimation · PhaseAnimator" },
-      { s: "yes", t: "✓ static WASI · WebHost" },
-      { s: "yes", t: "✓ macOS · iOS · Android preview" },
-    ],
-  },
-  {
-    name: "Bubble Tea",
-    cells: [
-      { s: "plain", t: "Go" },
-      { s: "yes", t: "✓ macOS · Linux · Windows" },
-      { s: "yes", t: "✓ Elm arch" },
-      { s: "partial", t: "~ mouse events" },
-      { s: "partial", t: "~ Harmonica" },
-      { s: "no", t: "—" },
-      { s: "no", t: "—" },
-    ],
-  },
-  {
-    name: "Textual",
-    cells: [
-      { s: "plain", t: "Python" },
-      { s: "yes", t: "✓ macOS · Linux · Windows" },
-      { s: "yes", t: "✓ widgets · CSS" },
-      { s: "partial", t: "~ mouse · hover" },
-      { s: "yes", t: "✓ animate() · easing" },
-      { s: "partial", t: "~ textual serve · local only" },
-      { s: "no", t: "—" },
-    ],
-  },
-  {
-    name: "Ratatui",
-    cells: [
-      { s: "plain", t: "Rust" },
-      { s: "yes", t: "✓ macOS · Linux · Windows" },
-      { s: "no", t: "— immediate-mode" },
-      { s: "partial", t: "~ backend only" },
-      { s: "partial", t: "~ tachyonfx" },
-      { s: "partial", t: "~ Ratzilla · static WASM" },
-      { s: "no", t: "—" },
-    ],
-  },
-  {
-    name: "Ink",
-    cells: [
-      { s: "plain", t: "JS/React" },
-      { s: "yes", t: "✓ macOS · Linux · Windows" },
-      { s: "yes", t: "✓ React" },
-      { s: "no", t: "—" },
-      { s: "partial", t: "~ useAnimation · ticks only" },
-      { s: "no", t: "—" },
-      { s: "no", t: "—" },
-    ],
-  },
-];
 ---
 
-<Section id="why" aria-labelledby="why-title">
-  <SectionHead id="why-title" eyebrow="Why SwiftTUI" align="center">
-    <Fragment slot="title">A proven UI model, pointed at the terminal.</Fragment>
-    Most TUI toolkits offer a low-level draw loop or a widget set with its own
-    state story. SwiftTUI takes the declarative model SwiftUI has proven at
-    platform scale and aims it at terminal cells: you declare views; the
-    framework owns layout, focus, redraw and the terminal.
+<Section id="why" class="benefits" aria-labelledby="why-title">
+  <SectionHead id="why-title" eyebrow="02 / The programming model">
+    <Fragment slot="title">Describe the interface. Keep building.</Fragment>
+    SwiftTUI connects state, layout, and input so your app can grow from one control to a whole workspace.
   </SectionHead>
-
-  <div class="card-grid card-grid--two why-cards">
-    {
-      cards.map((card) => (
-        <FeatureCard title={card.title}>
-          {card.body}
-          <span slot="meta" class="why-sym mono">
-            {card.sym}
-          </span>
-        </FeatureCard>
-      ))
-    }
+  <div id="capabilities" class="benefit-list">
+    <article class="benefit-row">
+      <div class="benefit-copy">
+        <p class="pane-label">State → view → cells</p>
+        <h3>Change state. See it happen.</h3>
+        <p>Declare the view once. When tracked state changes, SwiftTUI updates dependent views and emits the terminal cells that changed.</p>
+        <a class="link" href={`${base}/docs/documentation/swifttuiviews/state-environment-and-focus`}>Explore state and observation <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="state-figure benefit-figure">
+        <figcaption class="pane-label">One update, from action to output</figcaption>
+        <ol class="state-flow">
+          <li><span>01 / Action</span><code>count += 1</code></li>
+          <li><span>02 / State</span><code>@State count</code></li>
+          <li><span>03 / View</span><code>Text("\(count)")</code></li>
+        </ol>
+        <p class="figure-note">The runtime handles invalidation and redraw.</p>
+      </figure>
+    </article>
+    <article class="benefit-row">
+      <div class="benefit-copy">
+        <p class="pane-label">Composition → workspace</p>
+        <h3>Give every pane a purpose.</h3>
+        <p>Compose lists, tables, tabs, and scroll views. Keep focus with the active control and state with the view that owns it.</p>
+        <a class="link" href={`${base}/capabilities/#collections`}>Explore layout and collections <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="workspace-figure benefit-figure">
+        <figcaption class="pane-label">A workspace, built from views</figcaption>
+        <div class="workspace-sketch" aria-label="Layout illustration: a tab bar above a sidebar and a table, with a command bar below">
+          <div class="workspace-tabs"><span>Files</span><span>Changes</span><span>Logs</span></div>
+          <div class="workspace-sidebar"><strong>List</strong><span>Sources</span><span>Tests</span><span>Package.swift</span></div>
+          <div class="workspace-table"><strong>Table</strong><span>Name <span>Status</span></span><span>App.swift <span>Modified</span></span><span>Model.swift <span>Ready</span></span></div>
+          <div class="workspace-commands">Focus · selection · keyboard commands</div>
+        </div>
+        <p class="figure-note">Layout illustration. Compose each region from views.</p>
+      </figure>
+    </article>
+    <article class="benefit-row">
+      <div class="benefit-copy">
+        <p class="pane-label">App → terminal session</p>
+        <h3>Meet the terminal you’re in.</h3>
+        <p>Terminal capabilities are negotiated per session. Use richer color, images, and mouse input where supported, with explicit controls for simpler output.</p>
+        <a class="link" href={`${base}/docs/documentation/swifttuiruntime/running-apps`}>Explore terminal behavior <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="terminal-figure benefit-figure">
+        <figcaption class="pane-label">Choose the output for the session</figcaption>
+        <dl class="terminal-options">
+          <div><dt>Color</dt><dd>Truecolor or a simpler palette</dd></div>
+          <div><dt>Images</dt><dd>Kitty / Sixel when supported</dd></div>
+          <div><dt>Input</dt><dd>Keyboard, plus supported mouse input</dd></div>
+        </dl>
+        <p class="terminal-flags"><code>--no-color</code><code>--ascii</code><code>--reduce-motion</code></p>
+      </figure>
+    </article>
+  </div>
+  <div class="section-tail" id="compare">
+    <a class="link" href={`${base}/capabilities/`}>Explore every building block <span aria-hidden="true">→</span></a>
+    <a class="link" href={`${base}/compare/`}>Compare TUI frameworks <span aria-hidden="true">→</span></a>
   </div>
 </Section>
-
-<Section id="compare" aria-labelledby="compare-title">
-  <SectionHead id="compare-title" level={3} eyebrow="How it compares">
-    <Fragment slot="title">Notably powerful.</Fragment>
-  </SectionHead>
-
-  <div class="table-scroll">
-    <table class="table compare">
-      <thead>
-        <tr>
-          <th scope="col">Framework</th>
-          {headers.map((h) => <th scope="col">{h}</th>)}
-        </tr>
-      </thead>
-      <tbody>
-        {
-          rows.map((row) => (
-            <tr class:list={[row.accent && "is-accent"]}>
-              <th scope="row">{row.name}</th>
-              {row.cells.map((cell) => (
-                <td data-state={cell.s}>{cell.t}</td>
-              ))}
-            </tr>
-          ))
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <p class="caption compare-foot">
-    Verified against current releases: Bubble Tea 2.0, Textual 8.2,
-    Ratatui 0.30, Ink 7.1.
-  </p>
-
-  <p class="lead prose why-primer">
-    Coming from SwiftUI?{" "}
-    <a href={`${base}/differences-from-swiftui/`}>Read the terminal-native primer</a>.
-  </p>
-</Section>
-
-<style>
-  .why-cards {
-    max-width: 920px;
-    margin: 0 auto;
-  }
-
-  .why-sym {
-    display: block;
-    margin-top: var(--space-3);
-    color: var(--text-muted);
-    font-size: 11px;
-    line-height: 1.5;
-    letter-spacing: 0.05em;
-    overflow-wrap: anywhere;
-  }
-
-  .compare {
-    min-width: 1040px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
-
-  .compare tbody th {
-    font-family: var(--font-serif);
-    font-size: 14px;
-  }
-
-  .compare .is-accent {
-    background: var(--news-bar-tint);
-  }
-
-  .compare .is-accent th {
-    color: var(--text-accent);
-  }
-
-  .compare td {
-    color: var(--text-body);
-  }
-
-  .compare td[data-state="plain"] {
-    color: var(--text-strong);
-  }
-
-  .compare td[data-state="yes"] {
-    color: var(--text-accent);
-  }
-
-  .compare td[data-state="partial"] {
-    color: var(--text-strong);
-  }
-
-  .compare td[data-state="no"] {
-    color: var(--text-muted);
-  }
-
-  .compare-foot {
-    max-width: 100ch;
-    margin-top: var(--space-3);
-    color: var(--text-muted);
-  }
-
-  .compare-foot .lk {
-    color: var(--text-strong);
-    font-family: var(--font-mono);
-  }
-
-  .why-primer {
-    max-width: 72ch;
-    margin-top: var(--space-8);
-  }
-</style>

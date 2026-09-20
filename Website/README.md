@@ -59,12 +59,21 @@ other stylesheet composes those custom properties, and both themes (light is
 primary; `data-theme="dark"` on `<html>`) come from that one file.
 
 - `src/styles/components.css` — the system's Button, Kbd, NewsBar,
-  FeatureCard, Testimonial, GridFrame and Navigation rules, verbatim.
+  FeatureCard, Testimonial, GridFrame and Navigation rules.
 - `src/styles/site.css` — the page skeleton (two column rails with a `┼`
   junction at every intersection), the type scale, code, and the legacy-name
   aliases the pipeline walkthrough still reads.
 - `src/styles/docs.css` — the long-form pages (contents rail, numbered
   sections, callouts, side-by-side code).
+- `src/styles/home.css` — the marketing sequence: a compact live counter,
+  maintained app examples, three illustrated benefits, quick start, and hosts.
+- `src/components/CodeSnippet.astro` and `src/styles/code-snippet.css` —
+  syntax-highlighted code with copy controls, announced confirmation, and a
+  text-selection fallback when clipboard access is unavailable. The full
+  counter source is a native disclosure; mobile shows the live result first.
+- `/compare/` — a responsive framework comparison with dated primary sources
+  and explicit distinctions between built-in features and companion packages.
+  Toolchain and package setup live at `/guides/#toolchain`.
 - `src/layouts/Site.astro` — every public page: head, header, news bar,
   sections, footer. Sections are `Section.astro` so the nodes land on the
   rails; actions are `Button.astro`.
@@ -84,4 +93,3 @@ resolved from the tokens) and `docs-theme.css` (the font faces plus
 `overrides.css`), and `Scripts/apply_docc_theme.sh` copies both into every
 mount during `build:docc`. `scripts/docc-theme.test.ts` fails when the
 committed output is stale.
-

@@ -1,174 +1,58 @@
 ---
 import Button from "./Button.astro";
-import Icon from "./Icon.astro";
 import Section from "./Section.astro";
 import SectionHead from "./SectionHead.astro";
-
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Four reading paths, ordered by tier: the first-hour docs, the SwiftUI
-// primer, the example roster, then the internals walkthrough.
 const paths = [
-  {
-    kicker: "Documentation",
-    title: "The first-hour guides, the style system, and running apps",
-    cta: "Browse the docs",
-    href: `${base}/guides/`,
-  },
-  {
-    kicker: "From SwiftUI",
-    title: "What transfers, what is deliberately different, and why",
-    cta: "Read the primer",
-    href: `${base}/differences-from-swiftui/`,
-  },
-  {
-    kicker: "Examples",
-    title: "Every maintained terminal app, and the demo on every host",
-    cta: "Browse examples",
-    href: `${base}/showcase/`,
-  },
-  {
-    kicker: "Under the hood",
-    title: "resolve → measure → place → semantics → draw → raster → commit",
-    cta: "Read about the pipeline",
-    href: `${base}/pipeline/`,
-  },
+  { title: "Your first hour with SwiftTUI", href: `${base}/guides/#first-hour` },
+  { title: "Coming from SwiftUI", href: `${base}/differences-from-swiftui/` },
+  { title: "Compare TUI frameworks", href: `${base}/compare/` },
+  { title: "Inside the rendering pipeline", href: `${base}/pipeline/` },
 ];
 ---
 
-<Section id="next" aria-labelledby="next-title">
-  <SectionHead id="next-title" eyebrow="Further reading">
-    <Fragment slot="title">Where to go next.</Fragment>
-  </SectionHead>
-
-  <nav class="paths" aria-label="Choose a SwiftTUI guide">
-    {
-      paths.map((path) => (
-        <a class="path" href={path.href}>
-          <span class="path__kicker eyebrow">{path.kicker}</span>
-          <span class="path__title">{path.title}</span>
-          <span class="path__cta">
-            {path.cta}
-            <Icon name="chevronRight" />
-          </span>
-        </a>
-      ))
-    }
-  </nav>
-
-  <div class="beyond prose" id="beyond">
-    <p class="eyebrow">Beyond the terminal</p>
-    <p>
-      Terminal first, not terminal only. The same <code>App</code> runs in a
-      browser: <code>--web</code> serves it on localhost, or build it with{" "}
-      <code>SwiftTUIWASI</code> and ship a static bundle with{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-web" rel="noreferrer noopener">
-        @swifttui/web</a>, as the demo above is. It also embeds in native apps
-      through{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-swiftui" rel="noreferrer noopener">
-        swift-tui-swiftui</a>{" "}
-      (macOS, iOS) and{" "}
-      <a href="https://github.com/SwiftTUI/swift-tui-android" rel="noreferrer noopener">
-        swift-tui-android</a>{" "}
-      (arm64 preview). No terminal emulators. Start from{" "}
-      <a href={`${base}/docs/documentation/swifttuiruntime/hosts-and-platforms`}>
-        Hosts and Platforms</a>.
-    </p>
-    <p>
-      Keep the state and actions shared while adapting control size,
-      navigation and scrolling to keyboard or touch. Read{" "}
-      <a href={`${base}/docs/documentation/swifttuiviews/adapting-to-hosts`}>
-        Adapting an Interface to Its Host</a>.
-    </p>
+<Section id="next" aria-labelledby="hosts-title">
+  <div id="beyond">
+    <SectionHead id="hosts-title" eyebrow="04 / Take your views further">
+      <Fragment slot="title">Start in the terminal. Bring your views along.</Fragment>
+      Share state and actions across hosts, and adapt the interface for a keyboard, pointer, or touch.
+    </SectionHead>
+    <div class="host-options">
+      <article class="host-option">
+        <p class="pane-label">01 / Terminal</p>
+        <h3>A native executable</h3>
+        <p>Build with SwiftPM for macOS, Linux, or Windows.</p>
+        <a class="link" href={`${base}/docs/documentation/swifttuiruntime/running-apps`}>Run an app <span aria-hidden="true">→</span></a>
+      </article>
+      <article class="host-option">
+        <p class="pane-label">02 / Browser</p>
+        <h3>A static web bundle</h3>
+        <p>Compile to WebAssembly and host it on the web, like the live counter above.</p>
+        <a class="link" href={`${base}/docs/documentation/swifttuiwasi/deploying-to-the-browser`}>Deploy to the browser <span aria-hidden="true">→</span></a>
+      </article>
+      <article class="host-option">
+        <p class="pane-label">03 / Native app</p>
+        <h3>Inside SwiftUI</h3>
+        <p>Embed the same views in a macOS or iOS app with SwiftUIHost.</p>
+        <a class="link" href={`${base}/showcase/#hosts`}>See the hosts <span aria-hidden="true">→</span></a>
+      </article>
+    </div>
+    <p class="host-note prose">Also available: an <a href="https://github.com/SwiftTUI/swift-tui-android" rel="noreferrer noopener">Android arm64 preview</a>.
+      See <a href={`${base}/docs/documentation/swifttuiruntime/hosts-and-platforms`}>platform requirements</a> and
+      <a href={`${base}/docs/documentation/swifttuiviews/adapting-to-hosts`}>how to adapt an interface to its host</a>.</p>
   </div>
+  <nav class="reading-paths" aria-label="Further reading">
+    {paths.map((path) => <a class="reading-path" href={path.href}>{path.title}<span aria-hidden="true">→</span></a>)}
+  </nav>
 </Section>
 
 <Section id="community" class="closing" aria-labelledby="closing-title">
   <SectionHead id="closing-title" eyebrow="Community" align="center">
     <Fragment slot="title">Build with us.</Fragment>
-    Development happens in public on GitHub and Discord. Come ask questions, show what you are building, or talk
-    through a contribution.
+    Ask a question, share your app, or help shape the framework. Development happens in public.
   </SectionHead>
   <div class="button-row closing__actions">
-    <Button href="https://discord.gg/8j35kYDFxn" variant="primary" icon="messageCircle" external>
-      Join the Discord
-    </Button>
-    <Button href="https://github.com/SwiftTUI/swift-tui" variant="secondary" icon="github" external>
-      SwiftTUI on GitHub
-    </Button>
+    <Button href="https://discord.gg/8j35kYDFxn" variant="primary" icon="messageCircle" external>Join the Discord</Button>
+    <Button href="https://github.com/SwiftTUI/swift-tui" variant="secondary" icon="github" external>SwiftTUI on GitHub</Button>
   </div>
 </Section>
-
-<style>
-  .paths {
-    display: grid;
-    border: var(--border-width) solid var(--border-card);
-    border-radius: var(--radius-sm);
-    background: var(--surface-card);
-    box-shadow: var(--shadow-card-inset);
-  }
-
-  .path {
-    display: grid;
-    grid-template-columns: minmax(140px, 0.5fr) minmax(0, 1.5fr) auto;
-    gap: var(--space-6);
-    align-items: center;
-    padding: var(--space-4);
-    border-bottom: var(--border-width) solid var(--border-default);
-    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .path:last-child {
-    border-bottom: 0;
-  }
-
-  .path:hover {
-    background: var(--btn-ghost-hover);
-  }
-
-  .path__title {
-    font-family: var(--font-serif);
-    font-size: 16.8px;
-    line-height: 1.3;
-    color: var(--text-high-contrast);
-  }
-
-  .path__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    color: var(--text-accent);
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: -0.025em;
-    white-space: nowrap;
-  }
-
-  .path__cta :global(svg) {
-    color: var(--icon);
-  }
-
-  .beyond {
-    display: grid;
-    gap: var(--space-3);
-    max-width: 72ch;
-    margin-top: var(--space-8);
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  .beyond p + p {
-    margin-top: 0;
-  }
-
-  .closing__actions {
-    justify-content: center;
-  }
-
-  @media (max-width: 767px) {
-    .path {
-      grid-template-columns: 1fr;
-      gap: var(--space-2);
-    }
-  }
-</style>

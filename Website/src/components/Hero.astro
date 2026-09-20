@@ -1,221 +1,66 @@
 ---
 import Button from "./Button.astro";
+import CodeSnippet from "./CodeSnippet.astro";
 import DemoTerminal from "./DemoTerminal.astro";
 import Section from "./Section.astro";
-import Strip from "./Strip.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const repo = "https://github.com/SwiftTUI/swift-tui";
-const demoRepoHref = "https://github.com/SwiftTUI/swift-tui-counter-demo";
-// The source pane shows the counter the way a terminal app would write it:
-// `import SwiftTUI`, one View, one App, the same sample as the swift-tui
-// README. The live demo beside it also paints a ripple on each increment;
-// that layer is left out here so the first code a visitor reads is a first
-// app. The full file is one click away.
-const sourceHref = `${demoRepoHref}/blob/main/counter/Sources/CounterCore/CounterView.swift`;
+const excerpt = String.raw`@State private var count = 0
 
-const strip = [
-  {
-    title: "Declarative.",
-    text: "Views, state, focus, gestures and animation with SwiftUI's semantics. Change state; the runtime redraws the cells that changed.",
-  },
-  {
-    title: "Native.",
-    text: "One Swift 6 binary per platform, built with SwiftPM and checked concurrency. Truecolor, images and mouse are negotiated per terminal.",
-  },
-  {
-    title: "Portable.",
-    text: "The same views run in the browser through WASI and inside SwiftUI on macOS and iOS, with Android in preview.",
-  },
-];
+var body: some View {
+  VStack(spacing: 1) {
+    TextFigure("\(count)", font: .future)
+    Button("Increment") { count += 1 }
+  }
+}`;
+const source = String.raw`import SwiftTUI
+
+struct CounterView: View {
+  @State private var count = 0
+
+  var body: some View {
+    VStack(spacing: 1) {
+      TextFigure("\(count)", font: .future)
+        .frame(minWidth: 14, alignment: .center)
+      Button("Increment") { count += 1 }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+}
+
+@main
+struct CounterApp: App {
+  var body: some Scene {
+    WindowGroup("Counter") { CounterView() }
+  }
+}`;
 ---
 
 <Section id="top" class="hero" aria-labelledby="hero-title">
   <div class="hero__copy">
     <h1 id="hero-title" class="h0 hero__title">SwiftUI semantics, drawn in terminal cells.</h1>
     <p class="lead">
-      A deep subset of SwiftUI, reimplemented for terminal UIs: views,
-      state, observation, focus, gestures, animation, and more.
+      Build terminal apps with views, state, focus, and animation.
+      Compile a native executable for macOS, Linux, or Windows.
     </p>
     <div class="button-row hero__actions">
-      <Button href={`${base}/#get-started`} variant="primary" icon="terminal">
-        Get started
-      </Button>
-      <Button href={repo} variant="secondary" icon="github" external>
-        Read the code
-      </Button>
+      <Button href={`${base}/#get-started`} variant="primary" icon="terminal">Get started</Button>
+      <Button href={`${base}/#proof`} variant="secondary" trailingIcon="chevronRight">Explore examples</Button>
     </div>
-    <p class="caption hero__note">
-      For macOS, Linux, and Windows.
-    </p>
   </div>
 
   <div class="code-to-frame media-frame" id="demo">
-    <article class="source-pane" aria-labelledby="counter-source-title">
-      <header class="pane-head">
-        <div>
-          <strong id="counter-source-title">Source</strong>
-          <span>The counter, minus its ripple animation</span>
-        </div>
-        <a class="link" href={sourceHref} rel="noreferrer noopener">Full source</a>
-      </header>
-      <pre class="counter-source" tabindex="0"><code><span class="kw">import</span> <span class="ty">SwiftTUI</span>
-
-<span class="kw">struct</span> <span class="ty">CounterView</span>: <span class="ty">View</span> &#123;
-  <span class="at">@State</span> <span class="kw">private var</span> count = <span class="num">0</span>
-
-  <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">View</span> &#123;
-    <span class="ty">VStack</span>(spacing: <span class="num">1</span>) &#123;
-      <span class="ty">TextFigure</span>(<span class="str">"\(count)"</span>, font: .future)
-        .frame(minWidth: <span class="num">14</span>, alignment: .center)
-      <span class="ty">Button</span>(<span class="str">"Increment"</span>) &#123; count += <span class="num">1</span> &#125;
-    &#125;
-    .frame(maxWidth: .<span class="ty">infinity</span>, maxHeight: .<span class="ty">infinity</span>)
-  &#125;
-&#125;
-
-<span class="at">@main</span>
-<span class="kw">struct</span> <span class="ty">CounterApp</span>: <span class="ty">App</span> &#123;
-  <span class="kw">var</span> body: <span class="kw">some</span> <span class="ty">Scene</span> &#123;
-    <span class="ty">WindowGroup</span>(<span class="str">"Counter"</span>) &#123; <span class="ty">CounterView</span>() &#125;
-  &#125;
-&#125;
-</code></pre>
-    </article>
-
-    <div class="render-pane">
-      <DemoTerminal id="demo-terminal" />
+    <div class="render-pane"><DemoTerminal id="demo-terminal" /></div>
+    <div class="source-pane">
+      <CodeSnippet id="counter-excerpt" label="CounterView · excerpt" code={excerpt} />
+      <p class="source-note">Change the state. SwiftTUI updates the view.</p>
     </div>
   </div>
+  <details class="source-disclosure terminal-disclosure">
+    <summary>View and copy the complete Swift app</summary>
+    <p class="disclosure-note">This minimal example leaves out the live counter’s ripple animation.
+      <a class="link" href="https://github.com/SwiftTUI/swift-tui-counter-demo/blob/main/counter/Sources/CounterCore/CounterView.swift" rel="noreferrer noopener">Explore the demo source</a>.
+    </p>
+    <CodeSnippet id="counter-app" label="CounterApp.swift" code={source} />
+  </details>
 </Section>
-
-<Section pad="flush" aria-label="What SwiftTUI is">
-  <Strip items={strip} />
-</Section>
-
-<style>
-  .hero {
-    padding-top: var(--space-16);
-  }
-
-  .hero__copy {
-    display: grid;
-    gap: var(--space-4);
-    justify-items: center;
-    max-width: 62ch;
-    margin: 0 auto var(--space-12);
-    text-align: center;
-  }
-
-  .hero__title {
-    color: var(--text-accent);
-    max-width: 18ch;
-  }
-
-  .hero__actions {
-    justify-content: center;
-    margin-top: var(--space-2);
-  }
-
-  .hero__note {
-    color: var(--text-muted);
-  }
-
-  /* ── source beside the live frame ─────────────────────────────── */
-  .code-to-frame {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    min-height: 520px;
-  }
-
-  .source-pane,
-  .render-pane {
-    min-width: 0;
-  }
-
-  .source-pane {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    border-right: var(--border-width) solid var(--border-default);
-  }
-
-  .pane-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    min-height: var(--space-12);
-    padding: var(--space-2) var(--space-4);
-    border-bottom: var(--border-width) solid var(--border-default);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .pane-head > div {
-    display: grid;
-  }
-
-  .pane-head strong {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    font-size: 15px;
-  }
-
-  .pane-head span {
-    color: var(--text-muted);
-    font-size: 12px;
-  }
-
-  .counter-source {
-    border: 0;
-    border-radius: 0;
-    padding: var(--space-6) var(--space-4);
-    background: var(--surface);
-    font-size: clamp(11.5px, 0.95vw, 13px);
-    line-height: 1.7;
-  }
-
-  .render-pane {
-    min-height: 520px;
-  }
-
-  @media (max-width: 979px) {
-    .code-to-frame {
-      grid-template-columns: 1fr;
-    }
-
-    .source-pane {
-      order: 2;
-      border-top: var(--border-width) solid var(--border-default);
-      border-right: 0;
-    }
-
-    .render-pane {
-      order: 1;
-      min-height: 420px;
-    }
-  }
-
-  @media (max-width: 639px) {
-    .hero {
-      padding-top: var(--space-8);
-    }
-
-    .hero__copy {
-      margin-bottom: var(--space-8);
-    }
-
-    .code-to-frame {
-      min-height: 0;
-    }
-
-    .render-pane {
-      min-height: 360px;
-    }
-
-    .counter-source {
-      max-height: 470px;
-      font-size: 11px;
-    }
-  }
-</style>
