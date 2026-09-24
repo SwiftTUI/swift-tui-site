@@ -1,0 +1,34 @@
+---
+import Site from "../layouts/Site.astro";
+import Section from "../components/Section.astro";
+import SectionHead from "../components/SectionHead.astro";
+import "@swifttui/web/style.css";
+---
+
+<Site title="SwiftTUI DOM renderer" description="The SwiftTUI counter presented as browser text." path="/domrenderer">
+  <Section>
+    <SectionHead level={1} eyebrow="Browser host">
+      <span slot="title">The counter as browser text</span>
+      The same Swift application and WASM artifact as the canvas demo, presented through DOM cells.
+    </SectionHead>
+    <p>Use browser zoom to enlarge the text. Hold Alt/Option and drag to select it; copy and find cover the visible application viewport.</p>
+    <nav data-domrenderer-scenes aria-label="Application scenes"></nav>
+    <p data-domrenderer-status role="status">Loading the application…</p>
+    <div data-domrenderer-mount aria-label="SwiftTUI counter"></div>
+  </Section>
+</Site>
+
+<script>
+  import "../scripts/domrenderer-mount";
+</script>
+
+<style>
+  [data-domrenderer-mount] {
+    width: 100%;
+    min-width: 0;
+    height: var(--demo-canvas-height);
+    overflow: hidden;
+    margin-block: var(--space-8);
+  }
+  [data-domrenderer-scenes] { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+</style>

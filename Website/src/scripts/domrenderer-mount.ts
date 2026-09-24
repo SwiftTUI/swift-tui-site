@@ -2,39 +2,47 @@
 // scene manifest — but presented through @swifttui/web's DOM surface renderer
 // instead of the canvas painter. The wasm and manifest are fetched from the
 // composed /webexample artifact, so this page adds no second wasm build.
-import {
-  createWebHostApp,
-  type WebHostAppController,
-} from "@swifttui/web";
+
+import type { WebHostAppController } from "@swifttui/web";
+import * as WebHost from "@swifttui/web";
 import { createWasmSceneRuntimeFactory } from "@swifttui/web/wasi";
 import workerUrl from "./domrenderer-worker.ts?worker&url";
 
 const WEBEXAMPLE_DIST = "/webexample/TerminalApp/dist";
 
-// Keep the single counter scene readable while still fitting narrow embeds.
-const DEFAULT_FONT_SIZE = 16;
-const MIN_FONT_SIZE = 12;
-const TARGET_COLUMNS = 40;
-const CELL_WIDTH_RATIO = 0.62;
-
-function responsiveFontSize(): number {
-  const width = window.innerWidth || document.documentElement.clientWidth || 0;
-  if (!width) return DEFAULT_FONT_SIZE;
-  const fit = Math.round(width / (TARGET_COLUMNS * CELL_WIDTH_RATIO));
-  return Math.max(MIN_FONT_SIZE, Math.min(DEFAULT_FONT_SIZE, fit));
-}
-
 async function bootstrap(): Promise<void> {
   const mount = document.querySelector<HTMLElement>("[data-domrenderer-mount]");
-  const scenePicker = document.querySelector<HTMLElement>("[data-domrenderer-scenes]");
-  const status = document.querySelector<HTMLElement>("[data-domrenderer-status]");
+  const scenePicker = document.querySelector<HTMLElement>(
+    "[data-domrenderer-scenes]",
+  );
+  const status = document.querySelector<HTMLElement>(
+    "[data-domrenderer-status]",
+  );
   if (!mount) return;
 
-  const controller = await createWebHostApp({
+  // The package owns font sizing and observes this mount's content box.
+  // Preserve browser zoom and user text preferences. Assets live alongside
+  // the same WASM artifact; older tagged packages have no bundled-font option.
+  const fontOptions =
+    "DOM_FONT_ASSET_PATH" in WebHost &&
+    typeof WebHost.DOM_FONT_ASSET_PATH === "string"
+      ? {
+          domFont: {
+            assetBase: new URL(
+              `${WEBEXAMPLE_DIST}/${WebHost.DOM_FONT_ASSET_PATH}`,
+              location.href,
+            ),
+          },
+        }
+      : {};
+  const controller = await WebHost.createWebHostApp({
+    ...fontOptions,
     mount,
-    manifestUrl: new URL(`${WEBEXAMPLE_DIST}/scene-manifest.json`, window.location.href),
+    manifestUrl: new URL(
+      `${WEBEXAMPLE_DIST}/scene-manifest.json`,
+      window.location.href,
+    ),
     renderer: "dom",
-    style: { fontSize: responsiveFontSize() },
     environment: { SWIFTTUI_APP_NAME: "DomRendererDemo" },
     sceneRuntimeFactory: createWasmSceneRuntimeFactory(
       new URL(`${WEBEXAMPLE_DIST}/assets/app.wasm`, window.location.href),
@@ -42,24 +50,10 @@ async function bootstrap(): Promise<void> {
     ),
   });
 
-  installResponsiveFontSize(controller);
   renderScenePicker(controller, scenePicker);
   status?.remove();
-}
-
-function installResponsiveFontSize(controller: WebHostAppController): void {
-  let current = responsiveFontSize();
-  let pending = 0;
-  window.addEventListener("resize", () => {
-    if (pending) cancelAnimationFrame(pending);
-    pending = requestAnimationFrame(() => {
-      pending = 0;
-      const next = responsiveFontSize();
-      if (next !== current) {
-        current = next;
-        controller.setStyle({ fontSize: next });
-      }
-    });
+  window.addEventListener("pagehide", (event) => {
+    if (!event.persisted) void controller.dispose();
   });
 }
 
@@ -87,7 +81,9 @@ function highlightActiveScene(
   controller: WebHostAppController,
   container: HTMLElement,
 ): void {
-  for (const button of container.querySelectorAll<HTMLButtonElement>("button")) {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "button",
+  )) {
     button.setAttribute(
       "aria-pressed",
       String(button.dataset.sceneId === controller.selectedSceneId),
@@ -96,7 +92,9 @@ function highlightActiveScene(
 }
 
 function renderStartupError(error: unknown): void {
-  const status = document.querySelector<HTMLElement>("[data-domrenderer-status]");
+  const status = document.querySelector<HTMLElement>(
+    "[data-domrenderer-status]",
+  );
   if (!status) return;
   const message = error instanceof Error ? error.message : String(error);
   status.dataset.state = "error";
