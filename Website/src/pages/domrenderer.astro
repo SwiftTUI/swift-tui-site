@@ -5,12 +5,13 @@ import SectionHead from "../components/SectionHead.astro";
 import "@swifttui/web/style.css";
 ---
 
-<Site title="SwiftTUI DOM renderer" description="The SwiftTUI counter presented as browser text." path="/domrenderer">
+<Site title="SwiftTUI experimental DOM renderer" description="The SwiftTUI counter presented as browser text with the experimental DOM renderer." path="/domrenderer">
   <Section>
-    <SectionHead level={1} eyebrow="Browser host">
+    <SectionHead level={1} eyebrow="Experimental browser host">
       <span slot="title">The counter as browser text</span>
       The same Swift application and WASM artifact as the canvas demo, presented through DOM cells.
     </SectionHead>
+    <p>The DOM renderer is experimental. <a href="https://github.com/SwiftTUI/swift-tui-web/tree/main/packages/web#renderers">Read the setup guide and current limits.</a></p>
     <p>Use browser zoom to enlarge the text. Hold Alt/Option and drag to select and copy the visible application text.</p>
     <nav data-domrenderer-scenes aria-label="Application scenes"></nav>
     <p data-domrenderer-status role="status">Loading the application…</p>
