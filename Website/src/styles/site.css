@@ -610,31 +610,6 @@ pre code {
   }
 }
 
-/* The news bar shares the header's bottom rule; no second rule on top. */
-.swifttui-newsbar {
-  border-top: 0;
-}
-
-@media (max-width: 719px) {
-  .swifttui-newsbar {
-    display: block;
-    padding-inline: var(--space-4);
-    text-align: center;
-  }
-
-  .swifttui-newsbar > span {
-    display: inline;
-  }
-
-  .swifttui-newsbar__label {
-    margin-right: var(--space-1-5);
-  }
-
-  .swifttui-newsbar__arrow {
-    margin-left: var(--space-1-5);
-  }
-}
-
 /* Buttons fill their row on phones. */
 .button-row {
   display: flex;

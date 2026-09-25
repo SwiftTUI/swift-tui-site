@@ -1,6 +1,7 @@
 ---
 import Site from "../layouts/Site.astro";
 import Hero from "../components/Hero.astro";
+import NewsBar from "../components/NewsBar.astro";
 import GetStarted from "../components/GetStarted.astro";
 import WhySwiftTUI from "../components/WhySwiftTUI.astro";
 import Proof from "../components/Proof.astro";
@@ -60,6 +61,7 @@ const softwareSourceCodeJsonLd = {
     type="application/ld+json"
     set:html={JSON.stringify(softwareSourceCodeJsonLd)}
   />
+  <NewsBar />
   <Hero />
   <Proof />
   <WhySwiftTUI />

@@ -1,17 +1,57 @@
 ---
-import pkg from "../../package.json";
+import { getPublishedUpdates, updatePath } from "../lib/updates";
 
-// One current announcement, under the header: the latest release. The
-// version is the site's own package version, which the release process
-// bumps in lockstep with the framework.
-const version = pkg.version;
-const href = `https://github.com/SwiftTUI/swift-tui/releases/tag/${version}`;
+const [latest] = await getPublishedUpdates();
 ---
 
-<a class="swifttui-newsbar section" href={href} rel="noreferrer noopener">
-  <span class="swifttui-newsbar__label">News:</span>
-  <span class="swifttui-newsbar__msg">SwiftTUI {version} is out. Read the release notes.</span>
-  <span class="swifttui-newsbar__arrow" aria-hidden="true">→</span>
-  <i class="node node--l" aria-hidden="true"></i>
-  <i class="node node--r" aria-hidden="true"></i>
-</a>
+{latest && (
+  <a class="swifttui-newsbar section" href={updatePath(latest.id)}>
+    <span class="swifttui-newsbar__label">Latest update</span>
+    <span class="swifttui-newsbar__msg">{latest.data.title}</span>
+    <span class="swifttui-newsbar__arrow" aria-hidden="true">→</span>
+    <i class="node node--l" aria-hidden="true"></i>
+    <i class="node node--r" aria-hidden="true"></i>
+  </a>
+)}
+
+<style>
+  .swifttui-newsbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: var(--space-12);
+    padding: var(--space-2) var(--section-x);
+    background: var(--news-bar-tint);
+    font: var(--text-body-sm);
+    text-align: center;
+    transition: background-color 150ms;
+  }
+
+  .swifttui-newsbar:hover {
+    background: var(--news-bar-hover);
+  }
+
+  .swifttui-newsbar__label {
+    flex: none;
+    color: var(--text-accent);
+    font-family: var(--font-mono);
+    font-size: var(--meta-size);
+    text-transform: uppercase;
+  }
+
+  .swifttui-newsbar__msg {
+    color: var(--news-bar-text);
+  }
+
+  .swifttui-newsbar__arrow {
+    color: var(--text-accent);
+  }
+
+  @media (max-width: 719px) {
+    .swifttui-newsbar {
+      flex-wrap: wrap;
+      gap: var(--space-1) var(--space-2);
+    }
+  }
+</style>

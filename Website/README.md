@@ -59,7 +59,8 @@ Markdown file with a stable filename (its URL slug) and `title`, `description`,
 The listing sorts newest first; the post page, `/updates/rss.xml`, and sitemap
 are generated from the same collection. Posts are written for the website and
 are not imported from GitHub releases. Link to the relevant changelog or
-release notes from the article when they add useful detail.
+release notes from the article when they add useful detail. The homepage banner
+links to the newest authored post.
 
 ## Design system
 
