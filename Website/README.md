@@ -51,6 +51,16 @@ tag to build that snapshot, or to an empty string to use the manifest refs.
 The guides describe current behavior without a release
 history; package installation examples remain concrete and reproducible.
 
+## Updates
+
+The authored posts at `/updates/` live in `src/content/updates/*.md`. Add a
+Markdown file with a stable filename (its URL slug) and `title`, `description`,
+`published` (YYYY-MM-DD), and `kind` (`Release` or `Highlight`) frontmatter.
+The listing sorts newest first; the post page, `/updates/rss.xml`, and sitemap
+are generated from the same collection. Posts are written for the website and
+are not imported from GitHub releases. Link to the relevant changelog or
+release notes from the article when they add useful detail.
+
 ## Design system
 
 The site is styled from the SwiftTUI design system. `src/styles/tokens.css`

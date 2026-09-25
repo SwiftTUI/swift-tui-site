@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from "astro:content";
+import Site from "../../layouts/Site.astro";
+import Section from "../../components/Section.astro";
+import "../../styles/updates.css";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("updates");
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const date = post.data.published.toLocaleDateString("en-US", {
+  year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
+});
+---
+
+<Site
+  title={`${post.data.title} · SwiftTUI Updates`}
+  description={post.data.description}
+  path={`/updates/${post.id}/`}
+  ogType="article"
+  mainClass="updates"
+>
+  <meta slot="head" property="article:published_time" content={post.data.published.toISOString()} />
+  <Section as="article" class="updates-article">
+    <a class="link updates-back" href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/updates/`}>← All updates</a>
+    <div class="updates-item__meta">
+      <span>{post.data.kind}</span>
+      <time datetime={post.data.published.toISOString()}>{date}</time>
+    </div>
+    <h1>{post.data.title}</h1>
+    <p class="lead">{post.data.description}</p>
+    <div class="updates-prose prose"><Content /></div>
+  </Section>
+</Site>

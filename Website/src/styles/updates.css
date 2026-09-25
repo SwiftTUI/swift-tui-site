@@ -1,0 +1,111 @@
+/* Authored updates, using the site's shared type and spacing tokens. */
+.updates-intro {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.updates-intro .lead {
+  max-width: 62ch;
+}
+
+.updates-rss {
+  justify-self: start;
+  margin-top: var(--space-2);
+  font: var(--text-body-sm);
+}
+
+.updates-list {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.updates-item {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 70ch;
+}
+
+.updates-item + .updates-item {
+  padding-top: var(--space-8);
+  border-top: var(--border-width) solid var(--border-default);
+}
+
+.updates-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font: var(--text-label-xs);
+  font-family: var(--font-mono);
+}
+
+.updates-item__meta span {
+  color: var(--text-accent);
+}
+
+.updates-item h2 a:hover {
+  color: var(--text-accent);
+}
+
+.updates-item > p {
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+.updates-item__read {
+  justify-self: start;
+  font: var(--text-body-sm);
+}
+
+.updates-article {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.updates-back {
+  justify-self: start;
+  margin-bottom: var(--space-6);
+  font: var(--text-body-sm);
+}
+
+.updates-article h1,
+.updates-article > .lead,
+.updates-prose {
+  max-width: 70ch;
+}
+
+.updates-prose {
+  margin-top: var(--space-6);
+  color: var(--text-body);
+  font: var(--text-quote);
+  line-height: 1.75;
+}
+
+.updates-prose :is(h2, h3) {
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+
+.updates-prose p + p,
+.updates-prose :is(ul, ol) + p,
+.updates-prose p + :is(ul, ol) {
+  margin-top: var(--space-4);
+}
+
+.updates-prose :is(ul, ol) {
+  padding-left: var(--space-6);
+}
+
+.updates-prose li + li {
+  margin-top: var(--space-2);
+}
+
+.updates-prose a {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.updates-prose a:hover {
+  text-decoration-style: double;
+}
