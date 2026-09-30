@@ -36,7 +36,7 @@ const visionHref = `${base}/docs/documentation/swifttuiruntime/vision`;
             <a href="#keyboard">Keyboard first</a>
             <a href="#chrome">Chrome from values</a>
             <a href="#restraint">Restrained, fail-loud</a>
-            <a href="#accessibility">Accessible by default</a>
+            <a href="#accessibility">Accessibility options</a>
             <a href="#adds">What SwiftTUI adds</a>
             <a href="#register">Recorded in the open</a>
           </nav>
@@ -291,24 +291,31 @@ struct Dashboard: View {
             <div class="section-head">
               <span class="section-no">08</span>
               <div>
-                <h2>Accessibility and capture as defaults</h2>
+                <h2>Accessibility and capture options</h2>
                 <p class="section-lead">
-                  Reduced motion changes the <em>rendering</em> itself:
-                  spinners go static and phase animations hold their first
-                  phase. <code>CI=true</code> or a non-TTY stdout selects the
-                  same stable built-in. By default, every{" "}
-                  <code>App</code>'s CLI command ships{" "}
-                  <code>--accessible</code> (<code>--no-color</code>{" "}
-                  and <code>--reduce-motion</code>), and <code>--ascii</code> configs,{" "}
-                  <em>and an in-browser view</em> triggered with <code>--web</code> and served
-                  by a small http server — all out of the box.
+                  <code>--accessible</code> enables reduced motion and
+                  cursor-following; <code>--no-color</code> and <code>--ascii</code>
+                  are separate options. Reduced motion makes built-in spinners
+                  static and holds phase animations at their first phase.
+                  <code>CI=true</code> or non-TTY output selects stable built-in
+                  rendering without changing the app's accessibility preference.
+                  Cursor-following does not expose a semantic screen-reader tree
+                  or provide a sequential terminal reader.
                 </p>
               </div>
             </div>
             <p class="why">
               <strong>Why?</strong>: TUIs can have <a href="https://xogium.me/the-text-mode-lie-why-modern-tuis-are-a-nightmare-for-accessibility">serious accessibility issues</a>.
-              SwiftTUI's declarative API allows it to provide alternative behaviors
-              for screen readers without putting configuration burden on the developer.
+              On platforms with WebHost, <code>--web</code> explicitly launches
+              the Canvas browser view instead of terminal presentation; terminal
+              launch does not start a companion server. Windows does not include
+              WebHost. Canvas and the experimental DOM presenter expose semantic
+              content and supported control actions, but labels alone do not make
+              custom controls, charts, or embedded terminal programs operable.
+              See the <a href="https://github.com/SwiftTUI/swift-tui/blob/main/Sources/SwiftTUIViews/SwiftTUIViews.docc/Accessibility.md">current accessibility contract</a>
+              for control limits, author responsibilities and released-versus-candidate
+              evidence. Browser VoiceOver results do not qualify native macOS,
+              iOS, or Android accessibility.
             </p>
           </section>
 
