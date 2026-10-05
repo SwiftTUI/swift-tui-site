@@ -78,8 +78,12 @@ plan's 20,000-file and 25 MiB single-file limits:
 - `site/`: the website, all three DocC application shells and search indexes, and
   the compressed browser demo, deployed to the existing `swift-tui` project.
 - `views/`: SwiftTUIViews DocC JSON, deployed to `swift-tui-docc-views`.
-- `other/`: the remaining framework, Charts, and TerminalView DocC JSON, deployed to
-  `swift-tui-docc-data`.
+- `other/`: the remaining framework, Charts, and TerminalView DocC JSON, plus
+  any complete Views symbol directories that overflow the first data project's
+  budget, deployed to `swift-tui-docc-data`. Composition moves the largest
+  directories that fit its remaining capacity and generates matching specific
+  routes ahead of the general Views route. All JSON bytes and public paths are
+  preserved; composition still fails if the data cannot fit the two projects.
 
 The two data projects are direct-upload Pages projects with production branch
 `main`, in the same account as the site. The workflow uses its existing
