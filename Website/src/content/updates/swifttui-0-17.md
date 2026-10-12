@@ -19,6 +19,8 @@ Thanks to [@vmarcella](https://github.com/vmarcella) (Vincenzo Marcella) for [#4
 
 Thanks to [@echoz](https://github.com/echoz) (Jeremy Foo) for two contributions in this release. [#46](https://github.com/SwiftTUI/swift-tui/pull/46) preserves collection-owned scroll offsets on axes that do not need focus-reveal movement, keeping the last rows of compact lists reachable. The cooperative-exit work in [#45](https://github.com/SwiftTUI/swift-tui/pull/45) supplied the foundation for landed [#48](https://github.com/SwiftTUI/swift-tui/pull/48): **#48 is derived from #45**, including its policy design, drain wiring, and regression coverage. Quit and EOF now finish after required presentations and synchronous UI follow-ups without draining unrelated producer work to the acquisition cap.
 
+Returning visitors also receive the updated browser demo on reload.
+
 This release also fixes ordinary scroll-view reveal after viewport growth, transformed path origins, terminal clicks after companion zoom, popover-tip names, unchanged accessibility Picker selections, and environment port validation.
 
 See the [framework release notes](https://github.com/SwiftTUI/swift-tui/releases/tag/0.17.0) and [changelog](https://github.com/SwiftTUI/swift-tui/blob/0.17.0/CHANGELOG.md#0170---2026-10-12) for the full changes. All nine coordinated packages move to 0.17.0.

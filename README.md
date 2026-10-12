@@ -106,6 +106,14 @@ also remain usable through HTTP redirects. The adapter filename includes its
 content hash so custom-domain browser caching cannot retain another
 deployment's data routes.
 
+The deployment copy also fingerprints the demo's WASM, scene manifest, worker,
+frontend, and stylesheet. HTML references the hashed frontend and stylesheet;
+the frontend references the hashed worker, scene manifest, and WASM. This makes
+a new runtime load for returning browsers even when they retain earlier
+immutable responses. Stable asset aliases
+remain available, and generated headers preserve Brotli encoding for the hashed
+WASM. Tagged counter-demo inputs are not modified.
+
 Wrangler is pinned to 4.129.0 for its structured deployment output. Each data
 project exposes `_publication.json` so deployment verification can check the
 exact source revision and CORS headers before publishing the main site.

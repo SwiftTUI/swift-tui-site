@@ -10,6 +10,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
+import { fingerprintWebExample } from "./fingerprint-webexample";
 
 export const dataProjects = {
   views: "swift-tui-docc-views",
@@ -79,6 +80,7 @@ export async function composeCloudflare(
   await cp(websiteDist, site, { recursive: true });
   await rm(join(site, "webexample"), { recursive: true, force: true });
   await cp(webExampleDist, join(site, "webexample"), { recursive: true });
+  await fingerprintWebExample(site);
   await rm(join(site, "docs/documentation"), { recursive: true, force: true });
   await rm(join(site, "docs/charts/documentation"), {
     recursive: true,

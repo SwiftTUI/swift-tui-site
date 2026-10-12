@@ -61,6 +61,7 @@ async function fixture() {
     "docs/terminal-view/documentation/swifttuiterminalview/terminalview/index.html":
       "Duplicate terminal view shell",
     _redirects: "/docs/documentation/* /docs/ 200\n",
+    _headers: "/*\n  X-Content-Type-Options: nosniff\n",
   };
   for (const [path, text] of Object.entries(authored)) {
     await mkdir(join(website, path, ".."), { recursive: true });
@@ -71,6 +72,18 @@ async function fixture() {
     join(demo, "TerminalApp/dist/assets/app.wasm"),
     "compressed wasm",
   );
+  for (const [path, text] of Object.entries({
+    "index.js":
+      'const wasm = "./TerminalApp/dist/assets/app.wasm"; const worker = "./wasm-scene-worker.js"; const manifest = "./TerminalApp/dist/scene-manifest.json";',
+    "TerminalApp/dist/scene-manifest.json": "scene manifest",
+    "wasm-scene-worker.js": "worker code",
+    "index.css": "body { margin: 0 }",
+    "index.html":
+      '<script type="module" src="./index.js"></script><link rel="stylesheet" href="./index.css">',
+    "dom.html":
+      '<script type="module" src="./index.js"></script><link rel="stylesheet" href="./index.css">',
+  }))
+    await writeFile(join(demo, path), text);
   return { root, website, demo, output, data };
 }
 
@@ -82,7 +95,7 @@ test("preserves every DocC data byte and keeps shells, search, and demo on the m
     f.output,
     "release-sha",
   );
-  expect(counts).toEqual({ views: 3, other: 5, site: 8 });
+  expect(counts).toEqual({ views: 3, other: 5, site: 20 });
   for (const [path, content] of Object.entries(f.data)) {
     const shard = path.includes("/swifttuiviews/") ? "views" : "other";
     expect(await readFile(join(f.output, shard, path), "utf8")).toBe(content);
@@ -127,7 +140,7 @@ test("excludes oversized compiler linking digests without changing the input arc
   expect(await composeCloudflare(f.website, f.demo, f.output, "sha")).toEqual({
     views: 3,
     other: 5,
-    site: 8,
+    site: 20,
   });
   for (const path of paths) {
     await rejects(stat(join(f.output, "site", path)), { code: "ENOENT" });
@@ -182,8 +195,8 @@ test("uses immutable data URLs with the views rule ahead of the general data rul
 test("moves overflowing Views directories into spare data capacity and routes every byte", async () => {
   const f = await fixture();
   for (const [name, count] of [
-    ["large", 5],
-    ["small", 4],
+    ["large", 15],
+    ["small", 14],
   ] as const) {
     const directory = `docs/data/documentation/swifttuiviews/${name}`;
     await mkdir(join(f.website, directory), { recursive: true });
@@ -195,11 +208,11 @@ test("moves overflowing Views directories into spare data capacity and routes ev
     }
   }
   expect(
-    await composeCloudflare(f.website, f.demo, f.output, "sha", 10),
-  ).toEqual({ views: 7, other: 10, site: 8 });
+    await composeCloudflare(f.website, f.demo, f.output, "sha", 20),
+  ).toEqual({ views: 17, other: 20, site: 20 });
   for (const [name, count, shard] of [
-    ["large", 5, "other"],
-    ["small", 4, "views"],
+    ["large", 15, "other"],
+    ["small", 14, "views"],
   ] as const) {
     for (let index = 0; index < count; index++) {
       const path = `docs/data/documentation/swifttuiviews/${name}/${index}.json`;
@@ -249,8 +262,98 @@ test("moves overflowing Views directories into spare data capacity and routes ev
     redirects,
   );
   await rejects(
-    composeCloudflare(f.website, f.demo, f.output, "sha", 8),
+    composeCloudflare(f.website, f.demo, f.output, "sha", 18),
     /combined.*file budget/,
+  );
+});
+
+test("a new WASM deployment loads fresh bytes through a returning browser's cached entry assets", async () => {
+  const f = await fixture();
+  const cache = new Map<string, string>();
+  async function cached(path: string) {
+    const previous = cache.get(path);
+    if (previous !== undefined) return previous;
+    const contents = await readFile(
+      join(f.output, "site/webexample", path),
+      "utf8",
+    );
+    cache.set(path, contents);
+    return contents;
+  }
+  function reference(contents: string, pattern: RegExp) {
+    const path = contents.match(pattern)?.[1];
+    if (!path) throw new Error(`Missing asset reference matching ${pattern}`);
+    return path;
+  }
+  async function load() {
+    const html = await readFile(
+      join(f.output, "site/webexample/index.html"),
+      "utf8",
+    );
+    const entry = reference(html, /src="\.\/([^"]+\.js)"/);
+    const script = await cached(entry);
+    const wasm = reference(
+      script,
+      /\.\/(TerminalApp\/dist\/assets\/app(?:\.[a-f0-9]+)?\.wasm)/,
+    );
+    const worker = reference(
+      script,
+      /\.\/(wasm-scene-worker(?:\.[a-f0-9]+)?\.js)/,
+    );
+    const style = reference(html, /href="\.\/([^"]+\.css)"/);
+    const manifest = reference(
+      script,
+      /\.\/(TerminalApp\/dist\/scene-manifest(?:\.[a-f0-9]+)?\.json)/,
+    );
+    expect(
+      await readFile(join(f.output, "site/webexample/dom.html"), "utf8"),
+    ).toContain(`src="./${entry}"`);
+    return {
+      entry,
+      wasm,
+      worker,
+      style,
+      bytes: await cached(wasm),
+      workerCode: await cached(worker),
+      css: await cached(style),
+      manifest: await cached(manifest),
+    };
+  }
+  await composeCloudflare(f.website, f.demo, f.output, "first");
+  const first = await load();
+  expect(first.bytes).toBe("compressed wasm");
+  await writeFile(
+    join(f.demo, "TerminalApp/dist/assets/app.wasm"),
+    "next release wasm",
+  );
+  await composeCloudflare(f.website, f.demo, f.output, "second");
+  const second = await load();
+  expect(second.bytes).toBe("next release wasm");
+  expect(second.wasm).not.toBe(first.wasm);
+  expect(second.entry).not.toBe(first.entry);
+  expect(second.worker).toBe(first.worker);
+  expect(second.style).toBe(first.style);
+  const headers = await readFile(join(f.output, "site/_headers"), "utf8");
+  expect(headers).toContain(
+    `/webexample/${second.wasm}\n  Cache-Control: public, max-age=31536000, immutable, no-transform\n  Content-Type: application/wasm\n  Content-Encoding: br`,
+  );
+  // Changing the remaining runtime assets must also bypass their old caches.
+  await writeFile(join(f.demo, "wasm-scene-worker.js"), "new worker code");
+  await writeFile(join(f.demo, "index.css"), "new styles");
+  await writeFile(
+    join(f.demo, "TerminalApp/dist/scene-manifest.json"),
+    "new manifest",
+  );
+  await composeCloudflare(f.website, f.demo, f.output, "third");
+  const third = await load();
+  expect(third.workerCode).toBe("new worker code");
+  expect(third.css).toBe("new styles");
+  expect(third.manifest).toBe("new manifest");
+  expect(third.entry).not.toBe(second.entry);
+  expect(third.wasm).toBe(second.wasm);
+  expect(cache.get(first.wasm)).toBe("compressed wasm");
+  expect(await readFile(join(f.demo, "index.js"), "utf8")).toContain(
+    '"./TerminalApp/dist/assets/app.wasm"',
   );
 });
 
