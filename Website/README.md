@@ -40,10 +40,10 @@ bun run build:dev      # debug WebExample + DocC + Astro dist/
 
 By default, wasm scripts fetch the tagged public WebExample input recorded in
 `../docs/releases.yml` into `../.build/public-inputs/`. Set `WEBEXAMPLE_DIR` to
-the path of a WebExample checkout only for unpublished local inputs. Full
-website builds generate DocC from the repositories in
-`../docs/docc-repos.yml`. Then the builds copy the archive to
-`Website/dist/docs/`.
+the path of a WebExample checkout only for unpublished local inputs; a relative
+path is resolved from this directory. Full website builds generate DocC from
+the repositories in `../docs/docc-repos.yml`. Then the builds copy the archive
+to `Website/dist/docs/`.
 
 The deployment workflow documents `main` through its `docs_ref` input, and local
 documentation builds also default to `main`. Set `DOCC_SOURCE_REF` to a shared

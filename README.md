@@ -52,6 +52,10 @@ WEBEXAMPLE_DIR=/path/to/swift-tui-counter-demo/WebExample \
   bun run --cwd Website build:wasm
 ```
 
+A relative `WEBEXAMPLE_DIR` is resolved from `Website/`, the working directory
+of the Bun scripts, wherever the command starts; `Scripts/check_site.sh`
+resolves it the same way.
+
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
 [`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
 track the current package release (`0.19.3`). The `current.counterDemoRef`
@@ -67,6 +71,14 @@ Local builds also default to `main`. Set `DOCC_SOURCE_REF=` to reproduce the
 refs in `docc-repos.yml`, or select a shared tag with the workflow input or
 environment variable. A missing ref fails the build. The local
 checkout variables take precedence over the ref override for source overlays.
+
+Both manifests are YAML: values may be plain, single-quoted or double-quoted,
+with trailing `#` comments. A ref (in either manifest, `DOCC_SOURCE_REF` or
+`counter_demo_ref`) must be a branch, tag or commit ID: letters, digits and
+`._/+-`, starting with a letter or digit; quote one that YAML would read as a
+number, such as `"1.0"`. Each `mountPath` must name its own directory inside
+`Website/dist`, listed before any mount nested in it. The build checks all of
+this before it deletes anything.
 
 ## Cloudflare deployment
 

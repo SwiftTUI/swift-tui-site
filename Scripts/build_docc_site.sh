@@ -18,15 +18,26 @@ set -euo pipefail
 # DOCC_SOURCE_REF defaults to main for current documentation. Set it to an
 # empty string to use the manifest refs, or to a shared tag for that snapshot.
 # Local checkout inputs take precedence. Package dependencies remain tagged.
+#
+# The manifest is a `swiftRepos:` block list of flat `key: value` mappings.
+# Values are YAML scalars read as strings: plain (a ` #` starts a comment),
+# 'single-quoted' or "double-quoted". Every ref (DOCC_SOURCE_REF or the
+# manifest's) must be a branch, tag (SemVer build metadata included) or commit
+# ID. Every mountPath must name a distinct directory strictly inside
+# Website/dist, and a mount must be listed before any mount nested in it, since
+# each entry replaces its mount. All of this is checked before anything is
+# deleted.
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 manifest_path="${site_root}/docs/docc-repos.yml"
 work_root="${site_root}/.build-docs-work"
 website_dist="${site_root}/Website/dist"
 DOCC_SOURCE_REF="${DOCC_SOURCE_REF-main}"
+# A leading alphanumeric keeps every accepted ref from reading as a git option.
+ref_pattern='^[A-Za-z0-9][A-Za-z0-9._/+-]*$'
 
 if [ -n "${DOCC_SOURCE_REF:-}" ] &&
-  ! [[ "$DOCC_SOURCE_REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]]; then
+  ! [[ "$DOCC_SOURCE_REF" =~ $ref_pattern ]]; then
   printf '[build_docc_site] DOCC_SOURCE_REF must be a branch, tag, or commit ID\n' >&2
   exit 1
 fi
@@ -86,42 +97,151 @@ fi
 # Parse the manifest into one tab-separated record per swiftRepos entry.
 entries="$(
   python3 - "$manifest_path" <<'PY'
+import re
 import sys
+
+ESCAPES = {"0": "\0", "a": "\a", "b": "\b", "t": "\t", "n": "\n", "v": "\v",
+           "f": "\f", "r": "\r", "e": "\x1b", " ": " ", '"': '"', "/": "/",
+           "\\": "\\", "N": "\x85", "_": "\xa0", "L": "\u2028", "P": "\u2029"}
+HEX_ESCAPES = {"x": 2, "u": 4, "U": 8}
+
+
+def fail(message):
+    sys.stderr.write(message + "\n")
+    sys.exit(1)
+
+
+def scalar(text, where):
+    """One YAML 1.2 flow scalar, read with the failsafe schema (a string)."""
+    if not text or text.startswith("#"):
+        return ""
+    if text[0] == "'":
+        value, index = [], 1
+        while True:
+            end = text.find("'", index)
+            if end < 0:
+                fail("%s: unterminated single-quoted scalar" % where)
+            value.append(text[index:end])
+            if text[end + 1:end + 2] != "'":
+                break
+            value.append("'")
+            index = end + 2
+        rest = text[end + 1:]
+    elif text[0] == '"':
+        value, index = [], 1
+        while True:
+            if index >= len(text):
+                fail("%s: unterminated double-quoted scalar" % where)
+            char = text[index]
+            if char == '"':
+                break
+            if char == "\\":
+                code = text[index + 1:index + 2]
+                if code in HEX_ESCAPES:
+                    width = HEX_ESCAPES[code]
+                    digits = text[index + 2:index + 2 + width]
+                    if not re.fullmatch("[0-9A-Fa-f]{%d}" % width, digits):
+                        fail("%s: invalid \\%s escape" % (where, code))
+                    value.append(chr(int(digits, 16)))
+                    index += 2 + width
+                    continue
+                if code not in ESCAPES:
+                    fail("%s: unsupported escape \\%s" % (where, code))
+                value.append(ESCAPES[code])
+                index += 2
+                continue
+            value.append(char)
+            index += 1
+        rest = text[index + 1:]
+    else:
+        if text[0] in "[]{}&*!|>%@`," or (text[0] in "-?:" and text[1:2] in ("", " ")):
+            fail("%s: unsupported YAML value %r (use a plain or quoted scalar)" % (where, text))
+        comment = re.search(r"\s#", text)
+        return text[:comment.start()].rstrip() if comment else text
+    rest = rest.strip()
+    if rest and not rest.startswith("#"):
+        fail("%s: unexpected text after the quoted scalar: %r" % (where, rest))
+    return "".join(value)
+
 
 entries = []
 current = None
-for raw in open(sys.argv[1]):
-    line = raw.rstrip("\n")
-    stripped = line.strip()
-    if not stripped or stripped.startswith("#") or stripped == "swiftRepos:":
+for number, raw in enumerate(open(sys.argv[1], encoding="utf-8-sig"), 1):
+    stripped = raw.strip()
+    if not stripped or stripped.startswith("#") or re.fullmatch(r"swiftRepos:(\s+#.*)?", stripped):
         continue
-    if stripped.startswith("- "):
+    if stripped == "-" or stripped.startswith("- "):
         current = {}
         entries.append(current)
-        stripped = stripped[2:]
+        stripped = stripped[1:].lstrip()
     if current is None or ":" not in stripped:
         continue
     key, _, value = stripped.partition(":")
-    current[key.strip()] = value.strip()
+    key = key.strip()
+    value = scalar(value.strip(), "line %d (%s)" % (number, key))
+    # Each value becomes one field of a tab-separated record for the shell.
+    if any(ord(char) < 0x20 or ord(char) == 0x7F for char in value):
+        fail("line %d (%s): a value must not contain control characters" % (number, key))
+    current[key] = value
 
 required = ("name", "repository", "ref", "doccCommand", "outputPath", "mountPath")
+mounts = []
 for entry in entries:
-    missing = [key for key in required if not entry.get(key)]
+    missing = [key for key in required if not entry.get(key, "").strip()]
     if missing:
-        sys.stderr.write(
-            "invalid swiftRepos entry (missing %s): %r\n" % (", ".join(missing), entry)
-        )
-        sys.exit(1)
+        fail("invalid swiftRepos entry (missing %s): %r" % (", ".join(missing), entry))
+    # Empty and "." segments are dropped, so /docs/ still means docs; ".."
+    # could leave Website/dist, and no segment at all is the whole dist.
+    segments = [part for part in entry["mountPath"].split("/") if part not in ("", ".")]
+    if ".." in segments or not segments:
+        fail("mountPath %r must name a directory inside Website/dist" % entry["mountPath"])
+    mount = "/".join(segments)
+    for earlier in mounts:
+        if earlier == mount:
+            fail("duplicate mountPath %r: each archive needs its own mount" % mount)
+        if earlier.startswith(mount + "/"):
+            fail("mountPath %r is listed after the nested mount %r and would delete it; "
+                 "list the containing mount first" % (mount, earlier))
+    mounts.append(mount)
+    entry["mountPath"] = mount
     print("\t".join(entry[key] for key in required))
 
 if not entries:
-    sys.stderr.write("no swiftRepos entries found\n")
-    sys.exit(1)
+    fail("no swiftRepos entries found")
 PY
 )" || {
   printf '[build_docc_site] invalid manifest: %s\n' "$manifest_path" >&2
   exit 1
 }
+
+# Fails unless the real path of $1 lies strictly inside the real path of
+# Website/dist, so a symlinked parent cannot carry the rm -rf below outside it.
+require_mount_inside_dist() {
+  python3 - "$website_dist" "$1" <<'PY' || exit 1
+import os
+import sys
+
+dist, target = (os.path.realpath(path) for path in sys.argv[1:3])
+if target == dist or os.path.commonpath([dist, target]) != dist:
+    sys.stderr.write(
+        "[build_docc_site] mountPath %s resolves to %s, outside %s\n" % (sys.argv[2], target, dist)
+    )
+    sys.exit(1)
+PY
+}
+
+# Validate every entry before anything is deleted.
+while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_path; do
+  ref="${DOCC_SOURCE_REF:-$ref}"
+  if ! [[ "$ref" =~ $ref_pattern ]]; then
+    printf '[build_docc_site] %s ref must be a branch, tag, or commit ID: %s\n' \
+      "$repo_name" "$ref" >&2
+    exit 1
+  fi
+  require_mount_inside_dist "${website_dist}/${mount_path}"
+done <<EOF
+$entries
+EOF
 
 rm -rf "$work_root"
 mkdir -p "$work_root"
@@ -147,6 +267,8 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
     using_source_checkout=1
   fi
 
+  # An earlier archive may have added links under Website/dist; check again.
+  require_mount_inside_dist "$output_root"
   rm -rf "$output_root"
   mkdir -p "$output_root"
 
@@ -169,7 +291,7 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
   (
     cd "$clone_dir"
     if [ "$using_source_checkout" -eq 0 ]; then
-      git fetch --tags origin "$ref" >/dev/null
+      git fetch --tags origin -- "$ref" >/dev/null
       git checkout --quiet --detach FETCH_HEAD
       printf '[build_docc_site] source %s ref=%s revision=%s\n' \
         "$repo_name" "$ref" "$(git rev-parse HEAD)"

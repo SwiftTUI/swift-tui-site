@@ -15,7 +15,6 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { composeCloudflare, filesUnder } from "./compose-cloudflare";
-import { d1KnownIssue } from "./d1-known-issue";
 
 const roots: string[] = [];
 afterEach(async () => {
@@ -93,13 +92,8 @@ test("d1s012 a missing _headers, _redirects, DocC shell or demo dom.html fails o
       () => true,
       () => false,
     );
-    d1KnownIssue(
-      "d1s012",
-      `STUI-1203: missing ${where}/${path} is detected after rm(output) at compose-cloudflare.ts:78 (only five inputs are stat'ed at :75-77; the read fails at fingerprint-webexample.ts:57 / compose-cloudflare.ts:127,143); contract: compose-cloudflare.ts:74; adjacent none`,
-      () => {
-        expect(survived).toBe(true);
-      },
-    );
+    // STUI-1203, fixed in wave 3.
+    expect(survived, `${where}/${path}`).toBe(true);
   }
 });
 
@@ -118,4 +112,77 @@ test("d1s013 a symlink inside websiteDist is refused as a deployment input", asy
   );
   // The input archive is untouched by the refusal.
   expect(await readFile(join(f.website, "index.html"), "utf8")).toBe("Site");
+});
+
+// Wave 3 repair scenarios (swift-tui-org campaign two, STUI-1166): ids
+// w3r32-w3r34 of the wave-3 site repair-hypotheses.json.
+
+async function previousDeployment(output: string): Promise<string> {
+  const marker = join(output, "previous-deployment.marker");
+  await mkdir(output, { recursive: true });
+  await writeFile(marker, "previous deployment");
+  return marker;
+}
+
+const present = (path: string) =>
+  stat(path).then(
+    () => true,
+    () => false,
+  );
+
+test.each([
+  ["demo", "index.js"],
+  ["demo", "index.css"],
+  ["demo", "index.html"],
+  ["demo", "wasm-scene-worker.js"],
+  ["demo", "TerminalApp/dist/scene-manifest.json"],
+  ["website", "docs/index.html"],
+  ["website", "docs/terminal-view/index.html"],
+])(
+  "wave3 STUI-1203 a missing %s/%s is refused before the previous tree is removed",
+  async (where, path) => {
+    const f = await fixture();
+    await rm(join(where === "website" ? f.website : f.demo, path));
+    const marker = await previousDeployment(f.output);
+    await rejects(composeCloudflare(f.website, f.demo, f.output, "sha"));
+    expect(await present(marker)).toBe(true);
+  },
+);
+
+test.each([
+  [
+    "website",
+    "docs/index.html",
+    "<html><body>DocC shell</body></html>",
+    /Missing DocC HTML head/,
+  ],
+  [
+    "demo",
+    "index.js",
+    'const wasm = "./TerminalApp/dist/assets/app.wasm"; const manifest = "./TerminalApp/dist/scene-manifest.json";',
+    /Missing WebExample asset reference/,
+  ],
+] as const)(
+  "wave3 STUI-1203 a malformed %s/%s is refused before the previous tree is removed",
+  async (where, path, text, message) => {
+    const f = await fixture();
+    await writeFile(join(where === "website" ? f.website : f.demo, path), text);
+    const marker = await previousDeployment(f.output);
+    await rejects(
+      composeCloudflare(f.website, f.demo, f.output, "sha"),
+      message,
+    );
+    expect(await present(marker)).toBe(true);
+  },
+);
+
+test("wave3 STUI-1203 a complete input still replaces the previous tree", async () => {
+  const f = await fixture();
+  const marker = await previousDeployment(f.output);
+  const counts = await composeCloudflare(f.website, f.demo, f.output, "sha");
+  expect(counts).toEqual({ views: 3, other: 5, site: 20 });
+  expect(await present(marker)).toBe(false);
+  expect(
+    await readFile(join(f.output, "site/docs/index.html"), "utf8"),
+  ).toContain('<script src="/docc-data-routing.js"></script></head>');
 });

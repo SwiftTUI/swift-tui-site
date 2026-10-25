@@ -34,7 +34,8 @@ function stripComments(css: string): string {
 
 function declarations(block: string): TokenTable {
   const table: TokenTable = new Map();
-  for (const match of block.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/gi)) {
+  // CSS Syntax Level 3 §5.4.4: the block's last declaration may omit its `;`.
+  for (const match of block.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+)(?:;|$)/gi)) {
     table.set(match[1], match[2].trim());
   }
   return table;
@@ -62,17 +63,55 @@ export function parseTokens(css: string): ParsedTokens {
 }
 
 export function resolveToken(name: string, ...tables: TokenTable[]): string {
-  const seen = new Set<string>();
-  const lookup = (token: string): string => {
-    if (seen.has(token)) throw new Error(`token alias cycle at ${token}`);
-    seen.add(token);
-    const value = tables
+  // The tokens being resolved, outermost first: only a reference back into
+  // this chain is a cycle (CSS Custom Properties §2.3).
+  const resolving: string[] = [];
+  const declared = (token: string) =>
+    tables
       .map((table) => table.get(token))
       .find((entry) => entry !== undefined);
+  const lookup = (token: string): string => {
+    if (resolving.includes(token))
+      throw new Error(`token alias cycle at ${token}`);
+    const value = declared(token);
     if (value === undefined) throw new Error(`unknown token ${token}`);
-    return value.replace(/var\((--[a-z0-9-]+)\)/gi, (_match, inner: string) =>
-      lookup(inner),
-    );
+    resolving.push(token);
+    try {
+      return substitute(value);
+    } finally {
+      resolving.pop();
+    }
+  };
+  // CSS Custom Properties §3: var( <custom-property-name> [, <fallback>]? ).
+  // A defined name resolves; an undefined one takes its fallback.
+  const substitute = (value: string): string => {
+    let output = "";
+    let index = 0;
+    for (;;) {
+      const start = value.slice(index).search(/(?<![\w-])var\(/i);
+      if (start < 0) return output + value.slice(index);
+      const open = index + start + "var(".length;
+      let depth = 1;
+      let comma = -1;
+      let close = open;
+      for (; close < value.length && depth > 0; close++) {
+        if (value[close] === "(") depth++;
+        else if (value[close] === ")") depth--;
+        else if (value[close] === "," && depth === 1 && comma < 0)
+          comma = close;
+      }
+      if (depth > 0) throw new Error(`unbalanced var() in ${value}`);
+      const end = close - 1;
+      const reference = value.slice(open, comma < 0 ? end : comma).trim();
+      if (!/^--[a-z0-9-]+$/i.test(reference))
+        throw new Error(`invalid var() reference in ${value}`);
+      output += value.slice(index, index + start);
+      output +=
+        declared(reference) !== undefined || comma < 0
+          ? lookup(reference)
+          : substitute(value.slice(comma + 1, end).trim());
+      index = close;
+    }
   };
   return lookup(name);
 }

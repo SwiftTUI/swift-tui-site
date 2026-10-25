@@ -18,6 +18,28 @@ function replaceReference(contents: string, from: string, to: string) {
 /** Fingerprint the copied deployment graph without modifying tagged inputs. */
 export async function fingerprintWebExample(site: string) {
   const demo = join(site, "webexample");
+  const plan = await planWebExampleFingerprint(
+    demo,
+    await readFile(join(site, "_headers"), "utf8"),
+  );
+  for (const [path, contents] of plan.files)
+    await writeFile(join(demo, path), contents);
+  await writeFile(join(site, "_headers"), plan.headers);
+}
+
+/**
+ * Reads every WebExample input under `demo` and computes the fingerprinted
+ * files and the extended `headers`, writing nothing. Throws when an input, or
+ * a reference the fingerprint rewrites, is missing, so a caller can validate
+ * the inputs before it replaces anything.
+ */
+export async function planWebExampleFingerprint(
+  demo: string,
+  headers: string,
+): Promise<{
+  files: (readonly [string, Uint8Array | string])[];
+  headers: string;
+}> {
   const wasmPath = "TerminalApp/dist/assets/app.wasm";
   const workerPath = "wasm-scene-worker.js";
   const manifestPath = "TerminalApp/dist/scene-manifest.json";
@@ -54,7 +76,6 @@ export async function fingerprintWebExample(site: string) {
       return [path, html] as const;
     }),
   );
-  const headers = await readFile(join(site, "_headers"), "utf8");
   const rules = [
     `/webexample/${wasmName}\n  Cache-Control: public, max-age=31536000, immutable, no-transform\n  Content-Type: application/wasm\n  Content-Encoding: br`,
     ...[workerName, manifestName, frontendName, stylesheetName].map(
@@ -63,17 +84,15 @@ export async function fingerprintWebExample(site: string) {
     ),
   ];
   // Retain stable aliases for direct consumers; HTML loads only hashed assets.
-  for (const [path, contents] of [
-    [wasmName, wasm],
-    [workerName, worker],
-    [manifestName, manifest],
-    [frontendName, frontend],
-    [stylesheetName, stylesheet],
-    ...pages,
-  ] as const)
-    await writeFile(join(demo, path), contents);
-  await writeFile(
-    join(site, "_headers"),
-    `${headers.trimEnd()}\n\n${rules.join("\n\n")}\n`,
-  );
+  return {
+    files: [
+      [wasmName, wasm],
+      [workerName, worker],
+      [manifestName, manifest],
+      [frontendName, frontend],
+      [stylesheetName, stylesheet],
+      ...pages,
+    ],
+    headers: `${headers.trimEnd()}\n\n${rules.join("\n\n")}\n`,
+  };
 }

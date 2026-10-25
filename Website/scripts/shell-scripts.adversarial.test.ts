@@ -6,6 +6,7 @@ import { afterEach, expect, test } from "bun:test";
 import {
   chmod,
   copyFile,
+  lstat,
   mkdir,
   mkdtemp,
   readFile,
@@ -17,7 +18,6 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { d1KnownIssue } from "./d1-known-issue";
 
 const websiteRoot = resolve(import.meta.dir, "..");
 const siteCheckout = resolve(websiteRoot, "..");
@@ -238,14 +238,10 @@ test("d1s005 a mountPath that climbs out of Website/dist deletes and writes outs
   const escapedIndex = await exists(
     join(site.siteRoot, "Website/escaped/index.html"),
   );
-  d1KnownIssue(
-    "d1s005",
-    `STUI-1197: mountPath '../escaped' is joined without containment (build_docc_site.sh:132) and rm -rf'ed (:150) then written (:183): exit ${result.exitCode}, sentinel survived=${sentinelSurvived}, Website/escaped/index.html=${escapedIndex}; contract: build_docc_site.sh:4-5, README.md:36-40; adjacent none`,
-    () => {
-      expect(result.exitCode).not.toBe(0);
-      expect(sentinelSurvived).toBe(true);
-    },
-  );
+  // STUI-1197, fixed in wave 3.
+  expect(result.exitCode).not.toBe(0);
+  expect(sentinelSurvived).toBe(true);
+  expect(escapedIndex).toBe(false);
 });
 
 test("d1s006 a double-quoted ref in docc-repos.yml is fetched with its quotes", async () => {
@@ -267,14 +263,9 @@ test("d1s006 a double-quoted ref in docc-repos.yml is fetched with its quotes", 
     join(site.dist, "docs/index.html"),
     "utf8",
   ).catch(() => "");
-  d1KnownIssue(
-    "d1s006",
-    `STUI-1198: ref: "fixture" is fetched with literal quotes (build_docc_site.sh:104-105 keeps them, :172 fetches): exit ${result.exitCode}; contract: YAML 1.2 §7.3, README.md:62-68; adjacent none`,
-    () => {
-      expect(result.exitCode).toBe(0);
-      expect(index).toContain("tagged swift-tui");
-    },
-  );
+  // STUI-1198, fixed in wave 3.
+  expect(result.exitCode).toBe(0);
+  expect(index).toContain("tagged swift-tui");
 });
 
 test("d1s016 DOCC_SOURCE_REF rejects a tag carrying SemVer build metadata", async () => {
@@ -296,14 +287,9 @@ test("d1s016 DOCC_SOURCE_REF rejects a tag carrying SemVer build metadata", asyn
     join(site.dist, "docs/index.html"),
     "utf8",
   ).catch(() => "");
-  d1KnownIssue(
-    "d1s016",
-    `STUI-1206: DOCC_SOURCE_REF=0.14.0+site.1 is refused by the ref regex (build_docc_site.sh:28-32 has no '+'): exit ${result.exitCode}, stderr ${JSON.stringify(result.stderr.trim())}; contract: README.md:66-67, git-check-ref-format(1), prepare-webexample.test.ts:59; adjacent none`,
-    () => {
-      expect(result.exitCode).toBe(0);
-      expect(index).toContain("tagged swift-tui");
-    },
-  );
+  // STUI-1206, fixed in wave 3.
+  expect(result.exitCode).toBe(0);
+  expect(index).toContain("tagged swift-tui");
 });
 
 test("d1s007 two entries with the same mountPath silently keep only the last archive", async () => {
@@ -325,14 +311,9 @@ test("d1s007 two entries with the same mountPath silently keep only the last arc
     join(site.dist, "docs/index.html"),
     "utf8",
   ).catch(() => "");
-  d1KnownIssue(
-    "d1s007",
-    `STUI-1199: a duplicate mountPath replaces the earlier archive without a diagnostic (build_docc_site.sh:150 rm -rf per entry): exit ${result.exitCode}, docs/index.html=${JSON.stringify(index.trim())}; contract: build_docc_site_test.sh:87-89; adjacent none`,
-    () => {
-      // Either refused, or both archives survive (the first is not clobbered).
-      if (result.exitCode === 0) expect(index).toContain("first archive");
-    },
-  );
+  // STUI-1199, fixed in wave 3. Either refused, or both archives survive
+  // (the first is not clobbered).
+  if (result.exitCode === 0) expect(index).toContain("first archive");
 });
 
 test("d1s008 an empty swiftRepos list and a missing required key are refused", async () => {
@@ -373,13 +354,8 @@ test("d1s009 a root mount path produces a protocol-relative stylesheet URL", asy
     "utf8",
   );
   const href = linked.match(/href="([^"]*docs-theme\.css)"/)?.[1];
-  d1KnownIssue(
-    "d1s009",
-    `STUI-1200: mount path '/' strips to '' (apply_docc_theme.sh:32-33) and the template (:54) emits href=${JSON.stringify(href)}, a network-path reference; contract: apply_docc_theme.sh:11-13, RFC 3986 §4.2; adjacent none`,
-    () => {
-      expect(href).toBe("/docs-theme.css");
-    },
-  );
+  // STUI-1200, fixed in wave 3.
+  expect(href).toBe("/docs-theme.css");
 });
 
 test("d1s010 a symlinked shell is rewritten through the link outside the mount", async () => {
@@ -401,13 +377,8 @@ test("d1s010 a symlinked shell is rewritten through the link outside the mount",
   const result = runBash(site.themeScript, [mount, "docs"], {}, site.siteRoot);
   expect(result.exitCode).toBe(0);
   const after = await readFile(outside, "utf8");
-  d1KnownIssue(
-    "d1s010",
-    `STUI-1201: a symlinked index.html is listed by os.walk (apply_docc_theme.sh:56-59) and open(path, 'w') follows it (:67), so the file outside the mount gains the <link>; contract: apply_docc_theme.sh:8-11; adjacent none`,
-    () => {
-      expect(after).toBe(shell);
-    },
-  );
+  // STUI-1201, fixed in wave 3.
+  expect(after).toBe(shell);
 });
 
 test("d1s011 a shell whose body mentions docs-theme.css is never linked", async () => {
@@ -426,14 +397,9 @@ test("d1s011 a shell whose body mentions docs-theme.css is never linked", async 
   const links =
     linked.match(/<link rel="stylesheet" href="\/docs\/docs-theme\.css">/g) ??
     [];
-  d1KnownIssue(
-    "d1s011",
-    `STUI-1202: the idempotency check is a whole-document substring test (apply_docc_theme.sh:62), so a shell mentioning docs-theme.css in its body is skipped: links=${links.length}, report=${JSON.stringify(result.stdout.trim())}; contract: apply_docc_theme.sh:9-11,14; adjacent none`,
-    () => {
-      expect(links).toHaveLength(1);
-      expect(result.stdout).toContain("1 shell(s) linked");
-    },
-  );
+  // STUI-1202, fixed in wave 3.
+  expect(links).toHaveLength(1);
+  expect(result.stdout).toContain("1 shell(s) linked");
 });
 
 test("d1s017 an empty or HTML app.wasm is refused by the compressor", async () => {
@@ -464,3 +430,342 @@ test("d1s017 an empty or HTML app.wasm is refused by the compressor", async () =
     expect(await readFile(join(assets, "app.wasm"), "utf8")).toBe(body);
   }
 });
+
+// Wave 3 repair scenarios (swift-tui-org campaign two, STUI-1166): ids
+// w3r12-w3r30 and w3r42-w3r44 of the wave-3 site repair-hypotheses.json.
+
+/** Writes `text` to `path`, creating its parent directories. */
+async function plant(path: string, text: string): Promise<string> {
+  await mkdir(join(path, ".."), { recursive: true });
+  await writeFile(path, text);
+  return path;
+}
+
+/** One local-checkout entry per name, in order, with the given mounts. */
+async function buildWithMounts(
+  site: SiteRoot,
+  mounts: [name: "swift-tui" | "swift-tui-charts", mountPath: string][],
+): Promise<RunResult> {
+  const env: Record<string, string> = {};
+  for (const [name] of mounts)
+    env[
+      name === "swift-tui" ? "SWIFTTUI_CHECKOUT" : "SWIFTTUI_CHARTS_CHECKOUT"
+    ] = await site.checkoutStub(name, `${name} archive`);
+  await writeFile(
+    join(site.siteRoot, "docs/docc-repos.yml"),
+    `swiftRepos:\n${mounts.map(([name, mount]) => entry(name, mount)).join("")}`,
+  );
+  return runBash(site.buildScript, [], env, site.siteRoot);
+}
+
+test.each(["docs/../../escaped", "/"])(
+  "wave3 STUI-1197 mountPath %p is refused before any rm",
+  async (mount) => {
+    const site = await makeSiteRoot();
+    const kept = [
+      await plant(join(site.dist, "docs/old.txt"), "previous"),
+      await plant(join(site.dist, "astro.txt"), "astro page"),
+      await plant(join(site.siteRoot, "Website/escaped/keep.txt"), "sentinel"),
+      await plant(join(site.siteRoot, ".build-docs-work/marker"), "work tree"),
+    ];
+    const result = await buildWithMounts(site, [
+      ["swift-tui", "docs"],
+      ["swift-tui-charts", mount],
+    ]);
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stderr).toContain("mountPath");
+    for (const path of kept) expect(await exists(path), path).toBe(true);
+  },
+);
+
+test("wave3 STUI-1197 a mountPath under a symlinked directory that leaves Website/dist is refused", async () => {
+  const site = await makeSiteRoot();
+  const keep = await plant(
+    join(site.siteRoot, "outside/docs/keep.txt"),
+    "must survive",
+  );
+  await symlink("../../outside", join(site.dist, "linked"));
+  const result = await buildWithMounts(site, [["swift-tui", "linked/docs"]]);
+  expect(result.exitCode).not.toBe(0);
+  expect(result.stderr).toContain("outside");
+  expect(await exists(keep)).toBe(true);
+});
+
+test("wave3 STUI-1197 a slash-wrapped mountPath still composes inside Website/dist", async () => {
+  const site = await makeSiteRoot();
+  const result = await buildWithMounts(site, [["swift-tui", "/docs/"]]);
+  expect(result.exitCode, result.stderr).toBe(0);
+  expect(await readFile(join(site.dist, "docs/index.html"), "utf8")).toContain(
+    "swift-tui archive",
+  );
+  expect(
+    await readFile(
+      join(site.dist, "docs/documentation/fixture/index.html"),
+      "utf8",
+    ),
+  ).toContain('<link rel="stylesheet" href="/docs/docs-theme.css"></head>');
+});
+
+test.each(["'fixture' # pinned", "fixture # pinned"])(
+  "wave3 STUI-1198 manifest ref %p is read as the YAML scalar fixture",
+  async (ref) => {
+    const site = await makeSiteRoot();
+    const env = await makeRemotes(site, ["fixture"]);
+    await writeFile(
+      join(site.siteRoot, "docs/docc-repos.yml"),
+      `swiftRepos:\n${entry("swift-tui", "docs", { ref })}`,
+    );
+    const result = runBash(
+      site.buildScript,
+      [],
+      { ...env, DOCC_SOURCE_REF: "" },
+      site.siteRoot,
+    );
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect(
+      await readFile(join(site.dist, "docs/index.html"), "utf8"),
+    ).toContain("tagged swift-tui");
+  },
+);
+
+test("wave3 STUI-1198 quotes inside a plain scalar are content, not quoting", async () => {
+  const site = await makeSiteRoot();
+  const checkout = await site.checkoutStub("swift-tui", "plain command");
+  await writeFile(
+    join(site.siteRoot, "docs/docc-repos.yml"),
+    `swiftRepos:\n${entry("swift-tui", "docs", { doccCommand: 'sh -c "./make-docs.sh"' })}`,
+  );
+  const result = runBash(
+    site.buildScript,
+    [],
+    { SWIFTTUI_CHECKOUT: checkout },
+    site.siteRoot,
+  );
+  expect(result.exitCode, result.stderr).toBe(0);
+  expect(await readFile(join(site.dist, "docs/index.html"), "utf8")).toContain(
+    "plain command",
+  );
+});
+
+test.each([
+  ['"--upload-pack=/tmp/d1-evil"', "must be a branch, tag, or commit ID"],
+  ["[fixture]", "invalid manifest"],
+  ['"fixture', "invalid manifest"],
+  ['"fixture" extra', "invalid manifest"],
+])(
+  "wave3 STUI-1198 manifest ref %p is refused before any rm",
+  async (ref, message) => {
+    const site = await makeSiteRoot();
+    const env = await makeRemotes(site, ["fixture"]);
+    const previous = await plant(join(site.dist, "docs/old.txt"), "previous");
+    await writeFile(
+      join(site.siteRoot, "docs/docc-repos.yml"),
+      `swiftRepos:\n${entry("swift-tui", "docs", { ref })}`,
+    );
+    const result = runBash(
+      site.buildScript,
+      [],
+      { ...env, DOCC_SOURCE_REF: "" },
+      site.siteRoot,
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain(message);
+    expect(await exists(previous)).toBe(true);
+  },
+);
+
+test.each([
+  ["docs", "docs"],
+  ["docs", "/docs/"],
+  ["docs/charts", "docs"],
+])(
+  "wave3 STUI-1199 mounts %p then %p are refused before any rm",
+  async (first, second) => {
+    const site = await makeSiteRoot();
+    const previous = await plant(join(site.dist, "docs/old.txt"), "previous");
+    const result = await buildWithMounts(site, [
+      ["swift-tui", first],
+      ["swift-tui-charts", second],
+    ]);
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stderr).toContain("mountPath");
+    expect(await exists(previous)).toBe(true);
+  },
+);
+
+test("wave3 STUI-1199 sibling mounts that share a string prefix both compose", async () => {
+  const site = await makeSiteRoot();
+  const result = await buildWithMounts(site, [
+    ["swift-tui", "docs"],
+    ["swift-tui-charts", "docs-old"],
+  ]);
+  expect(result.exitCode, result.stderr).toBe(0);
+  expect(await readFile(join(site.dist, "docs/index.html"), "utf8")).toContain(
+    "swift-tui archive",
+  );
+  expect(
+    await readFile(join(site.dist, "docs-old/index.html"), "utf8"),
+  ).toContain("swift-tui-charts archive");
+});
+
+test.each(["docs", "docs/", "/docs"])(
+  "wave3 STUI-1200 mount path %p links /docs/docs-theme.css",
+  async (mountPath) => {
+    const site = await makeSiteRoot();
+    const mount = await mountWithShell(site, shell);
+    const result = runBash(
+      site.themeScript,
+      [mount, mountPath],
+      {},
+      site.siteRoot,
+    );
+    expect(result.exitCode).toBe(0);
+    const linked = await readFile(
+      join(mount, "documentation/fixture/index.html"),
+      "utf8",
+    );
+    expect(linked.match(/href="([^"]*docs-theme\.css)"/)?.[1]).toBe(
+      "/docs/docs-theme.css",
+    );
+  },
+);
+
+test("wave3 STUI-1201 the theme copy replaces a symlinked destination and regular shells are still linked", async () => {
+  const site = await makeSiteRoot();
+  const mount = await mountWithShell(site, shell);
+  const outside = await plant(
+    join(site.siteRoot, "outside/target.css"),
+    "outside original",
+  );
+  await symlink("../../../outside/target.css", join(mount, "docs-theme.css"));
+  // Precondition: the destination link resolves to the outside file.
+  expect(await readFile(join(mount, "docs-theme.css"), "utf8")).toBe(
+    "outside original",
+  );
+  const result = runBash(site.themeScript, [mount, "docs"], {}, site.siteRoot);
+  expect(result.exitCode).toBe(0);
+  expect(await readFile(outside, "utf8")).toBe("outside original");
+  expect((await lstat(join(mount, "docs-theme.css"))).isSymbolicLink()).toBe(
+    false,
+  );
+  expect(await readFile(join(mount, "docs-theme.css"), "utf8")).toBe(
+    "/* fixture theme */\n",
+  );
+  const linked = await readFile(
+    join(mount, "documentation/fixture/index.html"),
+    "utf8",
+  );
+  expect(linked.match(/docs-theme\.css/g)).toHaveLength(1);
+});
+
+test("wave3 STUI-1202 a second theme run changes nothing and headless shells stay skipped", async () => {
+  const site = await makeSiteRoot();
+  const mount = await mountWithShell(site, shell);
+  const headless = "<html><body>no head</body></html>\n";
+  const headlessPath = await plant(
+    join(mount, "documentation/headless/index.html"),
+    headless,
+  );
+  const first = runBash(site.themeScript, [mount, "docs"], {}, site.siteRoot);
+  expect(first.exitCode).toBe(0);
+  expect(first.stdout).toContain("1 shell(s) linked, 1 without <head> skipped");
+  const once = await readFile(
+    join(mount, "documentation/fixture/index.html"),
+    "utf8",
+  );
+  const second = runBash(site.themeScript, [mount, "docs"], {}, site.siteRoot);
+  expect(second.exitCode).toBe(0);
+  expect(second.stdout).toContain(
+    "0 shell(s) linked, 1 without <head> skipped",
+  );
+  expect(
+    await readFile(join(mount, "documentation/fixture/index.html"), "utf8"),
+  ).toBe(once);
+  expect(once.match(/docs-theme\.css/g)).toHaveLength(1);
+  expect(await readFile(headlessPath, "utf8")).toBe(headless);
+});
+
+test.each(["-x+y", "+main", "--help", "main;echo"])(
+  "wave3 STUI-1206 DOCC_SOURCE_REF %p is still refused before any rm",
+  async (ref) => {
+    const site = await makeSiteRoot();
+    const checkout = await site.checkoutStub("swift-tui", "local archive");
+    const previous = await plant(join(site.dist, "docs/old.txt"), "previous");
+    await writeFile(
+      join(site.siteRoot, "docs/docc-repos.yml"),
+      `swiftRepos:\n${entry("swift-tui", "docs")}`,
+    );
+    const result = runBash(
+      site.buildScript,
+      [],
+      { SWIFTTUI_CHECKOUT: checkout, DOCC_SOURCE_REF: ref },
+      site.siteRoot,
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain(
+      "DOCC_SOURCE_REF must be a branch, tag, or commit ID",
+    );
+    expect(await exists(previous)).toBe(true);
+  },
+);
+
+test.each(["relative", "absolute"])(
+  "wave3 S4 check_site.sh and the Bun scripts agree on a %s WEBEXAMPLE_DIR",
+  async (kind) => {
+    // check_site.sh with every external tool stubbed: the stub bun records the
+    // WEBEXAMPLE_DIR each build step sees; the gate's own wasm checks must look
+    // at the same directory. The gate runs from an unrelated directory.
+    const root = await realpath(
+      await mkdtemp(join(tmpdir(), "d1-check-site-")),
+    );
+    tempRoots.push(root);
+    const siteRoot = join(root, "site");
+    const bin = join(root, "bin");
+    const log = join(root, "bun.log");
+    await mkdir(join(siteRoot, "Scripts"), { recursive: true });
+    await copyFile(
+      join(siteCheckout, "Scripts/check_site.sh"),
+      join(siteRoot, "Scripts/check_site.sh"),
+    );
+    const executables = [
+      await plant(
+        join(bin, "bun"),
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$WEBEXAMPLE_DIR" >> "$D1_BUN_LOG"\n',
+      ),
+    ];
+    for (const stub of ["check_site_ci_workflow.sh", "build_docc_site.sh"])
+      executables.push(
+        await plant(join(siteRoot, "Scripts", stub), "#!/usr/bin/env bash\n"),
+      );
+    for (const tool of ["brotli", "swiftly", "wasm-opt"])
+      executables.push(await plant(join(bin, tool), "#!/usr/bin/env bash\n"));
+    for (const path of executables) await chmod(path, 0o755);
+    const demo = join(siteRoot, "demo/WebExample");
+    await plant(join(demo, "pages-dist/TerminalApp/dist/assets/app.wasm"), "w");
+    await plant(
+      join(
+        siteRoot,
+        "Website/dist/webexample/TerminalApp/dist/assets/app.wasm",
+      ),
+      "w",
+    );
+    const result = runBash(
+      join(siteRoot, "Scripts/check_site.sh"),
+      [],
+      {
+        PATH: `${bin}:${process.env.PATH ?? ""}`,
+        D1_BUN_LOG: log,
+        WEBEXAMPLE_DIR: kind === "relative" ? "../demo/WebExample" : demo,
+      },
+      root,
+    );
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect(result.stdout).toContain("[check_site] ok");
+    const seen = (await readFile(log, "utf8")).trim().split("\n");
+    expect(seen.length).toBeGreaterThan(0);
+    for (const dir of seen) {
+      expect(dir.startsWith("/"), dir).toBe(true);
+      expect(resolve(dir)).toBe(demo);
+    }
+  },
+);

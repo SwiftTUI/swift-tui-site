@@ -2,8 +2,14 @@
 set -euo pipefail
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
-webexample_dir="${WEBEXAMPLE_DIR:-${site_root}/.build/public-inputs/swift-tui-counter-demo/WebExample}"
 website_dir="${site_root}/Website"
+# The Bun and Astro steps resolve a relative WEBEXAMPLE_DIR from Website/, their
+# working directory. Resolve it the same way and export the absolute path, so
+# the wasm checks below inspect the directory those steps built.
+if [[ -n "${WEBEXAMPLE_DIR:-}" && "$WEBEXAMPLE_DIR" != /* ]]; then
+  export WEBEXAMPLE_DIR="${website_dir}/${WEBEXAMPLE_DIR}"
+fi
+webexample_dir="${WEBEXAMPLE_DIR:-${site_root}/.build/public-inputs/swift-tui-counter-demo/WebExample}"
 
 fail() {
   printf '[check_site] %s\n' "$1" >&2

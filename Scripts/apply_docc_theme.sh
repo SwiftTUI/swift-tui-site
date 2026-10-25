@@ -9,9 +9,11 @@ set -euo pipefail
 # fetches beside its shell) and docs-theme.css into <mount_dir>, then links
 # the stylesheet from every DocC shell under the mount so the documentation
 # loads the design system's fonts and heading rules. The link is absolute
-# (/<mount_path>/docs-theme.css) because the shells are served at rewritten
-# paths (/docs/documentation/...) by Cloudflare Pages. Shells without a
-# </head> are left alone. Idempotent: a second run changes nothing.
+# (/<mount_path>/docs-theme.css, or /docs-theme.css for the root mount /)
+# because the shells are served at rewritten paths (/docs/documentation/...)
+# by Cloudflare Pages. Shells without a </head>, and symlinked shells, are left
+# alone; nothing is written through a symlink. Idempotent: a second run
+# changes nothing.
 #
 # A DocC archive transformed for static hosting carries thousands of per-page
 # copies of the shell (the deploy removes them; local previews use them), so
@@ -43,6 +45,8 @@ for input in theme-settings.json docs-theme.css; do
       "$theme_dir/$input" >&2
     exit 1
   fi
+  # Replace, never write through, an existing (possibly symlinked) copy.
+  rm -f "$mount_dir/$input"
   cp "$theme_dir/$input" "$mount_dir/$input"
 done
 
@@ -51,25 +55,31 @@ import os
 import sys
 
 mount_dir = os.environ["MOUNT_DIR"]
-link = '<link rel="stylesheet" href="/%s/docs-theme.css">' % os.environ["MOUNT_PATH"]
+mount_path = os.environ["MOUNT_PATH"]
+href = "/%s/docs-theme.css" % mount_path if mount_path else "/docs-theme.css"
+link = '<link rel="stylesheet" href="%s">' % href
 linked = skipped = 0
 for root, _dirs, files in os.walk(mount_dir):
     if "index.html" not in files:
         continue
     path = os.path.join(root, "index.html")
+    if os.path.islink(path):
+        sys.stderr.write("[apply_docc_theme] left symlinked shell alone: %s\n" % path)
+        continue
     with open(path, encoding="utf-8") as handle:
         html = handle.read()
-    if "docs-theme.css" in html:
-        continue
-    if "</head>" not in html:
+    head_end = html.find("</head>")
+    if head_end < 0:
         skipped += 1
         continue
+    if link in html[:head_end]:
+        continue
     with open(path, "w", encoding="utf-8") as handle:
-        handle.write(html.replace("</head>", link + "</head>", 1))
+        handle.write(html[:head_end] + link + html[head_end:])
     linked += 1
 sys.stdout.write("%d %d\n" % (linked, skipped))
 PY
 )"
 
 printf '[apply_docc_theme] %s: theme copied, %s shell(s) linked, %s without <head> skipped\n' \
-  "$mount_path" "${counts%% *}" "${counts##* }"
+  "${mount_path:-/}" "${counts%% *}" "${counts##* }"

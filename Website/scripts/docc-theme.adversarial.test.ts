@@ -2,7 +2,6 @@
 // the token parser and the var() resolver.
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { d1KnownIssue } from "./d1-known-issue";
 import {
   parseTokens,
   resolveToken,
@@ -30,13 +29,8 @@ test("d1s014 the last declaration of a token block is dropped when it omits the 
       }${tail}`);
   // Precondition: the block was found and its first declaration parsed.
   expect(tokens.light.get("--a")).toBe("#000000");
-  d1KnownIssue(
-    "d1s014",
-    "STUI-1204: a block's last declaration without ';' is dropped by parseTokens (docc-theme.ts:37 requires a trailing semicolon); contract: CSS Syntax Level 3 §5.4.4; adjacent none",
-    () => {
-      expect(resolveToken("--b", tokens.light, tokens.shared)).toBe("#000000");
-    },
-  );
+  // STUI-1204, fixed in wave 3.
+  expect(resolveToken("--b", tokens.light, tokens.shared)).toBe("#000000");
 });
 
 test("d1s015 var() with a fallback is left unresolved and reaches theme-settings verbatim", async () => {
@@ -47,14 +41,9 @@ test("d1s015 var() with a fallback is left unresolved and reaches theme-settings
         --b: var(--missing, #123456);
       }${tail}`);
   expect(synthetic.light.get("--b")).toBe("var(--missing, #123456)");
-  d1KnownIssue(
-    "d1s015",
-    "STUI-1205: resolveToken resolves only the one-argument var() form (docc-theme.ts:73), so a fallback is emitted verbatim into theme-settings.json; contract: CSS Custom Properties §3, docc-theme.test.ts:44-49 (hex literals); adjacent none",
-    () => {
-      expect(resolveToken("--b", synthetic.light, synthetic.shared)).toBe(
-        "#123456",
-      );
-    },
+  // STUI-1205, fixed in wave 3.
+  expect(resolveToken("--b", synthetic.light, synthetic.shared)).toBe(
+    "#123456",
   );
   // The same mechanism through themeSettings on the real token file with one
   // alias rewritten: the drift test's hex-literal invariant is what breaks.
@@ -63,13 +52,40 @@ test("d1s015 var() with a fallback is left unresolved and reaches theme-settings
   const settings = themeSettings(real) as {
     theme: { color: Record<string, { light: string; dark: string }> };
   };
-  d1KnownIssue(
-    "d1s015",
-    "STUI-1205: themeSettings emits the unresolved var() string for a fallback token (docc-theme.ts:73, 208-215); contract: docc-theme.test.ts:44-49 hex literals; adjacent none",
-    () => {
-      expect(settings.theme.color.link.light).toMatch(
-        /^#[0-9a-f]{6}([0-9a-f]{2})?$/,
-      );
-    },
+  expect(settings.theme.color.link.light).toMatch(
+    /^#[0-9a-f]{6}([0-9a-f]{2})?$/,
   );
+});
+
+// Wave 3 repair scenarios (swift-tui-org campaign two, STUI-1166): ids
+// w3r37-w3r39 of the wave-3 site repair-hypotheses.json.
+
+const forms = parseTokens(`
+      :root, [data-theme="light"] {
+        --a: #000000;
+        --defined: var(--a, #123456);
+        --nested: var(--missing, var(--a));
+        --padded: var( --a );
+        --repeated: var(--a) var(--a);
+        --unknown: var(--missing);
+        --p: var(--q);
+        --q: var(--p);
+      }${tail}`);
+
+// CSS Custom Properties §3 (fallback), §2.3 (only a reference loop is a
+// cycle, so a name used twice in one value resolves twice).
+test.each([
+  ["--defined", "#000000"],
+  ["--nested", "#000000"],
+  ["--padded", "#000000"],
+  ["--repeated", "#000000 #000000"],
+])("wave3 STUI-1205 var() form %s resolves to %s", (name, expected) => {
+  expect(resolveToken(name, forms.light, forms.shared)).toBe(expected);
+});
+
+test.each([
+  ["--unknown", "unknown token --missing"],
+  ["--p", "token alias cycle"],
+])("wave3 STUI-1205 %s still fails with %s", (name, message) => {
+  expect(() => resolveToken(name, forms.light, forms.shared)).toThrow(message);
 });

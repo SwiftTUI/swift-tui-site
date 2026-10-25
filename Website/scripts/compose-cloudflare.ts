@@ -10,7 +10,10 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
-import { fingerprintWebExample } from "./fingerprint-webexample";
+import {
+  fingerprintWebExample,
+  planWebExampleFingerprint,
+} from "./fingerprint-webexample";
 
 export const dataProjects = {
   views: "swift-tui-docc-views",
@@ -19,6 +22,11 @@ export const dataProjects = {
 
 const viewsPath = "docs/data/documentation/swifttuiviews";
 const dataPaths = ["docs/data", "docs/charts/data", "docs/terminal-view/data"];
+const shellPaths = [
+  "docs/index.html",
+  "docs/charts/index.html",
+  "docs/terminal-view/index.html",
+];
 const fileLimit = 20_000;
 const sizeLimit = 25 * 1024 * 1024;
 
@@ -72,9 +80,7 @@ export async function composeCloudflare(
     }
   }
   // Validate required inputs before replacing the generated deployment tree.
-  await stat(join(websiteDist, viewsPath));
-  for (const path of dataPaths) await stat(join(websiteDist, path));
-  await stat(join(webExampleDist, "TerminalApp/dist/assets/app.wasm"));
+  await validateInputs(websiteDist, webExampleDist);
   await rm(output, { recursive: true, force: true });
   const site = join(output, "site");
   await cp(websiteDist, site, { recursive: true });
@@ -119,11 +125,7 @@ export async function composeCloudflare(
   }
   // DocC treats HTTP data redirects as renamed pages. Its scoped loader must
   // request the data origin directly; public JSON URLs still have redirects.
-  for (const path of [
-    "docs/index.html",
-    "docs/charts/index.html",
-    "docs/terminal-view/index.html",
-  ]) {
+  for (const path of shellPaths) {
     const shell = await readFile(join(site, path), "utf8");
     if (!shell.includes("</head>"))
       throw new Error(`Missing DocC HTML head: ${path}`);
@@ -143,6 +145,34 @@ export async function composeCloudflare(
   await cp(join(site, "_redirects"), join(output, "site-redirects.txt"));
   counts.site = await checkBudget(site, maximumFiles);
   return counts;
+}
+
+/**
+ * Every input the composition reads, and every precondition it asserts on
+ * them, so a refused composition leaves the previous deployment tree intact.
+ * Properties of the composed output (regular files only, file and size
+ * budgets) are checked on the output itself.
+ */
+async function validateInputs(websiteDist: string, webExampleDist: string) {
+  const requireInput = async (path: string, kind: "file" | "directory") => {
+    const info = await stat(path).catch(() => undefined);
+    if (!(kind === "file" ? info?.isFile() : info?.isDirectory()))
+      throw new Error(`Missing deployment input ${kind}: ${path}`);
+  };
+  for (const path of [viewsPath, ...dataPaths])
+    await requireInput(join(websiteDist, path), "directory");
+  for (const path of ["_headers", "_redirects", ...shellPaths])
+    await requireInput(join(websiteDist, path), "file");
+  const wasm = join(webExampleDist, "TerminalApp/dist/assets/app.wasm");
+  await requireInput(wasm, "file");
+  for (const path of shellPaths) {
+    if (!(await readFile(join(websiteDist, path), "utf8")).includes("</head>"))
+      throw new Error(`Missing DocC HTML head: ${path}`);
+  }
+  await planWebExampleFingerprint(
+    webExampleDist,
+    await readFile(join(websiteDist, "_headers"), "utf8"),
+  );
 }
 
 async function distributeViewsData(output: string, maximumFiles: number) {
@@ -247,11 +277,7 @@ export async function writeDataRedirects(
   const scriptPattern =
     /<script src="\/docc-data-routing(?:\.[a-f0-9]{64})?\.js"><\/script>/g;
   const shells = await Promise.all(
-    [
-      "docs/index.html",
-      "docs/charts/index.html",
-      "docs/terminal-view/index.html",
-    ].map(async (path) => {
+    shellPaths.map(async (path) => {
       const html = await readFile(join(site, path), "utf8");
       if ([...html.matchAll(scriptPattern)].length !== 1)
         throw new Error(`Expected one DocC data router: ${path}`);
