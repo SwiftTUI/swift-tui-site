@@ -73,12 +73,17 @@ environment variable. A missing ref fails the build. The local
 checkout variables take precedence over the ref override for source overlays.
 
 Both manifests are YAML: values may be plain, single-quoted or double-quoted,
-with trailing `#` comments. A ref (in either manifest, `DOCC_SOURCE_REF` or
-`counter_demo_ref`) must be a branch, tag or commit ID: letters, digits and
-`._/+-`, starting with a letter or digit; quote one that YAML would read as a
-number, such as `"1.0"`. Each `mountPath` must name its own directory inside
-`Website/dist`, listed before any mount nested in it. The build checks all of
-this before it deletes anything.
+with trailing `#` comments. `docc-repos.yml` holds only the `swiftRepos:` list,
+one flat `key: value` mapping per entry with each value on its own line; the
+build refuses any line it cannot place there, such as another top-level key, a
+nested mapping or a value continued onto the next line. A ref (in either
+manifest, `DOCC_SOURCE_REF` or `counter_demo_ref`) must be a branch, tag or
+commit ID: letters, digits and `._/+-`, starting with a letter or digit; quote
+one that YAML would read as a number, such as `"1.0"`. Each `mountPath` must
+name its own directory inside `Website/dist`, listed before any mount nested in
+it. Mounts are compared as directories, so a spelling that differs only in case
+on a case-insensitive volume, or a path through a symlink, counts as the mount
+it reaches. The build checks all of this before it deletes anything.
 
 ## Cloudflare deployment
 

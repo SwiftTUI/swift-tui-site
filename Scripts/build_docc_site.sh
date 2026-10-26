@@ -19,14 +19,19 @@ set -euo pipefail
 # empty string to use the manifest refs, or to a shared tag for that snapshot.
 # Local checkout inputs take precedence. Package dependencies remain tagged.
 #
-# The manifest is a `swiftRepos:` block list of flat `key: value` mappings.
-# Values are YAML scalars read as strings: plain (a ` #` starts a comment),
-# 'single-quoted' or "double-quoted". Every ref (DOCC_SOURCE_REF or the
-# manifest's) must be a branch, tag (SemVer build metadata included) or commit
-# ID. Every mountPath must name a distinct directory strictly inside
-# Website/dist, and a mount must be listed before any mount nested in it, since
-# each entry replaces its mount. All of this is checked before anything is
-# deleted.
+# The manifest is a `swiftRepos:` block list of flat `key: value` mappings:
+# the only top-level key, its entries all at one indentation, and each entry's
+# keys on lines of their own at one indentation. Values are one-line YAML
+# scalars read as strings: plain (a ` #` starts a comment), 'single-quoted' or
+# "double-quoted". A line the reader cannot place (another top-level key, a
+# nested or continued value, tab indentation) is refused. Every ref
+# (DOCC_SOURCE_REF or the manifest's) must be a branch, tag (SemVer build
+# metadata included) or commit ID. Every mountPath must name a distinct
+# directory strictly inside Website/dist, and a mount must be listed before any
+# mount nested in it, since each entry replaces its mount. Mounts are compared
+# as the directories their real paths name, so a case-only or symlinked alias
+# of another mount counts as that mount. All of this is checked before
+# anything is deleted.
 
 site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 manifest_path="${site_root}/docs/docc-repos.yml"
@@ -154,7 +159,8 @@ def scalar(text, where):
             index += 1
         rest = text[index + 1:]
     else:
-        if text[0] in "[]{}&*!|>%@`," or (text[0] in "-?:" and text[1:2] in ("", " ")):
+        # \x60 is the backtick indicator, escaped so bash 3.2 can parse this heredoc.
+        if text[0] in "[]{}&*!|>%@\x60," or (text[0] in "-?:" and text[1:2] in ("", " ")):
             fail("%s: unsupported YAML value %r (use a plain or quoted scalar)" % (where, text))
         comment = re.search(r"\s#", text)
         return text[:comment.start()].rstrip() if comment else text
@@ -164,21 +170,67 @@ def scalar(text, where):
     return "".join(value)
 
 
+# A plain-word key, then ":" before a space, a tab or the end of the line.
+PAIR = re.compile(r"([A-Za-z0-9_][A-Za-z0-9_. -]*?)[ \t]*:(?:[ \t]+(.*))?")
+
+
+def unplaceable(number, text):
+    fail("line %d: cannot place %r: the manifest is a swiftRepos: block list of "
+         "flat mappings, one key: value per line" % (number, text))
+
+
 entries = []
 current = None
+root = None      # the indentation of the swiftRepos: key, once read
+started = False  # whether a document marker was read before the key
+ended = False    # whether the document end marker was read
+dash = None      # the indentation of every entry's "-"
+column = None    # the indentation of the current entry's keys
 for number, raw in enumerate(open(sys.argv[1], encoding="utf-8-sig"), 1):
-    stripped = raw.strip()
-    if not stripped or stripped.startswith("#") or re.fullmatch(r"swiftRepos:(\s+#.*)?", stripped):
+    line = raw.rstrip("\n").rstrip(" \t")
+    text = line.lstrip(" ")
+    indent = len(line) - len(text)
+    if not text or text.lstrip(" \t").startswith("#"):
         continue
-    if stripped == "-" or stripped.startswith("- "):
+    if text.startswith("\t"):
+        fail("line %d: indentation must use spaces, not tabs" % number)
+    if ended:
+        unplaceable(number, text)
+    if indent == 0 and re.fullmatch(r"\.\.\.(?:[ \t]+#.*)?", text):
+        ended = True  # only comments may follow the document end marker
+        continue
+    if root is None:
+        # Before the key: a %YAML directive and one leading document marker.
+        if indent == 0 and not started and re.fullmatch(r"%YAML[ \t].*", text):
+            continue
+        if indent == 0 and not started and re.fullmatch(r"---(?:[ \t]+#.*)?", text):
+            started = True
+            continue
+        if not re.fullmatch(r"swiftRepos:(?:[ \t]+#.*)?", text):
+            unplaceable(number, text)
+        root = indent
+        continue
+    if text == "-" or text.startswith("- "):
+        if indent < root or (dash is not None and indent != dash):
+            unplaceable(number, text)
+        dash = indent
         current = {}
         entries.append(current)
-        stripped = stripped[1:].lstrip()
-    if current is None or ":" not in stripped:
-        continue
-    key, _, value = stripped.partition(":")
-    key = key.strip()
-    value = scalar(value.strip(), "line %d (%s)" % (number, key))
+        rest = text[1:].lstrip(" ")
+        if not rest or rest.startswith("#"):
+            column = None  # the keys start on the next line
+            continue
+        column = indent + len(text) - len(rest)
+        indent, text = column, rest
+    elif current is None:
+        unplaceable(number, text)
+    elif column is None and indent > dash:
+        column = indent
+    match = PAIR.fullmatch(text)
+    if indent != column or not match:
+        unplaceable(number, text)
+    key = match.group(1)
+    value = scalar(match.group(2) or "", "line %d (%s)" % (number, key))
     # Each value becomes one field of a tab-separated record for the shell.
     if any(ord(char) < 0x20 or ord(char) == 0x7F for char in value):
         fail("line %d (%s): a value must not contain control characters" % (number, key))
@@ -214,23 +266,106 @@ PY
   exit 1
 }
 
-# Fails unless the real path of $1 lies strictly inside the real path of
-# Website/dist, so a symlinked parent cannot carry the rm -rf below outside it.
-require_mount_inside_dist() {
-  python3 - "$website_dist" "$1" <<'PY' || exit 1
+# Checks mounts by the directories they name, not by their spelling: a
+# case-only variant on a case-insensitive volume, or a path through a
+# symlinked directory, is the mount it aliases. Each mount's real path must lie
+# strictly inside the real path of Website/dist, so a symlinked parent cannot
+# carry an rm -rf outside it, and no mount may be, or contain, a mount listed
+# before it, since its rm -rf would delete that archive.
+#   check_mounts all <mount>...  Before anything is deleted. Creates each
+#     missing mount directory to learn its identity, then removes exactly what
+#     it created, so the dist is left as it was found.
+#   check_mounts next <mount> <earlier mount>...  Before one entry's rm -rf,
+#     since an earlier archive may have added links. Creates nothing.
+check_mounts() {
+  python3 - "$website_dist" "$@" <<'PY' || exit 1
 import os
 import sys
 
-dist, target = (os.path.realpath(path) for path in sys.argv[1:3])
-if target == dist or os.path.commonpath([dist, target]) != dist:
-    sys.stderr.write(
-        "[build_docc_site] mountPath %s resolves to %s, outside %s\n" % (sys.argv[2], target, dist)
-    )
+dist = os.path.realpath(sys.argv[1])
+mode, mounts = sys.argv[2], sys.argv[3:]
+created = []
+
+
+def remove_created():
+    for path in reversed(created):
+        try:
+            os.rmdir(path)
+        except OSError:
+            pass
+
+
+def fail(message):
+    remove_created()
+    sys.stderr.write("[build_docc_site] %s\n" % message)
     sys.exit(1)
+
+
+def real(mount):
+    target = os.path.realpath(os.path.join(dist, mount))
+    if target == dist or os.path.commonpath([dist, target]) != dist:
+        fail("mountPath %s resolves to %s, outside %s" % (mount, target, dist))
+    return target
+
+
+def identity(path):
+    status = os.stat(path)
+    return status.st_dev, status.st_ino
+
+
+def lineage(path):
+    """The identities of path and of each directory above it inside the dist."""
+    found = []
+    while path != dist and path != os.path.dirname(path):
+        found.append(identity(path))
+        path = os.path.dirname(path)
+    return found
+
+
+def refuse_overlap(mount, own, earlier, target):
+    if own == identity(target):
+        fail("mountPath %s names the same directory as %s: each archive needs "
+             "its own mount" % (mount, earlier))
+    if own in lineage(target):
+        fail("mountPath %s contains the earlier mount %s and would delete it; "
+             "list the containing mount first" % (mount, earlier))
+
+
+try:
+    if mode == "all":
+        targets = [real(mount) for mount in mounts]
+        for mount, target in zip(mounts, targets):
+            missing = []
+            path = target
+            while not os.path.lexists(path):
+                missing.append(path)
+                path = os.path.dirname(path)
+            for path in reversed(missing):
+                try:
+                    os.mkdir(path)
+                except OSError as error:
+                    fail("mountPath %s cannot be created inside %s: %s" % (mount, dist, error))
+                created.append(path)
+        for index, (mount, target) in enumerate(zip(mounts, targets)):
+            own = identity(target)
+            for earlier, earlier_target in zip(mounts[:index], targets[:index]):
+                refuse_overlap(mount, own, earlier, earlier_target)
+        remove_created()
+    else:
+        target = real(mounts[0])
+        if os.path.exists(target):
+            own = identity(target)
+            for earlier in mounts[1:]:
+                earlier_target = os.path.realpath(os.path.join(dist, earlier))
+                if os.path.exists(earlier_target):
+                    refuse_overlap(mounts[0], own, earlier, earlier_target)
+except OSError as error:
+    fail("cannot check mountPath directories: %s" % error)
 PY
 }
 
 # Validate every entry before anything is deleted.
+mounts=()
 while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_path; do
   ref="${DOCC_SOURCE_REF:-$ref}"
   if ! [[ "$ref" =~ $ref_pattern ]]; then
@@ -238,14 +373,16 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
       "$repo_name" "$ref" >&2
     exit 1
   fi
-  require_mount_inside_dist "${website_dist}/${mount_path}"
+  mounts+=("$mount_path")
 done <<EOF
 $entries
 EOF
+check_mounts all "${mounts[@]}"
 
 rm -rf "$work_root"
 mkdir -p "$work_root"
 
+composed=()
 while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_path; do
   ref="${DOCC_SOURCE_REF:-$ref}"
   clone_dir="${work_root}/${repo_name}"
@@ -268,7 +405,7 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
   fi
 
   # An earlier archive may have added links under Website/dist; check again.
-  require_mount_inside_dist "$output_root"
+  check_mounts next "$mount_path" ${composed[@]+"${composed[@]}"}
   rm -rf "$output_root"
   mkdir -p "$output_root"
 
@@ -305,6 +442,7 @@ while IFS=$'\t' read -r repo_name repository ref docc_command output_path mount_
   cp -R "${clone_dir}/${output_path}"/. "$output_root"/
   printf '[build_docc_site] copied %s DocC archive to %s\n' "$repo_name" "$output_root"
   "${site_root}/Scripts/apply_docc_theme.sh" "$output_root" "$mount_path"
+  composed+=("$mount_path")
 done <<EOF
 $entries
 EOF

@@ -11,7 +11,10 @@ set -euo pipefail
 # loads the design system's fonts and heading rules. The link is absolute
 # (/<mount_path>/docs-theme.css, or /docs-theme.css for the root mount /)
 # because the shells are served at rewritten paths (/docs/documentation/...)
-# by Cloudflare Pages. Shells without a </head>, and symlinked shells, are left
+# by Cloudflare Pages. <mount_path> is normalized as build_docc_site.sh
+# normalizes a mountPath: empty and "." segments are dropped (so /docs/,
+# //docs and docs// all mean docs), and a ".." segment is refused before
+# anything is written. Shells without a </head>, and symlinked shells, are left
 # alone; nothing is written through a symlink. Idempotent: a second run
 # changes nothing.
 #
@@ -31,8 +34,20 @@ if [ "$#" -ne 2 ]; then
 fi
 
 mount_dir=$1
-mount_path=${2#/}
-mount_path=${mount_path%/}
+mount_path=
+rest=$2/
+while [ -n "$rest" ]; do
+  segment=${rest%%/*}
+  rest=${rest#*/}
+  case $segment in
+  '' | .) ;;
+  ..)
+    printf '[apply_docc_theme] mount path must not contain "..": %s\n' "$2" >&2
+    exit 1
+    ;;
+  *) mount_path=${mount_path:+$mount_path/}$segment ;;
+  esac
+done
 
 if [ ! -d "$mount_dir" ]; then
   printf '[apply_docc_theme] mount directory does not exist: %s\n' "$mount_dir" >&2

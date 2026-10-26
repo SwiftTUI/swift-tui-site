@@ -62,34 +62,61 @@ export function parseTokens(css: string): ParsedTokens {
   };
 }
 
+/** A token's computed value, or why it has the guaranteed-invalid value. */
+type Computed = { value: string } | { invalid: string };
+
+// CSS Cascade 4 §7.3: on the root element, where the tokens are declared,
+// each CSS-wide keyword computes a custom property to its initial value, the
+// guaranteed-invalid value (CSS Custom Properties §2).
+const cssWideKeyword = /^(?:initial|inherit|unset|revert|revert-layer)$/i;
+
 export function resolveToken(name: string, ...tables: TokenTable[]): string {
-  // The tokens being resolved, outermost first: only a reference back into
-  // this chain is a cycle (CSS Custom Properties §2.3).
-  const resolving: string[] = [];
+  // CSS Custom Properties §2.3, §3 and §3.1, as Chrome computes them. A token
+  // has the guaranteed-invalid value when it is undeclared, when its value is
+  // a CSS-wide keyword, when a var() in its value has neither a valid referent
+  // nor a valid fallback, or when it lies in a reference cycle. A var() takes
+  // its fallback whenever its referent has the guaranteed-invalid value,
+  // declared or not. Cycles are found along the references actually
+  // substituted, so an unused fallback is never followed, and every token in
+  // a cycle is invalid, whatever its own fallbacks yield.
+  const resolving: string[] = []; // the tokens being computed, outermost first
+  const cyclic = new Set<string>();
+  const computed = new Map<string, Computed>();
   const declared = (token: string) =>
     tables
       .map((table) => table.get(token))
       .find((entry) => entry !== undefined);
-  const lookup = (token: string): string => {
-    if (resolving.includes(token))
-      throw new Error(`token alias cycle at ${token}`);
+  const compute = (token: string): Computed => {
+    const known = computed.get(token);
+    if (known) return known;
+    const repeated = resolving.indexOf(token);
+    if (repeated >= 0) {
+      for (const member of resolving.slice(repeated)) cyclic.add(member);
+      return { invalid: `token alias cycle at ${token}` };
+    }
     const value = declared(token);
-    if (value === undefined) throw new Error(`unknown token ${token}`);
+    if (value === undefined) return { invalid: `unknown token ${token}` };
+    if (cssWideKeyword.test(value))
+      return { invalid: `token ${token} is the CSS-wide keyword ${value}` };
     resolving.push(token);
+    let result: Computed;
     try {
-      return substitute(value);
+      result = substitute(value);
     } finally {
       resolving.pop();
     }
+    if (cyclic.has(token) && "value" in result)
+      result = { invalid: `token alias cycle at ${token}` };
+    computed.set(token, result);
+    return result;
   };
   // CSS Custom Properties §3: var( <custom-property-name> [, <fallback>]? ).
-  // A defined name resolves; an undefined one takes its fallback.
-  const substitute = (value: string): string => {
+  const substitute = (value: string): Computed => {
     let output = "";
     let index = 0;
     for (;;) {
       const start = value.slice(index).search(/(?<![\w-])var\(/i);
-      if (start < 0) return output + value.slice(index);
+      if (start < 0) return { value: output + value.slice(index) };
       const open = index + start + "var(".length;
       let depth = 1;
       let comma = -1;
@@ -105,15 +132,18 @@ export function resolveToken(name: string, ...tables: TokenTable[]): string {
       const reference = value.slice(open, comma < 0 ? end : comma).trim();
       if (!/^--[a-z0-9-]+$/i.test(reference))
         throw new Error(`invalid var() reference in ${value}`);
-      output += value.slice(index, index + start);
-      output +=
-        declared(reference) !== undefined || comma < 0
-          ? lookup(reference)
-          : substitute(value.slice(comma + 1, end).trim());
+      let referent = compute(reference);
+      if ("invalid" in referent && comma >= 0)
+        referent = substitute(value.slice(comma + 1, end).trim());
+      // An invalid var() makes the whole value invalid at computed-value time.
+      if ("invalid" in referent) return referent;
+      output += value.slice(index, index + start) + referent.value;
       index = close;
     }
   };
-  return lookup(name);
+  const result = compute(name);
+  if ("invalid" in result) throw new Error(result.invalid);
+  return result.value;
 }
 
 // DocC colour property → design-system token. Semantic asides (warning,

@@ -3,14 +3,18 @@
 // coordination root's wave-3 hunt evidence owns the case descriptions
 // (w3cb021 to w3cb030). Every shell case runs against a temporary site root
 // assembled as shell-scripts.adversarial.test.ts assembles one; nothing
-// touches the checkout.
+// touches the checkout. The wave-4 repair (STUI-1169: STUI-1278 to STUI-1281)
+// promoted the six finding tests, w3cb021 to w3cb026, to ordinary assertions
+// and adds its own repair and neighbour scenarios as `wave4 ...` tests.
 import { afterEach, expect, test } from "bun:test";
 import { rejects } from "node:assert/strict";
 import {
   chmod,
   copyFile,
+  lstat,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   realpath,
   rm,
@@ -55,23 +59,16 @@ async function plant(path: string, text: string): Promise<string> {
   return path;
 }
 
-/**
- * A reproduced finding asserts the observed value, requires the contract
- * expectation to fail, and logs a W3HUNT_KNOWN_ASSERTION line citing the
- * proposed issue. With SWIFTTUI_W3HUNT_UNMARKED=1 only the contract runs.
- */
-function w3HuntKnownIssue(
-  message: string,
-  observed: () => void,
-  contract: () => void,
-): void {
-  if (process.env.SWIFTTUI_W3HUNT_UNMARKED === "1") {
-    contract();
-    return;
+/** Every path under `root`, relative and sorted; links are listed, not followed. */
+async function listing(root: string, prefix = ""): Promise<string[]> {
+  const paths: string[] = [];
+  for (const name of (await readdir(join(root, prefix))).sort()) {
+    const path = prefix ? `${prefix}/${name}` : name;
+    paths.push(path);
+    if ((await lstat(join(root, path))).isDirectory())
+      paths.push(...(await listing(root, path)));
   }
-  observed();
-  expect(contract).toThrow();
-  console.log(`W3HUNT_KNOWN_ASSERTION ${message}`);
+  return paths;
 }
 
 // ---------------------------------------------------------------------------
@@ -192,9 +189,13 @@ function runBash(
   };
 }
 
-type RepoName = "swift-tui" | "swift-tui-charts";
+type RepoName = "swift-tui" | "swift-tui-charts" | "swift-tui-terminal-view";
 const checkoutVariable = (name: RepoName) =>
-  name === "swift-tui" ? "SWIFTTUI_CHECKOUT" : "SWIFTTUI_CHARTS_CHECKOUT";
+  ({
+    "swift-tui": "SWIFTTUI_CHECKOUT",
+    "swift-tui-charts": "SWIFTTUI_CHARTS_CHECKOUT",
+    "swift-tui-terminal-view": "SWIFTTUI_TERMINAL_VIEW_CHECKOUT",
+  })[name];
 
 /** Local-checkout stubs for `names`, as environment for build_docc_site.sh. */
 async function checkoutEnv(
@@ -290,21 +291,34 @@ async function makeRemotes(
 
 const shell = "<html><head><title>x</title></head><body>shell</body></html>\n";
 
-async function linkedHref(mountPath: string): Promise<string | undefined> {
+/** apply_docc_theme.sh over a docs mount holding one shell. */
+async function applyTheme(mountPath: string) {
   const site = await makeSiteRoot();
   const mount = join(site.dist, "docs");
-  await plant(join(mount, "documentation/fixture/index.html"), shell);
+  const shellPath = await plant(
+    join(mount, "documentation/fixture/index.html"),
+    shell,
+  );
   const result = runBash(
     site.themeScript,
     [mount, mountPath],
     {},
     site.siteRoot,
   );
+  const linked = await readText(shellPath);
+  return {
+    result,
+    mount,
+    shellPath,
+    linked,
+    href: linked.match(/href="([^"]*docs-theme\.css)"/)?.[1],
+  };
+}
+
+async function linkedHref(mountPath: string): Promise<string | undefined> {
+  const { result, href } = await applyTheme(mountPath);
   expect(result.exitCode, result.stderr).toBe(0);
-  const linked = await readText(
-    join(mount, "documentation/fixture/index.html"),
-  );
-  return linked.match(/href="([^"]*docs-theme\.css)"/)?.[1];
+  return href;
 }
 
 // ---------------------------------------------------------------------------
@@ -341,23 +355,13 @@ test("w3cb021 a case-only duplicate mount replaces the earlier archive on a case
     : bothSurvive
       ? "both archives survive"
       : `exit ${result.exitCode}; docs/index.html: ${docs.trim()}; old.txt ${(await exists(previous)) ? "kept" : "deleted"}`;
-  const contract = () =>
-    expect(["refused before any rm", "both archives survive"]).toContain(
-      outcome,
-    );
-  // On a case-sensitive volume the two mounts are distinct directories and
-  // the contract holds; only a case-insensitive volume reproduces the finding.
-  if (!(await caseInsensitiveVolume())) {
-    contract();
-    return;
-  }
-  w3HuntKnownIssue(
-    "w3cb021 NEW-5: on a case-insensitive volume mounts docs and DOCS pass the duplicate check and the second archive deletes the first; mounts are compared as normalized strings, not as directories (build_docc_site.sh:195-205); contract: build_docc_site.sh:26-29, README.md:79-81, build_docc_site_test.sh:87-89; adjacent STUI-1199",
-    () =>
-      expect(outcome).toBe(
-        "exit 0; docs/index.html: swift-tui-charts archive args=[]; old.txt deleted",
-      ),
-    contract,
+  // STUI-1278, fixed in wave 4: on a case-insensitive volume docs and DOCS
+  // name one directory and the build is refused before any rm; on a
+  // case-sensitive volume they are distinct and both archives compose.
+  expect(outcome).toBe(
+    (await caseInsensitiveVolume())
+      ? "refused before any rm"
+      : "both archives survive",
   );
 });
 
@@ -377,14 +381,144 @@ test("w3cb022 a nested mount reached through a symlink inside the dist is delete
     : result.exitCode === 0 && charts.includes("swift-tui-charts archive")
       ? "both archives survive"
       : `exit ${result.exitCode}; docs/charts/index.html ${charts ? charts.trim() : "missing"}`;
-  w3HuntKnownIssue(
-    "w3cb022 NEW-5: a nested mount reached through a symlinked directory inside the dist (alias/charts, alias -> docs) listed before docs is deleted by the docs entry; mounts are compared as normalized strings, and the real-path check covers only containment (build_docc_site.sh:199-204, :217-231); contract: build_docc_site.sh:26-29, README.md:79-81; adjacent STUI-1199, STUI-1197",
-    () => expect(outcome).toBe("exit 0; docs/charts/index.html missing"),
-    () =>
-      expect(["refused before any rm", "both archives survive"]).toContain(
-        outcome,
-      ),
+  // STUI-1278, fixed in wave 4: docs contains the earlier alias/charts.
+  expect(outcome).toBe("refused before any rm");
+});
+
+// Wave 4 repair scenarios (swift-tui-org campaign two, STUI-1169): ids
+// w4s03-w4s08 and w4s37 of the wave-4 site repair-hypotheses.json. Mounts are
+// compared as the directories they name, before anything is deleted.
+
+test("wave4 STUI-1278 case-only mounts that do not exist yet are compared as the directories they create", async () => {
+  const site = await makeSiteRoot();
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui", "docs")}${entry("swift-tui-charts", "DOCS")}`,
+    ["swift-tui", "swift-tui-charts"],
   );
+  if (await caseInsensitiveVolume()) {
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("mountPath");
+    // The probe removes the directories it created.
+    expect(await listing(site.dist)).toEqual([]);
+  } else {
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect(await readText(join(site.dist, "docs/index.html"))).toContain(
+      "swift-tui archive",
+    );
+    expect(await readText(join(site.dist, "DOCS/index.html"))).toContain(
+      "swift-tui-charts archive",
+    );
+  }
+});
+
+test("wave4 STUI-1278 a case-only containing mount listed after its nested mount is refused on a case-insensitive volume", async () => {
+  const site = await makeSiteRoot();
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui-charts", "DOCS/charts")}${entry("swift-tui", "docs")}`,
+    ["swift-tui", "swift-tui-charts"],
+  );
+  if (await caseInsensitiveVolume()) {
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("mountPath");
+    expect(await listing(site.dist)).toEqual([]);
+  } else {
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect(await readText(join(site.dist, "DOCS/charts/index.html"))).toContain(
+      "swift-tui-charts archive",
+    );
+    expect(await readText(join(site.dist, "docs/index.html"))).toContain(
+      "swift-tui archive",
+    );
+  }
+});
+
+test("wave4 STUI-1278 a refused manifest leaves the dist as it found it", async () => {
+  const site = await makeSiteRoot();
+  await plant(join(site.dist, "docs/old.txt"), "previous");
+  await mkdir(join(site.dist, "keep-empty"));
+  await symlink("docs", join(site.dist, "alias"));
+  const before = await listing(site.dist);
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui-terminal-view", "fresh/one")}${entry("swift-tui-charts", "alias/charts")}${entry("swift-tui", "docs")}`,
+    ["swift-tui", "swift-tui-charts", "swift-tui-terminal-view"],
+  );
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr).toContain("mountPath");
+  expect(await listing(site.dist)).toEqual(before);
+  expect(before).toEqual(["alias", "docs", "docs/old.txt", "keep-empty"]);
+  expect((await lstat(join(site.dist, "alias"))).isSymbolicLink()).toBe(true);
+});
+
+test("wave4 STUI-1278 a mount whose last component links to an earlier mount is refused", async () => {
+  const site = await makeSiteRoot();
+  await mkdir(join(site.dist, "docs"));
+  await symlink("docs", join(site.dist, "latest"));
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui", "docs")}${entry("swift-tui-charts", "latest")}`,
+    ["swift-tui", "swift-tui-charts"],
+  );
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr).toContain("mountPath");
+  expect((await lstat(join(site.dist, "latest"))).isSymbolicLink()).toBe(true);
+});
+
+test("wave4 STUI-1278 a nested mount reached through a symlink after its container still composes", async () => {
+  const site = await makeSiteRoot();
+  await mkdir(join(site.dist, "docs"));
+  await symlink("docs", join(site.dist, "alias"));
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui", "docs")}${entry("swift-tui-charts", "alias/charts")}`,
+    ["swift-tui", "swift-tui-charts"],
+  );
+  expect(result.exitCode, result.stderr).toBe(0);
+  expect(await readText(join(site.dist, "docs/index.html"))).toContain(
+    "swift-tui archive",
+  );
+  expect(await readText(join(site.dist, "docs/charts/index.html"))).toContain(
+    "swift-tui-charts archive",
+  );
+});
+
+test("wave4 STUI-1278 a mount through a dangling link inside the dist composes and leaves no probe directory", async () => {
+  const site = await makeSiteRoot();
+  await symlink("nowhere", join(site.dist, "dangling"));
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui", "dangling")}`,
+    ["swift-tui"],
+  );
+  expect(result.exitCode, result.stderr).toBe(0);
+  // rm -rf replaces the link itself; the probe's directory at its target is
+  // removed again once the mounts are checked.
+  expect(await listing(site.dist)).toEqual([
+    "dangling",
+    "dangling/docs-theme.css",
+    "dangling/documentation",
+    "dangling/documentation/fixture",
+    "dangling/documentation/fixture/index.html",
+    "dangling/index.html",
+    "dangling/theme-settings.json",
+  ]);
+});
+
+test("wave4 STUI-1278 a mount through a symlink out of the dist is refused before any directory is created", async () => {
+  const site = await makeSiteRoot();
+  await mkdir(join(site.siteRoot, "outside"));
+  await symlink("../../outside", join(site.dist, "linked"));
+  const result = await buildManifest(
+    site,
+    `swiftRepos:\n${entry("swift-tui", "fresh")}${entry("swift-tui-charts", "linked/new")}`,
+    ["swift-tui", "swift-tui-charts"],
+  );
+  expect(result.exitCode).not.toBe(0);
+  expect(result.stderr).toContain("outside");
+  expect(await exists(join(site.dist, "fresh"))).toBe(false);
+  expect(await exists(join(site.siteRoot, "outside/new"))).toBe(false);
 });
 
 // ---------------------------------------------------------------------------
@@ -392,14 +526,45 @@ test("w3cb022 a nested mount reached through a symlink inside the dist is delete
 
 test("w3cb023 a doubled slash in the mount path still links an absolute path", async () => {
   const hrefs = [await linkedHref("//docs"), await linkedHref("docs//")];
-  w3HuntKnownIssue(
-    "w3cb023 NEW-6: apply_docc_theme.sh links //docs/docs-theme.css (a network-path reference) for //docs and /docs//docs-theme.css for docs//; it strips one leading and one trailing slash (apply_docc_theme.sh:34-35, :59); contract: apply_docc_theme.sh:11-13, RFC 3986 §4.2; adjacent STUI-1200",
-    () =>
-      expect(hrefs).toEqual(["//docs/docs-theme.css", "/docs//docs-theme.css"]),
-    () =>
-      expect(hrefs).toEqual(["/docs/docs-theme.css", "/docs/docs-theme.css"]),
-  );
+  // STUI-1279, fixed in wave 4.
+  expect(hrefs).toEqual(["/docs/docs-theme.css", "/docs/docs-theme.css"]);
 });
+
+// Wave 4 repair scenarios: ids w4s11-w4s13. The mount path is normalized as
+// build_docc_site.sh normalizes a mountPath.
+
+test.each([
+  ["/./docs/./", "/docs/docs-theme.css"],
+  ["docs/./charts", "/docs/charts/docs-theme.css"],
+  ["///", "/docs-theme.css"],
+])("wave4 STUI-1279 mount path %p links %p", async (mountPath, href) => {
+  expect(await linkedHref(mountPath)).toBe(href);
+});
+
+test("wave4 STUI-1279 a mount path with a .. segment is refused before anything is written", async () => {
+  const { result, mount, linked } = await applyTheme("docs/../x");
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr).toContain("..");
+  expect(linked).toBe(shell);
+  expect(await exists(join(mount, "docs-theme.css"))).toBe(false);
+  expect(await exists(join(mount, "theme-settings.json"))).toBe(false);
+});
+
+test.each([
+  ["docs/charts", "/docs/charts/docs-theme.css", "docs/charts"],
+  ["/", "/docs-theme.css", "/"],
+  ["", "/docs-theme.css", "/"],
+])(
+  "wave4 STUI-1279 mount path %p still links %p",
+  async (mountPath, href, label) => {
+    const { result, href: linked } = await applyTheme(mountPath);
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect(linked).toBe(href);
+    expect(result.stdout).toContain(
+      `[apply_docc_theme] ${label}: theme copied, 1 shell(s) linked`,
+    );
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Manifest reader (STUI-1198): build_docc_site.sh:22-24 (a swiftRepos: block
@@ -424,14 +589,8 @@ test("w3cb024 entries of a sibling top-level list are not built as swiftRepos en
       : archived
         ? "archivedRepos entry built"
         : "only swiftRepos built";
-  w3HuntKnownIssue(
-    "w3cb024 NEW-7: an entry listed under a sibling top-level key (archivedRepos:) is built as a swiftRepos entry; the manifest reader is line-based, discards indentation and starts an entry at any '- ' line (build_docc_site.sh:167-185); contract: build_docc_site.sh:22-24, YAML 1.2 §8.2.1 (Bun.YAML reads one entry); adjacent STUI-1198",
-    () => expect(outcome).toBe("archivedRepos entry built"),
-    () =>
-      expect(["refused as unsupported", "only swiftRepos built"]).toContain(
-        outcome,
-      ),
-  );
+  // STUI-1280, fixed in wave 4: the line the reader cannot place is refused.
+  expect(outcome).toBe("refused as unsupported");
 });
 
 test("w3cb025 a plain scalar folded onto a continuation line keeps the continuation", async () => {
@@ -452,14 +611,172 @@ test("w3cb025 a plain scalar folded onto a continuation line keeps the continuat
       : index.includes("args=[--flag]")
         ? "ran ./make-docs.sh --flag"
         : `ran with ${index.trim()}`;
-  w3HuntKnownIssue(
-    "w3cb025 NEW-7: a plain doccCommand folded onto a continuation line runs without the continuation; a line without ':' is skipped (build_docc_site.sh:177); contract: build_docc_site.sh:22-24, YAML 1.2 §7.3.3 (Bun.YAML reads './make-docs.sh --flag'); adjacent STUI-1198",
-    () => expect(outcome).toBe("ran with swift-tui archive args=[]"),
-    () =>
-      expect(["refused as unsupported", "ran ./make-docs.sh --flag"]).toContain(
-        outcome,
-      ),
-  );
+  // STUI-1280, fixed in wave 4: a multi-line scalar is an unsupported form.
+  expect(outcome).toBe("refused as unsupported");
+});
+
+// Wave 4 repair scenarios: ids w4s16-w4s27, w4s35 and w4s36. The reader
+// places every line of the documented subset or refuses the manifest at that
+// line, before any rm. Bun.YAML, the cross-implementation reading, either
+// rejects each refused shape or reads it as something other than one flat
+// swiftRepos list (a tab never indents YAML, YAML 1.2 §6.1, although Bun.YAML
+// accepts one).
+
+const docsEntry = entry("swift-tui", "docs");
+
+test.each([
+  [
+    "a sibling list before swiftRepos",
+    `archivedRepos:\n${entry("swift-tui-charts", "docs-archived")}swiftRepos:\n${docsEntry}`,
+    1,
+    false,
+  ],
+  [
+    "a continuation at the key column",
+    `swiftRepos:\n${entry("swift-tui", "docs", { doccCommand: "./make-docs.sh\n    --flag" })}`,
+    6,
+    true,
+  ],
+  [
+    "a nested mapping under an entry key",
+    `swiftRepos:\n${entry("swift-tui", "docs", { extra: "\n      nested: y" })}`,
+    9,
+    false,
+  ],
+  [
+    "a tab-indented key line",
+    `swiftRepos:\n${docsEntry.replace("    ref:", "\tref:")}`,
+    4,
+    undefined,
+  ],
+  [
+    "a misaligned second entry",
+    `swiftRepos:\n${docsEntry}${entry("swift-tui-charts", "docs-charts").replace("  - ", "   - ")}`,
+    8,
+    true,
+  ],
+  [
+    "a key without a separator",
+    `swiftRepos:\n${docsEntry.replace("outputPath: ", "outputPath:")}`,
+    6,
+    true,
+  ],
+  [
+    "a second YAML document",
+    `swiftRepos:\n${docsEntry}---\nswiftRepos:\n${entry("swift-tui-charts", "docs-second")}`,
+    8,
+    false,
+  ],
+  [
+    "content after the document end marker",
+    `swiftRepos:\n${docsEntry}...\n${entry("swift-tui-charts", "docs-after")}`,
+    9,
+    false,
+  ],
+])(
+  "wave4 STUI-1280 manifest with %s is refused at its line before any rm",
+  async (_shape, manifest, line, bunRejects) => {
+    if (bunRejects !== undefined) {
+      const parse = () => Bun.YAML.parse(manifest);
+      if (bunRejects) expect(parse).toThrow();
+      else expect(parse).not.toThrow();
+    }
+    const site = await makeSiteRoot();
+    await plant(join(site.dist, "docs/old.txt"), "previous");
+    const result = await buildManifest(site, manifest, [
+      "swift-tui",
+      "swift-tui-charts",
+    ]);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("invalid manifest");
+    expect(result.stderr).toContain(`line ${line}:`);
+    expect(await listing(site.dist)).toEqual(["docs", "docs/old.txt"]);
+  },
+);
+
+test.each([
+  [
+    "a compact sequence at column 0",
+    `swiftRepos:\n${docsEntry.replace(/^ {2}/gm, "")}`,
+    ["docs"],
+    "swift-tui archive args=[]",
+  ],
+  [
+    "a directive, a document marker, comments, blank lines and CRLF",
+    `%YAML 1.2\n---\n# DocC inputs\nswiftRepos: # one entry\n\n  # the framework\n\t# a tab-led comment\n  \t # a space, tab and space before the comment\n${docsEntry}`.replace(
+      /\n/g,
+      "\r\n",
+    ),
+    ["docs"],
+    "swift-tui archive args=[]",
+  ],
+  [
+    "a bare dash and a dash comment",
+    `swiftRepos:\n${docsEntry.replace("  - ", "  -\n    ")}${entry("swift-tui-charts", "docs-charts").replace("  - ", "  - # charts\n    ")}`,
+    ["docs", "docs-charts"],
+    "swift-tui archive args=[]",
+  ],
+  [
+    "an indented root",
+    `  swiftRepos:\n${docsEntry.replace(/^/gm, "  ")}`,
+    ["docs"],
+    "swift-tui archive args=[]",
+  ],
+  [
+    "a document end marker and a closing comment",
+    `swiftRepos:\n${docsEntry}...\n# end of the DocC inputs\n`,
+    ["docs"],
+    "swift-tui archive args=[]",
+  ],
+  [
+    "spaced and tab separators, an unknown key and a duplicate key",
+    "swiftRepos:\n  - name : swift-tui\n    repository: SwiftTUI/swift-tui\n    ref: fixture\n    doccCommand:\t./make-docs.sh --flag\n    outputPath: .build-docs\n    note: kept\n    mountPath: elsewhere\n    mountPath: docs\n",
+    ["docs"],
+    "swift-tui archive args=[--flag]",
+  ],
+])(
+  "wave4 STUI-1280 manifest with %s still builds as Bun.YAML reads it",
+  async (_shape, manifest, mounts, docsIndex) => {
+    const yaml = Bun.YAML.parse(manifest) as {
+      swiftRepos: { mountPath: string }[];
+    };
+    expect(yaml.swiftRepos.map((repo) => repo.mountPath)).toEqual(mounts);
+    const site = await makeSiteRoot();
+    const result = await buildManifest(site, manifest, [
+      "swift-tui",
+      "swift-tui-charts",
+    ]);
+    expect(result.exitCode, result.stderr).toBe(0);
+    expect((await readText(join(site.dist, "docs/index.html"))).trim()).toBe(
+      docsIndex,
+    );
+    for (const mount of mounts.slice(1))
+      expect(await readText(join(site.dist, mount, "index.html"))).toContain(
+        "swift-tui-charts archive",
+      );
+  },
+);
+
+// Adjacent repair with STUI-1280 (not campaign yield): since aba2410 a backtick
+// in the manifest reader's heredoc, inside a command substitution, stopped
+// bash 3.2 (macOS's /bin/bash) from parsing build_docc_site.sh at all.
+
+test("wave4 every site shell script parses under /bin/bash (bash 3.2 on macOS)", async () => {
+  const scripts = (await readdir(join(siteCheckout, "Scripts")))
+    .filter((name) => name.endsWith(".sh"))
+    .sort();
+  expect(scripts).toContain("build_docc_site.sh");
+  const failures = scripts.flatMap((script) => {
+    const result = Bun.spawnSync({
+      cmd: ["/bin/bash", "-n", join(siteCheckout, "Scripts", script)],
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    return result.exitCode === 0
+      ? []
+      : [`${script}: ${new TextDecoder().decode(result.stderr).trim()}`];
+  });
+  expect(failures).toEqual([]);
 });
 
 test("w3cb029 double-quoted manifest escapes decode, and an escaped tab is refused before any rm", async () => {
@@ -538,25 +855,20 @@ const tokenForms = parseTokens(`
         --empty: var(--missing,);
       }${tail}`);
 
-function resolved(name: string): string {
+function resolved(name: string, tokens = tokenForms): string {
   try {
-    return resolveToken(name, tokenForms.light, tokenForms.shared);
+    return resolveToken(name, tokens.light, tokens.shared);
   } catch (error) {
     return `throws ${error instanceof Error ? error.message : String(error)}`;
   }
 }
 
 test("w3cb026 a declared token whose own substitution fails takes the outer fallback", () => {
-  const values = [resolved("--outer"), resolved("--cyc")];
-  w3HuntKnownIssue(
-    "w3cb026 NEW-8: var(--x, F) throws instead of taking F when --x is declared but its own substitution fails (an undefined reference or a cycle); resolveToken takes the fallback only for an undeclared name (docc-theme.ts:110-112, :74-77); contract: CSS Custom Properties L1 §3, §3.1, §2.3 (Chromium 149 resolves #123456 and #654321); adjacent STUI-1205",
-    () =>
-      expect(values).toEqual([
-        "throws unknown token --missing",
-        "throws token alias cycle at --p",
-      ]),
-    () => expect(values).toEqual(["#123456", "#654321"]),
-  );
+  // STUI-1281, fixed in wave 4 (Chromium 149 computes the same values).
+  expect([resolved("--outer"), resolved("--cyc")]).toEqual([
+    "#123456",
+    "#654321",
+  ]);
 });
 
 test("w3cb027 var() function-name case and comma-bearing or empty fallbacks resolve as CSS", () => {
@@ -565,6 +877,86 @@ test("w3cb027 var() function-name case and comma-bearing or empty fallbacks reso
     resolved("--commas"),
     resolved("--empty"),
   ]).toEqual(["#000000", "rgb(1, 2, 3)", ""]);
+});
+
+// Wave 4 repair scenarios: ids w4s30-w4s33. Each expected value is Chrome
+// 155's computed value for the same declarations (the wave-4 site evidence's
+// css-oracle-probe.log): a var() takes its fallback whenever its referent has
+// the guaranteed-invalid value.
+
+const wave4Tokens = parseTokens(`
+      :root, [data-theme="light"] {
+        --a: #000000;
+        --unknown: var(--missing);
+        --outer: var(--unknown, #123456);
+        --p: var(--q);
+        --q: var(--p);
+        --p2: var(--q2, #0000ff);
+        --q2: var(--p2);
+        --r2: var(--p2, #111111);
+        --x3: var(--y3, #990000);
+        --y3: var(--x3, #009900);
+        --useX3: var(--x3, #999999);
+        --k: initial;
+        --useK: var(--k, #222222);
+        --inh: inherit;
+        --useInh: var(--inh, #333333);
+        --uns: unset;
+        --useUns: var(--uns, #444444);
+        --rev: revert;
+        --useRev: var(--rev, #454545);
+        --revl: revert-layer;
+        --useRevl: var(--revl, #464646);
+        --kupper: INITIAL;
+        --useKupper: var(--kupper, #474747);
+        --chain: var(--unknown);
+        --useChain: var(--chain, #555555);
+        --both: var(--unknown, var(--missing));
+        --useBoth: var(--both, #666666);
+        --mid: var(--a) var(--unknown);
+        --useMid: var(--mid, #777777);
+        --deep: var(--outer, #abcdef);
+        --fallbackRef: var(--missing, var(--unknown, #fedcba));
+        --inner: var(--unknown, var(--p, #010101));
+        --self: var(--a, var(--self));
+        --emptyDecl: ;
+        --useEmpty: var(--emptyDecl, #888888);
+        --kw2: initial #000;
+        --useKw2: var(--kw2, #020202);
+      }${tail}`);
+
+test.each([
+  ["--r2", "#111111"],
+  ["--useX3", "#999999"],
+  ["--useK", "#222222"],
+  ["--useInh", "#333333"],
+  ["--useUns", "#444444"],
+  ["--useRev", "#454545"],
+  ["--useRevl", "#464646"],
+  ["--useKupper", "#474747"],
+  ["--useChain", "#555555"],
+  ["--useBoth", "#666666"],
+  ["--useMid", "#777777"],
+  ["--deep", "#123456"],
+  ["--fallbackRef", "#fedcba"],
+  ["--inner", "#010101"],
+  ["--self", "#000000"],
+  ["--useEmpty", ""],
+  ["--useKw2", "initial #000"],
+])(
+  "wave4 STUI-1281 token %s resolves to %p as Chrome computes it",
+  (name, expected) => {
+    expect(resolved(name, wave4Tokens)).toBe(expected);
+  },
+);
+
+test.each([
+  ["--p2", "token alias cycle at --p2"],
+  ["--x3", "token alias cycle at --x3"],
+  ["--k", "token --k is the CSS-wide keyword initial"],
+  ["--unknown", "unknown token --missing"],
+])("wave4 STUI-1281 top-level token %s still throws %p", (name, message) => {
+  expect(resolved(name, wave4Tokens)).toBe(`throws ${message}`);
 });
 
 // ---------------------------------------------------------------------------
