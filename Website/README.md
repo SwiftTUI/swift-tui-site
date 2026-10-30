@@ -1,7 +1,7 @@
 # Website
 
 Astro site that frames the
-[`swift-tui-counter-demo/WebExample`](https://github.com/SwiftTUI/swift-tui-counter-demo/tree/0.19.5/WebExample)
+[`swift-tui-counter-demo/WebExample`](https://github.com/SwiftTUI/swift-tui-counter-demo/tree/0.20.0/WebExample)
 WASI demo in an iframe.
 Deployed at <https://swifttui.sh>.
 
@@ -30,6 +30,7 @@ headers in `public/_headers` also isolate the iframe.
 
 ```sh
 bun install
+bun run test           # all script tests, including adversarial fixtures
 bun run dev            # http://localhost:4321
 bun run build:wasm     # release WebExample, q11 Brotli wasm
 bun run build:wasm:dev # debug WebExample, q9 Brotli wasm
@@ -37,6 +38,11 @@ bun run build:docc     # combined DocC archive for linkable public products
 bun run build:full     # release WebExample + DocC + Astro dist/
 bun run build:dev      # debug WebExample + DocC + Astro dist/
 ```
+
+Script tests live directly under `scripts/` and end in `.test.ts`. The test
+command passes their paths explicitly: unrestricted discovery with Bun 1.3.14
+can leave spawned shell fixtures with invalid output descriptors on macOS
+(STUI-1403).
 
 By default, wasm scripts fetch the tagged public WebExample input recorded in
 `../docs/releases.yml` into `../.build/public-inputs/`. Set `WEBEXAMPLE_DIR` to

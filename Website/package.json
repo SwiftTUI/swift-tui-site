@@ -1,7 +1,7 @@
 {
   "name": "swift-tui-website",
   "type": "module",
-  "version": "0.19.5",
+  "version": "0.20.0",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -21,12 +21,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test": "bun test"
+    "test": "bun test ./scripts/*.test.ts"
   },
   "dependencies": {
     "@astrojs/check": "0.9.10",
     "@astrojs/rss": "4.0.19",
-    "@swifttui/web": "https://github.com/SwiftTUI/swift-tui-web/releases/download/0.19.5/swifttui-web-0.19.5.tgz",
+    "@swifttui/web": "https://github.com/SwiftTUI/swift-tui-web/releases/download/0.20.0/swifttui-web-0.20.0.tgz",
     "astro": "7.3.3",
     "typescript": "^6.0.3"
   },
