@@ -57,19 +57,20 @@ of the Bun scripts, wherever the command starts; `Scripts/check_site.sh`
 resolves it the same way.
 
 [`docs/docc-repos.yml`](docs/docc-repos.yml) lists the DocC inputs.
-[`docs/releases.yml`](docs/releases.yml) pins the release versions. Both files
-track the current package release (`0.20.1`). The `current.counterDemoRef`
+[`docs/releases.yml`](docs/releases.yml) selects the showcased framework,
+libraries, hosts, and applications separately. The site's own version belongs
+to `Website/package.json`; the footer labels framework and site versions and
+links the framework's selected changelog. The `current.counterDemoRef`
 source tag is selected separately so a demo packaging repair can ship without
 republishing the framework. Local builds and deployments use that pin by
 default; the optional `counter_demo_ref` workflow input overrides it.
 
-The public documentation describes current source. Website deployment defaults
-its `docs_ref` input to `main` for the framework, Charts, and TerminalView; the
-build logs record the exact fetched revision of each archive. The native
-package dependencies and browser demo keep their independent release pins.
-Local builds also default to `main`. Set `DOCC_SOURCE_REF=` to reproduce the
-refs in `docc-repos.yml`, or select a shared tag with the workflow input or
-environment variable. A missing ref fails the build. The local
+Local documentation builds and website deployments default to each curated
+ref in `docc-repos.yml`. A new component release does not automatically advance
+the documentation or demo selection. Build logs record each archive's exact
+fetched revision. To preview all current branches, explicitly set the optional
+`docs_ref` workflow input or `DOCC_SOURCE_REF` environment variable to `main`;
+a shared tag is also accepted. A missing ref fails the build. The local
 checkout variables take precedence over the ref override for source overlays.
 
 Both manifests are YAML: values may be plain, single-quoted or double-quoted,

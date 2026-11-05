@@ -135,12 +135,12 @@ git config --file "$git_config" "url.file://$remote_root/.insteadOf" https://git
 export GIT_CONFIG_GLOBAL="$git_config" GIT_CONFIG_NOSYSTEM=1
 unset SWIFTTUI_CHECKOUT SWIFTTUI_CHARTS_CHECKOUT SWIFTTUI_TERMINAL_VIEW_CHECKOUT DOCC_SOURCE_REF
 
-DOCC_SOURCE_REF= "$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/tagged.log" 2>&1
+"$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/tagged.log" 2>&1
 grep -q 'tagged swift-tui$' "$site_root/Website/dist/docs/index.html"
 grep -q 'tagged swift-tui-charts$' "$site_root/Website/dist/docs/charts/index.html"
 grep -q 'tagged swift-tui-terminal-view$' "$site_root/Website/dist/docs/terminal-view/index.html"
 
-"$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/head.log" 2>&1
+DOCC_SOURCE_REF=main "$site_root/Scripts/build_docc_site.sh" > "$tmp_dir/head.log" 2>&1
 grep -q 'head swift-tui$' "$site_root/Website/dist/docs/index.html"
 grep -q 'head swift-tui-charts$' "$site_root/Website/dist/docs/charts/index.html"
 grep -q 'head swift-tui-terminal-view$' "$site_root/Website/dist/docs/terminal-view/index.html"

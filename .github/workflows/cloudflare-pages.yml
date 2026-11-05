@@ -22,9 +22,8 @@ on:
         required: false
         type: string
       docs_ref:
-        description: Public branch or tag to document across framework, Charts, and TerminalView
-        required: true
-        default: "main"
+        description: Optional all-branch preview override (blank uses each curated DocC ref)
+        required: false
         type: string
 
 permissions:

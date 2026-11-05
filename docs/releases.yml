@@ -2,6 +2,8 @@ current:
   swiftTUI: 0.20.1
   charts: 0.20.1
   terminalView: 0.20.1
+  swiftUI: 0.20.1
+  android: 0.20.1
   web: 0.20.1
   examplesRef: 0.20.1
   counterDemoRef: 0.20.1
@@ -26,3 +28,7 @@ repos:
     url: https://github.com/SwiftTUI/swift-tui-examples
   swift-tui-counter-demo:
     url: https://github.com/SwiftTUI/swift-tui-counter-demo
+  swift-tui-android:
+    url: https://github.com/SwiftTUI/swift-tui-android
+  swift-tui-site:
+    url: https://github.com/SwiftTUI/swift-tui-site

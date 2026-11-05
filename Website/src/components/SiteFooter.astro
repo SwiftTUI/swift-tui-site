@@ -1,10 +1,9 @@
 ---
-import pkg from "../../package.json";
+import { frameworkVersion, siteVersion } from "../lib/site-releases";
 import Mark from "./Mark.astro";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const year = new Date().getFullYear();
-const version = pkg.version;
 
 type FooterLink = { href: string; label: string; external?: boolean };
 const columns: { title: string; links: FooterLink[] }[] = [
@@ -59,13 +58,14 @@ const columns: { title: string; links: FooterLink[] }[] = [
       </a>
       <p>SwiftUI semantics, drawn in terminal cells.</p>
       <p class="footer-version mono">
-        {version} ·{" "}
+        Framework {frameworkVersion} ·{" "}
         <a
-          href={`https://github.com/SwiftTUI/swift-tui/blob/${version}/CHANGELOG.md`}
+          href={`https://github.com/SwiftTUI/swift-tui/blob/${frameworkVersion}/CHANGELOG.md`}
           rel="noreferrer noopener"
         >
           changelog
         </a>
+        {" · "}Site {siteVersion}
       </p>
     </div>
 
@@ -99,7 +99,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
       <a href="https://optional.dev" rel="noreferrer noopener">OPTIONAL.DEV</a>
     </span>
     <a
-      href={`https://github.com/SwiftTUI/swift-tui/blob/${version}/LICENSE`}
+      href={`https://github.com/SwiftTUI/swift-tui/blob/${frameworkVersion}/LICENSE`}
       rel="noreferrer noopener"
     >
       MIT License

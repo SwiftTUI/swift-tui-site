@@ -15,8 +15,8 @@ set -euo pipefail
 # When the variable for a repo is set it MUST point at an existing directory —
 # the script fails loudly rather than silently cloning a public tag while a
 # pre-tag overlay intended to test local source.
-# DOCC_SOURCE_REF defaults to main for current documentation. Set it to an
-# empty string to use the manifest refs, or to a shared tag for that snapshot.
+# Each archive defaults to its own curated manifest ref. Set DOCC_SOURCE_REF
+# explicitly (for example to main) for an all-branch preview or shared snapshot.
 # Local checkout inputs take precedence. Package dependencies remain tagged.
 #
 # The manifest is a `swiftRepos:` block list of flat `key: value` mappings:
@@ -37,7 +37,7 @@ site_root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 manifest_path="${site_root}/docs/docc-repos.yml"
 work_root="${site_root}/.build-docs-work"
 website_dist="${site_root}/Website/dist"
-DOCC_SOURCE_REF="${DOCC_SOURCE_REF-main}"
+DOCC_SOURCE_REF="${DOCC_SOURCE_REF-}"
 # A leading alphanumeric keeps every accepted ref from reading as a git option.
 ref_pattern='^[A-Za-z0-9][A-Za-z0-9._/+-]*$'
 

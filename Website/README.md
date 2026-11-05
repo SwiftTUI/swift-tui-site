@@ -51,9 +51,11 @@ path is resolved from this directory. Full website builds generate DocC from
 the repositories in `../docs/docc-repos.yml`. Then the builds copy the archive
 to `Website/dist/docs/`.
 
-The deployment workflow documents `main` through its `docs_ref` input, and local
-documentation builds also default to `main`. Set `DOCC_SOURCE_REF` to a shared
-tag to build that snapshot, or to an empty string to use the manifest refs.
+Local documentation builds and the deployment workflow use each curated
+`docc-repos.yml` ref by default. Explicitly set `DOCC_SOURCE_REF` or the workflow's
+optional `docs_ref` to `main` for an all-branch preview, or to a shared tag for
+that snapshot. The footer distinguishes the selected framework version from
+this site's package version; its changelog link follows the framework selection.
 The guides describe current behavior without a release
 history; package installation examples remain concrete and reproducible.
 
