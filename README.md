@@ -141,3 +141,8 @@ exact source revision and CORS headers before publishing the main site.
 MIT. See [LICENSE](LICENSE). The build creates the DocC archive under `/docs/`
 from the separate [`swift-tui`](https://github.com/SwiftTUI/swift-tui)
 repository. That repository also uses the MIT license.
+
+## Version compatibility
+
+See the [compatibility policy](docs/COMPATIBILITY.md) for supported minor lines,
+independent dependency adoption, and experimental interfaces.
