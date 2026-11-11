@@ -42,8 +42,8 @@ The full artifact has this layout:
 
 ## WebExample and DocC inputs
 
-The `0.20.1` public beta build fetches the tagged `swift-tui-counter-demo`
-repo into `.build/public-inputs/` and uses the WebExample release-tarball
+The public build fetches the `swift-tui-counter-demo` tag selected in
+`docs/releases.yml` into `.build/public-inputs/` and uses the WebExample release-tarball
 dependencies recorded there. To test unpublished changes, point the build at a
 local WebExample checkout instead:
 
@@ -94,7 +94,8 @@ contains three independent static deployments, each checked against the Free
 plan's 20,000-file and 25 MiB single-file limits:
 
 - `site/`: the website, all three DocC application shells and search indexes, and
-  the compressed browser demo, deployed to the existing `swift-tui` project.
+  the compressed browser demo, deployed to the project selected by the
+  `CLOUDFLARE_PAGES_PROJECT` repository variable (default: `swift-tui`).
 - `views/`: SwiftTUIViews DocC JSON, deployed to `swift-tui-docc-views`.
 - `other/`: the remaining framework, Charts, and TerminalView DocC JSON, plus
   any complete Views symbol directories that overflow the first data project's

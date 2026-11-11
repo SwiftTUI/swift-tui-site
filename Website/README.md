@@ -53,8 +53,9 @@ to `Website/dist/docs/`.
 
 Local documentation builds and the deployment workflow use each curated
 `docc-repos.yml` ref by default. Explicitly set `DOCC_SOURCE_REF` or the workflow's
-optional `docs_ref` to `main` for an all-branch preview, or to a shared tag for
-that snapshot. The footer distinguishes the selected framework version from
+optional `docs_ref` to `main` for an all-branch preview. A shared-tag override
+is valid only for an explicitly synchronized snapshot; ordinary independent
+releases keep the per-repository curated refs. The footer distinguishes the selected framework version from
 this site's package version; its changelog link follows the framework selection.
 The guides describe current behavior without a release
 history; package installation examples remain concrete and reproducible.
