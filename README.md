@@ -144,5 +144,5 @@ repository. That repository also uses the MIT license.
 
 ## Version compatibility
 
-See the [compatibility policy](docs/COMPATIBILITY.md) for supported minor lines,
+See the [compatibility policy](docs/COMPATIBILITY.md) for supported major lines,
 independent dependency adoption, and experimental interfaces.
